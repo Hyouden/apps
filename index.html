@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>App Shelf</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#F2F5F3;--card:#FFFFFF;--fg:#1F2A25;--muted:#5A6661;--line:#D6E2DB;--accent:#34536E;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#141A17;--card:#1E2622;--fg:#EAF0EC;--muted:#A3B0A9;--line:#2E3A34;--accent:#9EC3E0;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 Nunito,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding-block:40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:24px}
+h1{font:800 2.2rem/1.1 "Baloo 2",system-ui,sans-serif;margin:0;color:var(--accent)}
+p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+a.app{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;text-decoration:none;color:inherit;min-width:0}
+a.app:hover,a.app:focus-visible{border-color:var(--accent);outline:none}
+a.app img{width:64px;height:64px;border-radius:16px}
+a.app b{display:block;font-size:1.05rem}
+a.app span{font-size:.88rem;color:var(--muted)}
+</style>
+</head><body>
+<main>
+  <div><h1>App Shelf</h1><p>Little apps, made for friends and family. Open one on your phone, then add it to your home screen.</p></div>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+// Add one line here for each new app folder.
+const APPS = [
+  { folder: "jennys-garden", name: "Jenny's Delivery Garden", blurb: "Regenerative farming with Farm G.O.A.T. Brenda" },
+];
+const grid = document.getElementById("grid");
+for (const a of APPS) {
+  const el = document.createElement("a");
+  el.className = "app"; el.href = a.folder + "/";
+  const img = document.createElement("img"); img.src = a.folder + "/icons/icon-192.png"; img.alt = "";
+  const t = document.createElement("div"); const b = document.createElement("b"); b.textContent = a.name;
+  const s = document.createElement("span"); s.textContent = a.blurb; t.append(b, s);
+  el.append(img, t); grid.append(el);
+}
+</script>
+</body></html>

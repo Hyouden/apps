@@ -1,0 +1,629 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#34536E">
+<meta name="description" content="Jenny's regenerative farming care plan, guided by Farm G.O.A.T. Brenda.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jenny's Garden">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<title>Jenny's Delivery Garden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: a phone-first app — sticky header, one scrolling view, fixed bottom tab bar like a unit's charting tablet */
+/* Layout: phone-first app, denim header, mint ground, Brenda's speech bubbles open each screen, fixed tab bar */
+:root{
+  --bg:#F2F8F4; --surface:#FFFFFF; --sunk:#EBF0EE; --line:#D2E7DC;
+  --fg:#26302C; --muted:#5A6661;
+  --loam:#34536E; --denim:#34536E; --hay:#F3D27A; --haysoft:#F8E7B5; --haytext:#6B4E12; --mint:#9ED8BF;
+  --scrub:#2F7D68; --scrub-ink:#FFFFFF; --sprout:#3E9A7D; --blush:#6B4E12;
+  --ok:#2F7D46; --warn:#9A6A0C; --bad:#B23B3B;
+  --f-display:"Baloo 2",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Nunito",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--loam)}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0}
+a{color:var(--scrub)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--scrub);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--denim);color:#FFFFFF;border-radius:0 0 22px 22px}
+header.top .wrap{padding-block:14px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+header.top h1{font-size:1.3rem}
+header.top .tag{font-weight:800;font-size:.85rem;color:var(--hay)}
+
+main{padding-block:20px 110px}
+.view{display:flex;flex-direction:column;gap:20px}
+.eyebrow{font-family:var(--f-mono);font-weight:800;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:60ch}
+.panel{background:var(--surface);border:1.5px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+
+/* Home: due-date card */
+.due{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.ring{width:118px;height:118px;max-width:100%}
+.ring text{font-family:var(--f-mono);fill:var(--fg)}
+.due h2{font-size:1.6rem}
+.stage-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stage{border-radius:10px;padding:10px 8px;background:var(--sunk);font-size:.78rem;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stage b{font-family:var(--f-mono);font-weight:500;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stage.on{background:var(--sprout);color:#FFFFFF}
+.stage.on b{color:inherit;opacity:.85}
+.stage.done{background:color-mix(in srgb,var(--sprout) 22%,var(--surface))}
+.next{background:var(--haysoft);border-color:var(--haysoft)}
+.next .eyebrow{color:var(--haytext)}
+.btn{border:0;border-radius:999px;padding:12px 20px;min-height:44px;background:var(--denim);color:#FFFFFF;font-weight:800;align-self:flex-start;text-decoration:none;display:inline-flex;align-items:center}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--fg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* Plan */
+.tri{display:flex;flex-direction:column;gap:12px}
+.tri-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.tri-head h2{font-size:1.35rem}
+.pill{font-family:var(--f-mono);font-size:.7rem;padding:4px 9px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.go{background:var(--sprout);color:#FFFFFF}
+.pill.done{background:var(--sprout);color:var(--surface)}
+.goals{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.locked{opacity:.5}
+.lockmsg{font-size:.88rem;color:var(--muted);background:var(--sunk);border-radius:10px;padding:10px 12px}
+.task{border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+.task summary{list-style:none;display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:12px;cursor:pointer}
+.task summary::-webkit-details-marker{display:none}
+.chk{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;font-size:.8rem;color:var(--surface)}
+.task.is-done .chk{background:var(--sprout);border-color:var(--sprout)}
+.task.is-done .t-title{text-decoration:line-through;text-decoration-color:var(--muted)}
+.t-title{font-weight:600;min-width:0}
+.t-time{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.t-body{padding:0 14px 14px 50px;display:flex;flex-direction:column;gap:10px;font-size:.95rem}
+.t-body ol{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.ld{background:var(--haysoft);border-radius:10px;padding:10px 12px;font-size:.9rem}
+.ld b{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--blush);display:block;margin-bottom:2px}
+.safety{font-size:.85rem;color:var(--muted)}
+.t-actions{display:flex;gap:8px;flex-wrap:wrap}
+.linkbtn{background:none;border:0;padding:0;color:var(--scrub);text-decoration:underline;font-size:.9rem}
+
+/* Quiz */
+.quiz{border-top:1px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:14px}
+.q{display:flex;flex-direction:column;gap:8px}
+.q p{font-weight:600}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px}
+.opt.pick{border-color:var(--scrub);background:color-mix(in srgb,var(--scrub) 10%,var(--surface))}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.opt.wrong{border-color:var(--bad)}
+.why{font-size:.88rem;color:var(--muted)}
+.signoff{font-family:var(--f-display);font-size:1.05rem;color:var(--ok)}
+
+/* APGAR */
+.scale{width:100%;border-collapse:collapse;font-size:.85rem}
+.scale th,.scale td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.scale th{font-family:var(--f-mono);font-weight:500;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.scale td:first-child{font-weight:600;white-space:nowrap}
+.tbl{overflow-x:auto}
+label{font-weight:600;font-size:.9rem}
+input[type=text],input[type=date],textarea,select{width:100%;font:inherit;color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:70px;resize:vertical}
+.field{display:flex;flex-direction:column;gap:6px}
+.score-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding-block:8px;border-bottom:1px solid var(--line)}
+.score-row .nm{font-weight:600}
+.score-row .hint{font-size:.8rem;color:var(--muted)}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--bg);width:42px;padding:8px 0;font-family:var(--f-mono)}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button.on{background:var(--scrub);color:var(--scrub-ink)}
+.total{display:flex;align-items:baseline;gap:10px}
+.total .num{font-family:var(--f-mono);font-size:2.4rem;font-variant-numeric:tabular-nums}
+.verdict{font-weight:600}
+.v-ok{color:var(--ok)} .v-warn{color:var(--warn)} .v-bad{color:var(--bad)}
+.hist{display:flex;flex-direction:column;gap:8px}
+.hrow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.hrow .sc{font-family:var(--f-mono);font-size:1.3rem;font-variant-numeric:tabular-nums;min-width:2.2ch;text-align:center}
+.hrow .meta{font-size:.82rem;color:var(--muted)}
+.del{background:none;border:0;color:var(--muted);font-size:.8rem;text-decoration:underline}
+.empty{color:var(--muted);font-size:.92rem;background:var(--sunk);border-radius:10px;padding:14px}
+
+/* Chart (SOAP notes) */
+.soap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.field{min-width:0}
+input[type=date]{min-width:0;max-width:100%;display:block;-webkit-appearance:none;appearance:none;min-height:44px;text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+@media (max-width:480px){.soap{grid-template-columns:1fr}.due{grid-template-columns:1fr;justify-items:start}}
+.note{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.note .nh{display:flex;justify-content:space-between;gap:10px;font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.note dl{margin:0;display:grid;grid-template-columns:1.4em 1fr;gap:4px 8px}
+.note dt{font-family:var(--f-mono);font-weight:500;color:var(--scrub)}
+.note dd{margin:0;min-width:0;overflow-wrap:anywhere}
+
+/* Reference */
+.search{position:relative}
+.refs{display:flex;flex-direction:column;gap:10px}
+.ref{border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.ref summary{list-style:none;padding:14px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.ref summary::-webkit-details-marker{display:none}
+.ref summary h3{font-size:1.05rem}
+.ref .r-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;font-size:.95rem}
+.ref ul{margin:0;padding-left:1.1em}
+.ref.flash{outline:3px solid var(--blush)}
+
+/* Tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+nav.tabs .row{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 10px;text-decoration:none;color:var(--muted);font-size:.7rem;font-weight:600}
+nav.tabs a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs a[aria-current="page"]{color:var(--scrub)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--fg);color:#FFFFFF;font-weight:700;padding:10px 16px;border-radius:999px;font-size:.88rem;z-index:7}
+.savenote{font-size:.78rem;color:var(--muted)}
+/* Brenda */
+.brenda{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
+.brenda svg{flex:none}
+.bubble{background:var(--surface);border:2.5px solid var(--fg);border-radius:18px;padding:12px 14px;box-shadow:4px 4px 0 var(--mint);min-width:0;display:flex;flex-direction:column;gap:3px}
+.bubble .hi{font-family:var(--f-display);font-weight:800;font-size:1.05rem;line-height:1.15;color:var(--denim)}
+.bubble .msg{font-size:.92rem;line-height:1.4}
+.bubble .sig{font-size:.75rem;font-weight:800;color:var(--scrub)}
+.overlay{position:fixed;inset:0;z-index:20;background:var(--denim);color:#FFFFFF;overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.overlay .in{max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:16px;padding-block:18px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ov-top{display:flex;justify-content:space-between;align-items:center}
+.dots{display:flex;gap:6px}.dots i{width:8px;height:8px;border-radius:4px;background:#6E89A1}.dots i.on{width:22px;background:var(--hay)}
+.ov-skip{background:none;border:0;color:#DCE6EE;font-weight:700;min-height:44px}
+.ov-head{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.ov-head h2{font-size:1.9rem;color:#FFFFFF}
+.ov-head .who{color:var(--hay);font-weight:800}
+.ov-card{background:var(--surface);color:var(--fg);border-radius:24px;padding:18px;box-shadow:4px 4px 0 var(--mint);display:flex;flex-direction:column;gap:12px;font-size:.98rem;line-height:1.45}
+.ov-card ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.ov-next{margin-top:auto;background:var(--hay);color:var(--fg);border:0;border-radius:999px;min-height:52px;font-weight:800;font-size:1rem}
+@media (prefers-reduced-motion:no-preference){.ring .arc{transition:stroke-dashoffset .8s ease}}
+</style>
+
+<header class="top"><div class="wrap"><h1>Jenny's Delivery Garden</h1><span class="tag">a Labor of Loam</span></div></header>
+
+<main class="wrap">
+  <section class="view" id="v-home"></section>
+  <section class="view" id="v-plan" hidden></section>
+  <section class="view" id="v-apgar" hidden></section>
+  <section class="view" id="v-chart" hidden></section>
+  <section class="view" id="v-ref" hidden></section>
+</main>
+
+<nav class="tabs" aria-label="Sections"><div class="row">
+  <a href="#home" data-v="home"><svg viewBox="0 0 24 24"><path d="M12 21c-4-3-7-6.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 3.5-3 7-7 10z"/></svg>Home</a>
+  <a href="#plan" data-v="plan"><svg viewBox="0 0 24 24"><path d="M12 21V11"/><path d="M12 11c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 14c0-3-2-5-6-5 0 3 2 5 6 5z"/></svg>Care plan</a>
+  <a href="#apgar" data-v="apgar"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>Soil APGAR</a>
+  <a href="#chart" data-v="chart"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Farm chart</a>
+  <a href="#ref" data-v="ref"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Reference</a>
+</div></nav>
+<div class="toast" id="toast" hidden></div>
+<div class="overlay" id="overlay" hidden></div>
+
+<script>
+/* ---------------- Content ---------------- */
+const TRIS = [
+ { id:"t1", stage:"First trimester", nick:"Crawl", title:"One bed, one baby",
+   intro:"Everything starts small. You'll care for a single garden bed and learn to read soil the way you read a patient.",
+   goals:["Explain why soil is alive, not just dirt","Name the 5 principles of soil health","Take a baseline Soil APGAR and know what the numbers mean","Feed one bed without tilling it"],
+   farm:"By the end, one bed on your farm is fed, covered and charted. It becomes your control group for everything that follows.",
+   tasks:[
+    {id:"t1a",title:"Choose your bed and take baseline vitals",time:"1 afternoon",ref:"principles",
+     why:"You can't see improvement without a baseline. Pick one bed you already grow in and score it before you change anything.",
+     steps:["Pick one bed you'd like to improve, not your best one","Dig a spade-deep hole and look, smell and count earthworms","Score it on the Soil APGAR tab and snap a photo for your records"],
+     ld:"This is the admission assessment. Everything later gets compared to today's numbers."},
+    {id:"t1b",title:"The jar test",time:"20 min + 2 days settling",ref:"texture",
+     why:"Shows what your soil is made of: sand, silt and clay settle into layers you can see.",
+     steps:["Fill a mason jar a third with soil from your bed","Top up with water and a teaspoon of dish soap, shake hard for 3 minutes","Mark the layers at 1 minute (sand), 2 hours (silt) and 2 days (clay)"],
+     ld:"Think of it as a soil blood draw that separates in the tube. Each layer tells you something different."},
+    {id:"t1c",title:"The infiltration test",time:"30 min",ref:"water",
+     why:"Healthy soil drinks water like a sponge. Compacted soil lets it run off.",
+     steps:["Push a tin can with both ends removed 3 inches into the bed","Pour in 1 inch of water and time how long it takes to soak in","Write the time in your farm chart. Under 10 minutes is great"],
+     ld:"Like capillary refill time. Faster means better circulation."},
+    {id:"t1d",title:"Feed the bed with alpaca beans and mulch",time:"1 weekend morning",ref:"manure",
+     why:"Alpaca manure is gentle and low in salts, so it's a safe first feed. Mulch keeps the soil covered and the soil life fed.",
+     steps:["Spread a thin layer of alpaca beans across the bed","Cover with 2–3 inches of straw, leaves or wood chips","Leave it. No digging it in"],
+     ld:"First feeding. Small, gentle and regular beats big and rich.",
+     safety:"Wear gloves and wash produce. Keep fresh manure off anything you'll harvest within 90–120 days."},
+    {id:"t1e",title:"Retire the tiller for this bed",time:"Ongoing",ref:"nodig",
+     why:"Tilling tears up the fungal networks that feed plant roots. From now on this bed only gets added to from the top.",
+     steps:["Plant straight into the mulch by pulling it aside","Pull weeds by hand or smother them with more mulch","Note anything new you see in your chart: worms, fungi, beetles"],
+     ld:"Minimize disturbance. The same reason you don't wake a sleeping newborn for no reason."}
+   ],
+   quiz:[
+    {q:"Which of these is one of the 5 principles of soil health?",o:["Till every spring to loosen soil","Keep the soil covered","Leave beds bare over winter"],a:1,why:"Bare soil loses moisture and life. Mulch or living plants should always cover it."},
+    {q:"In the jar test, which layer settles first?",o:["Clay","Silt","Sand"],a:2,why:"Sand is heaviest, so it drops out within a minute. Clay can take days."},
+    {q:"Why is alpaca manure a good first feed for your bed?",o:["It's low in salts and gentle on plants","It kills weeds","It replaces the need for mulch"],a:0,why:"Alpaca beans are mild compared with other manures, so they're less likely to burn plants."}
+   ]},
+ { id:"t2", stage:"Second trimester", nick:"Walk", title:"Feeding the whole garden",
+   intro:"Now you build the systems that make fertility on your farm, using the animals you already have.",
+   goals:["Make compost from your goat and cow manure","Run a worm bin and understand what castings do","Turn the chicken run into a compost maker with deep litter","Keep living roots in the ground with cover crops"],
+   farm:"By the end, your animals' waste becomes your garden's food, and every bed is covered year-round.",
+   tasks:[
+    {id:"t2a",title:"Start a worm bin",time:"1 afternoon",ref:"worms",
+     why:"Worms turn kitchen scraps into castings, one of the richest soil foods there is. Great for seedlings and the greenhouse later.",
+     steps:["Drill air holes in a storage tote and add damp shredded cardboard","Add a pound of red wigglers and a handful of garden soil","Feed vegetable scraps once a week, buried under the bedding"],
+     ld:"A nursery. Keep it warm, damp and fed little and often."},
+    {id:"t2b",title:"Build a hot compost pile",time:"1 weekend + turning",ref:"compost",
+     why:"Composting goat and cow manure with garden scraps kills pathogens and weed seeds, then makes food for every bed.",
+     steps:["Layer roughly 2 parts browns (straw, leaves) to 1 part greens (manure, scraps)","Build it at least 3×3×3 feet and keep it as damp as a wrung-out sponge","Check the temperature and turn it when it drops"],
+     ld:"A good pile runs a fever: 131–160°F for several days is what kills the bad stuff. Check it with a compost thermometer like you'd chart a temp.",
+     safety:"Raw cow and goat manure should be fully composted before it goes near food crops."},
+    {id:"t2c",title:"Deep litter in the chicken run",time:"1 morning, then top up",ref:"deeplitter",
+     why:"The chickens' run stays where it is. You just add carbon and let them do the turning and the fertilizing.",
+     steps:["Spread 6 inches of wood chips, leaves or straw across the run","Add a fresh layer whenever it smells or looks wet","Every 6–12 months, harvest the bottom layer as finished compost"],
+     ld:"Like changing bedding on a schedule. Nothing has to move. The run just becomes a compost maker."},
+    {id:"t2d",title:"Sow a cover crop",time:"1 afternoon",ref:"cover",
+     why:"Living roots feed soil life even in the off-season and stop beds sitting bare.",
+     steps:["After a harvest, scatter a cover mix such as winter rye, crimson clover or vetch","Rake it lightly and water it in","In spring, cut it down and leave it on top as mulch"],
+     ld:"Keeping the soil 'on the breast': constant living nourishment from roots."},
+    {id:"t2e",title:"Second Soil APGAR",time:"30 min",ref:"apgar",
+     why:"Score your first bed again and compare it with your baseline.",
+     steps:["Repeat the spade test on your first bed","Score it on the Soil APGAR tab","Compare with your baseline in the history list"],
+     ld:"The 5-minute APGAR. Is the baby responding to care?"}
+   ],
+   quiz:[
+    {q:"What temperature shows a hot compost pile is working?",o:["70–90°F","131–160°F","Above 200°F"],a:1,why:"Holding 131–160°F for several days kills pathogens and weed seeds."},
+    {q:"With deep litter, what do you add to the chicken run?",o:["Carbon like wood chips or straw","Fresh manure","Nothing, just rake it"],a:0,why:"Carbon balances the nitrogen in chicken droppings and turns the run into compost."},
+    {q:"Why sow a cover crop in the off-season?",o:["To sell the harvest","Living roots keep feeding soil life and cover the ground","It replaces compost forever"],a:1,why:"Roots feed soil microbes year-round, and the plants keep the soil covered."}
+   ]},
+ { id:"t3", stage:"Third trimester", nick:"Run", title:"Connecting the whole farm",
+   intro:"Time to tie it all together. You scale what worked on one bed and link the animals, compost and greenhouse into one loop.",
+   goals:["Convert all your garden beds to no-dig","Plan a greenhouse that runs on compost","Draw your farm's nutrient loop","Read three APGARs as a trend, not a snapshot"],
+   farm:"By the end, every part of the farm feeds another part. That's the definition of regenerative.",
+   tasks:[
+    {id:"t3a",title:"Convert every bed to no-dig",time:"A few weekends",ref:"nodig",
+     why:"Your first bed proved it works. Now roll it out.",
+     steps:["Lay cardboard over weeds or grass, overlapping the edges","Top with 3–4 inches of your own compost","Plant straight into it and keep it mulched"],
+     ld:"Scaling a protocol that worked on one patient to the whole unit."},
+    {id:"t3b",title:"Plan the greenhouse",time:"Planning weekend",ref:"greenhouse",
+     why:"A greenhouse extends your season. A compost pile inside or against it can add gentle heat.",
+     steps:["Pick a sunny, level spot near water and your compost","Plan beds filled with compost and worm castings","Sketch where a compost heat bay could sit along one wall"],
+     ld:"The NICU of your farm: a warm, protected place for the youngest plants."},
+    {id:"t3c",title:"Map your nutrient loop",time:"1 evening",ref:"loop",
+     why:"Seeing the whole cycle on paper shows you what's wasted and where to connect it.",
+     steps:["Draw each part of the farm: animals, run, compost, worms, beds, greenhouse","Draw arrows for what flows where: manure, scraps, castings, food","Circle any arrow that leaves the farm and ask how to bring it back"],
+     ld:"Like mapping the circulatory system. Every output should become someone else's input."},
+    {id:"t3d",title:"Third Soil APGAR and trend review",time:"1 hour",ref:"apgar",
+     why:"Three readings make a trend. This is how you'll know your farm is thriving.",
+     steps:["Score your first bed again plus one newer bed","Compare all your scores in the history list","Write an assessment and plan in your farm chart"],
+     ld:"Reading the whole flow sheet, not just the latest vitals."}
+   ],
+   quiz:[
+    {q:"What goes down first when you build a no-dig bed on top of grass?",o:["Compost","Cardboard","Seeds"],a:1,why:"Cardboard smothers the grass and weeds. Compost goes on top of it."},
+    {q:"How can compost help a greenhouse?",o:["It gives off gentle heat while it breaks down","It replaces the need for sun","It keeps pests out"],a:0,why:"Decomposition makes heat, which can warm a greenhouse in cold months."},
+    {q:"What makes a farm 'regenerative'?",o:["Using the newest equipment","Each part feeding another so soil gets healthier every year","Never keeping animals"],a:1,why:"The goal is a closed loop where soil health improves over time."}
+   ]}
+];
+
+const REFS = [
+ {id:"principles",title:"The 5 principles of soil health",sum:"The foundation of everything in this app.",
+  body:"<p>Regenerative farming means farming in a way that leaves the soil healthier every year. Most programs boil it down to five principles:</p><ul><li><b>Minimize disturbance:</b> less tilling and digging.</li><li><b>Keep the soil covered:</b> mulch or plants, never bare.</li><li><b>Keep living roots in the ground:</b> as many months as possible.</li><li><b>Grow diversity:</b> many kinds of plants, not just one.</li><li><b>Integrate animals:</b> their manure and activity feed the soil.</li></ul>",
+  links:[["USDA NRCS: Soil health","https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soil/soil-health"],["Rodale Institute","https://rodaleinstitute.org/"]]},
+ {id:"apgar",title:"The Soil APGAR",sum:"A quick 0–10 score for a garden bed, borrowed from the delivery room.",
+  body:"<p>Score five things from 0 to 2: Appearance (color), Pulse (earthworms), Grimace (smell), Activity (how water soaks in) and Respiration (crumbly structure). 7–10 is thriving, 4–6 needs support, 0–3 needs intensive care.</p><p>Score the same beds at the same time of year so the trend means something.</p>",links:[]},
+ {id:"texture",title:"Soil texture and the jar test",sum:"Sand, silt and clay, and why the mix matters.",
+  body:"<p>Sand drains fast, clay holds water and nutrients but compacts, and silt sits in between. A mix called loam is the gardener's ideal. You can't change texture much, but adding organic matter improves how any soil behaves.</p>",
+  links:[["USDA NRCS: Soil health","https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soil/soil-health"]]},
+ {id:"water",title:"Water infiltration",sum:"How fast soil drinks, and why it's a health sign.",
+  body:"<p>Healthy soil is full of pores made by roots, worms and fungi, so rain soaks in instead of running off. Compaction and tilling crush those pores. Faster infiltration over time is one of the clearest signs your work is paying off.</p>",links:[]},
+ {id:"manure",title:"Using animal manure safely",sum:"Which manures go where, and when.",
+  body:"<ul><li><b>Alpaca:</b> mild and low in salts. Can go on beds directly as a thin layer.</li><li><b>Goat:</b> pelleted and fairly mild, but best composted.</li><li><b>Cow:</b> compost it first to kill pathogens and weed seeds.</li><li><b>Chicken:</b> very high in nitrogen and can burn plants. Compost it or use deep litter.</li></ul><p>For food safety, the usual rule for raw manure is to apply it 90 days before harvest for crops that don't touch the soil and 120 days for crops that do. Fully composted manure doesn't have that wait. Gloves on, and wash produce.</p>",
+  links:[["Rodale Institute","https://rodaleinstitute.org/"]]},
+ {id:"nodig",title:"No-dig gardening",sum:"Build soil from the top down instead of turning it over.",
+  body:"<p>Instead of tilling, you add compost and mulch on top and plant into it. Soil life stays intact, weeds get smothered, and the soil improves every season. Charles Dowding is the best-known teacher of this method and has many free videos.</p>",
+  links:[["Charles Dowding: No dig","https://charlesdowding.co.uk/"]]},
+ {id:"compost",title:"Hot composting",sum:"Turning manure and scraps into black gold.",
+  body:"<p>Mix carbon-rich browns (straw, leaves, cardboard) with nitrogen-rich greens (manure, scraps, grass) at about 2:1. Keep it damp and big enough to heat up, at least 3 feet on each side. Turn it when the temperature drops. It's ready when it's dark, crumbly and smells like a forest floor.</p>",links:[]},
+ {id:"worms",title:"Worm bins (vermicomposting)",sum:"A small, tidy way to make the richest soil food.",
+  body:"<p>Red wiggler worms eat scraps and leave castings full of nutrients and microbes. Keep the bin out of hot sun and freezing cold, damp but not wet. Avoid meat, dairy, oils and citrus. Harvest castings every few months.</p>",links:[]},
+ {id:"deeplitter",title:"Deep litter for chickens",sum:"Composting right where the hens already live.",
+  body:"<p>Keep a thick layer of carbon bedding in the coop or run and keep adding to it. The chickens scratch and turn it, their droppings add nitrogen, and the bottom layer slowly becomes compost. Done well, it doesn't smell. If it does, add more carbon.</p>",links:[]},
+ {id:"cover",title:"Cover crops",sum:"Plants grown to feed the soil rather than you.",
+  body:"<p>Rye, oats, clover, vetch and radish are common choices. Grasses add lots of organic matter, legumes like clover pull nitrogen from the air, and radishes break up compaction. Mixes give you all three. Cut them down before they set seed and leave them as mulch.</p>",
+  links:[["USDA SARE: Cover crops","https://www.sare.org/resources/cover-crops/"]]},
+ {id:"greenhouse",title:"Greenhouse growing",sum:"Extending the season with protected beds.",
+  body:"<p>Fill greenhouse beds with your best compost and worm castings, keep them mulched and no-dig like the rest of the garden, and rotate crops. A compost pile built against an inside wall can add gentle warmth in winter. Vent well on sunny days.</p>",links:[]},
+ {id:"loop",title:"The nutrient loop",sum:"How a regenerative farm feeds itself.",
+  body:"<p>Animals eat feed and forage, their manure and bedding become compost, compost and castings feed the beds and greenhouse, and the garden's scraps go back to the animals, worms or pile. Every output becomes an input somewhere else, so less has to be bought in each year.</p>",links:[]}
+];
+
+const MORE = {
+ principles:[["Kiss the Ground: films and a short intro course","https://kisstheground.com/"],["Kiss the Ground (documentary)","https://kissthegroundmovie.com"]],
+ apgar:[["USDA soil quality test kit guide (archived PDF)","https://webarchive.library.unt.edu/web/20121018235522/http:/soils.usda.gov/sqi/assessment/files/test_kit_fact_sheet.pdf"],["USDA NRCS: Soil health","https://www.nrcs.usda.gov/conservation-basics/natural-resource-concerns/soil/soil-health"]],
+ texture:[["Clemson Extension: The jar test, step by step","https://hgic.clemson.edu/factsheet/soil-texture-analysis-the-jar-test/"],["Clemson Extension: Soil texture explained","https://hgic.clemson.edu/factsheet/soil-texture/"]],
+ water:[["USDA soil quality test kit guide (archived PDF)","https://webarchive.library.unt.edu/web/20121018235522/http:/soils.usda.gov/sqi/assessment/files/test_kit_fact_sheet.pdf"]],
+ manure:[["UW–Madison Extension: Safely using manure in the garden","https://hort.extension.wisc.edu/articles/safely-using-manure-garden/"],["FDA: Raw manure and produce safety","https://www.fda.gov/food/food-safety-modernization-act-fsma/raw-manure-under-fsma-final-rule-produce-safety"],["Ask Extension: Alpaca manure vs. horse and cow","https://ask2.extension.org/kb/faq.php?id=426651"],["SARE: Dewormer residue in manure and compost","https://projects.sare.org/sare_project/fne12-750/"]],
+ compost:[["EPA: Composting at home","https://www.epa.gov/recycle/composting-home"],["Rodale Institute","https://rodaleinstitute.org/"]],
+ worms:[["Rodale Institute: A simple guide to vermicomposting (PDF)","https://rodaleinstitute.org/wp-content/uploads/A-Simple-Guide-to-Vermicomposting-Rodale-Institute.pdf"],["WSU Extension: Worm composting handout (PDF)","https://wpcdn.web.wsu.edu/extension/uploads/sites/30/2024/10/Worm-Composting-Workshop-Handout-v2022.pdf"]],
+ deeplitter:[["Ask Extension: Deep litter in chicken coops","https://ask2.extension.org/kb/faq.php?id=409581"],["Mother Earth News: The deep litter method","https://www.motherearthnews.com/homesteading-and-livestock/deep-litter-method-zb0z1208zmat/"]],
+ cover:[["SARE: Managing Cover Crops Profitably (free book, PDF)","https://www.sare.org/wp-content/uploads/Managing-Cover-Crops-Profitably.pdf"]],
+ greenhouse:[["SARE: High tunnels and season extension (PDF)","https://sare.org/wp-content/uploads/High-Tunnels-and-Other-Season-Extension-Techniques.pdf"],["UW–Madison: Cold frames, high tunnels or greenhouses?","https://urbanagriculture.horticulture.wisc.edu/2016/01/21/cold-frames-high-tunnels-and-greenhouses-choose-a-growing-structure-best-for-you"],["UMass: High tunnels on a budget","https://www.umass.edu/agriculture-food-environment/greenhouse-floriculture/fact-sheets/high-tunnels-low-cost-seasonal-growth-space"]],
+ loop:[["Rodale Institute","https://rodaleinstitute.org/"],["Kiss the Ground","https://kisstheground.com/"]]
+};
+REFS.forEach(r=>{ const seen=new Set(r.links.map(l=>l[1])); (MORE[r.id]||[]).forEach(l=>{ if(!seen.has(l[1])){ r.links.push(l); seen.add(l[1]); } }); });
+
+const APGAR = [
+ {k:"A",nm:"Appearance",hint:"Soil color",s:["Pale, grey or dusty","Medium brown","Dark, rich brown"]},
+ {k:"P",nm:"Pulse",hint:"Earthworms in one spadeful",s:["None","1–4","5 or more"]},
+ {k:"G",nm:"Grimace",hint:"Smell",s:["Sour or no smell","Faint earthy","Sweet, like a forest floor"]},
+ {k:"A2",nm:"Activity",hint:"How fast 1 inch of water soaks in",s:["Puddles over 30 min","10–30 min","Under 10 min"]},
+ {k:"R",nm:"Respiration",hint:"Structure when you crumble it",s:["Hard clods or loose dust","Some crumbs","Crumbly like cottage cheese"]}
+];
+
+/* ---------------- State & storage ---------------- */
+const KEY="delivery-garden-v1";
+let S = {done:{}, quiz:{}, apgar:[], chart:[]};
+try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+let cloud=null, saveTimer=null;
+function save(){
+  try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  if(cloud){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ cloud.set({json:JSON.stringify(S),at:Date.now()}).catch(()=>{}); },600); }
+}
+
+
+/* ---------------- Helpers ---------------- */
+const $=s=>document.querySelector(s);
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const fmt=d=>{try{return new Date(d+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}catch(e){return d}};
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200)}
+const triDone=t=>t.tasks.every(x=>S.done[x.id]);
+const triPassed=t=>triDone(t)&&S.quiz[t.id];
+const triOpen=i=>i===0||triPassed(TRIS[i-1]);
+const allTasks=TRIS.flatMap(t=>t.tasks);
+function progress(){ const n=allTasks.filter(x=>S.done[x.id]).length+TRIS.filter(t=>S.quiz[t.id]).length; return n/(allTasks.length+TRIS.length); }
+function verdict(n){ return n>=7?["Thriving","v-ok"]:n>=4?["Needs support","v-warn"]:["Intensive care","v-bad"]; }
+
+/* ---------------- Brenda ---------------- */
+const brendaSvg=(w)=>`<svg width="${w}" height="${Math.round(w*130/120)}" viewBox="0 0 120 130" aria-hidden="true">       <ellipse cx="20" cy="64" rx="18" ry="8" transform="rotate(-22 20 64)" fill="#2A2A2E" stroke="#111114" stroke-width="2.5"></ellipse>       <ellipse cx="100" cy="64" rx="18" ry="8" transform="rotate(22 100 64)" fill="#2A2A2E" stroke="#111114" stroke-width="2.5"></ellipse>       <ellipse cx="22" cy="65" rx="10" ry="3.5" transform="rotate(-22 22 65)" fill="#D98F8F"></ellipse>       <ellipse cx="98" cy="65" rx="10" ry="3.5" transform="rotate(22 98 65)" fill="#D98F8F"></ellipse>       <ellipse cx="60" cy="72" rx="27" ry="31" fill="#2A2A2E" stroke="#111114" stroke-width="2.5"></ellipse>       <path d="M56 50 Q60 70 57 84 L63 84 Q60 70 64 50 Z" fill="#F4F1EA"></path>       <circle cx="47" cy="68" r="9" fill="#FFFFFF" stroke="#111114" stroke-width="2"></circle>       <circle cx="73" cy="68" r="9" fill="#FFFFFF" stroke="#111114" stroke-width="2"></circle>       <circle cx="44" cy="72" r="4.2" fill="#111114"></circle>       <circle cx="77" cy="64" r="4.2" fill="#111114"></circle>       <ellipse cx="60" cy="91" rx="14" ry="10" fill="#5B5B63" stroke="#111114" stroke-width="2"></ellipse>       <circle cx="55" cy="88" r="1.7" fill="#111114"></circle><circle cx="65" cy="88" r="1.7" fill="#111114"></circle>       <path d="M53 94 Q60 100 67 94" fill="none" stroke="#111114" stroke-width="2" stroke-linecap="round"></path>       <path d="M65 96 L98 84" stroke="#E2B93B" stroke-width="3.2" stroke-linecap="round"></path>       <path d="M90 87 L100 80 M92 88 L103 85" stroke="#E2B93B" stroke-width="2" stroke-linecap="round"></path>       <path d="M55 101 Q60 120 65 101 Z" fill="#3A3A40" stroke="#111114" stroke-width="1.8"></path>       <path d="M36 44 C33 24 40 12 49 15 Q55 22 60 20 Q65 22 71 15 C80 12 87 24 84 44 Z" fill="#E59AAE" stroke="#111114" stroke-width="2.5"></path>       <path d="M37 38 Q60 43 83 38" fill="none" stroke="#FBF3E6" stroke-width="5"></path>       <g transform="translate(75 39)"><circle cx="0" cy="-4" r="2.8" fill="#FFFFFF" stroke="#111114" stroke-width="0.8"></circle><circle cx="4" cy="0" r="2.8" fill="#FFFFFF" stroke="#111114" stroke-width="0.8"></circle><circle cx="0" cy="4" r="2.8" fill="#FFFFFF" stroke="#111114" stroke-width="0.8"></circle><circle cx="-4" cy="0" r="2.8" fill="#FFFFFF" stroke="#111114" stroke-width="0.8"></circle><circle cx="0" cy="0" r="2.4" fill="#E9B23A"></circle></g>       <path d="M8 38 Q14 50 34 47 Q60 54 86 47 Q106 50 112 38 Q106 44 90 41 Q60 47 30 41 Q14 44 8 38 Z" fill="#CF7690" stroke="#111114" stroke-width="2.5" stroke-linejoin="round"></path>     </svg>`;
+function brenda(hi,msg,w=96){return `<div class="brenda">${brendaSvg(w)}<div class="bubble"><div class="hi">${hi}</div><div class="msg">${msg}</div><div class="sig">Farm G.O.A.T. Brenda</div></div></div>`;}
+const TOUR=[
+ {h:"Howdy, Jenny!",who:"I'm Farm G.O.A.T. Brenda, your charge nurse.",body:"<p>This time your <b>farm</b> is the patient. Together we'll grow it from one garden bed to a whole farm that feeds itself, over three trimesters.</p>"},
+ {h:"Your care plan",who:"Crawl, walk, run.",body:"<p>Each trimester has a few small, weekend-sized tasks. Tap any task to see why it matters and learn more, or visit the Reference tab, where all sorts of learning materials are waiting for you.</p><ul><li>Finish every task in a trimester</li><li>Pass my 3-question sign-off</li><li>The next trimester unlocks</li></ul><p>No skipping ahead. Healthy babies take their time!</p>"},
+ {h:"Vitals and charting",who:"You already know how to do this part.",body:"<ul><li><b>Soil APGAR:</b> score a garden bed 0 to 10, just like a newborn</li><li><b>Farm chart:</b> jot SOAP notes after each task. If it isn't charted, it didn't happen!</li><li><b>Reference:</b> every idea explained, any time you're curious</li></ul>"},
+ {h:"Let's get started",who:"Your first patient is waiting.",body:"<p>Pick one garden bed, not your best one, and we'll take its baseline vitals together. I'll check in with you on every screen.</p>"}
+];
+let tourStep=0;
+function openTour(){tourStep=0;renderOverlay();}
+function renderOverlay(kind){
+  const ov=$("#overlay");
+  if(kind){ ov.innerHTML=`<div class="in"><div class="ov-head" style="margin-top:24px">${brendaSvg(170)}<h2>${kind.h}</h2><span class="who">${kind.who}</span></div><div class="ov-card">${kind.body}</div><button class="ov-next" data-ov="close">${kind.btn}</button></div>`; ov.hidden=false; return; }
+  const t=TOUR[tourStep];
+  ov.innerHTML=`<div class="in"><div class="ov-top"><div class="dots" aria-label="Step ${tourStep+1} of ${TOUR.length}">${TOUR.map((_,i)=>`<i class="${i===tourStep?"on":""}"></i>`).join("")}</div><button class="ov-skip" data-ov="close">Skip tour</button></div>
+   <div class="ov-head">${brendaSvg(150)}<h2>${t.h}</h2><span class="who">${t.who}</span></div>
+   <div class="ov-card">${t.body}</div>
+   <button class="ov-next" data-ov="${tourStep<TOUR.length-1?"next":"close"}">${tourStep<TOUR.length-1?"Next":"Meet my first patient"}</button></div>`;
+  ov.hidden=false;
+}
+$("#overlay").addEventListener("click",e=>{const b=e.target.closest("[data-ov]");if(!b)return;
+  if(b.dataset.ov==="next"){tourStep++;renderOverlay();$("#overlay").scrollTo(0,0);}
+  else{$("#overlay").hidden=true;if(!S.toured){S.toured=true;save();}}});
+const CELEBRATE={
+ t1:{h:"First trimester: signed off!",who:"Look at you go, Jenny.",body:"<p>Your first bed is fed, covered and charted. Now we build the systems that feed the whole garden: worms, compost, deep litter and cover crops.</p><p>Same deal as before: small tasks, then my sign-off.</p>",btn:"On to the second trimester"},
+ t2:{h:"Second trimester: signed off!",who:"Your animals are feeding your garden now.",body:"<p>That's the hard part done. The third trimester ties it all together: no-dig everywhere, the greenhouse and your farm's nutrient loop.</p>",btn:"On to the third trimester"},
+ t3:{h:"It's a farm!",who:"Delivered, healthy and thriving.",body:"<p>Every part of your farm now feeds another part. That's regenerative farming. Keep scoring your beds and charting, and it'll only get healthier from here.</p><p>So proud of you, Jenny.</p>",btn:"Celebrate"}
+};
+
+/* ---------------- Home ---------------- */
+function renderHome(){
+  const p=progress(), wk=Math.max(1,Math.round(p*40)), cur=TRIS.findIndex(t=>!triPassed(t));
+  const C=2*Math.PI*48, off=C*(1-p);
+  const nextT = cur===-1?null:TRIS[cur].tasks.find(x=>!S.done[x.id]);
+  const born = cur===-1;
+  const stages=TRIS.map((t,i)=>`<div class="stage ${triPassed(t)?"done":i===cur?"on":""}"><b>${t.nick}</b>${t.stage.replace(" trimester"," tri.")}</div>`).join("")+
+    `<div class="stage ${born?"on":""}"><b>Goal</b>Delivery</div>`;
+  const last=S.apgar[S.apgar.length-1];
+  const done=allTasks.filter(x=>S.done[x.id]).length;
+  const hm = born ? brenda("Congratulations, Jenny!","Your farm is delivered. Keep charting and scoring, and it'll keep getting healthier.")
+    : done===0 ? brenda("Mornin', Jenny!","First things first: pick one garden bed and let's take its baseline vitals.")
+    : triDone(TRIS[cur]) ? brenda("Sign-off time!",`All your ${TRIS[cur].stage.toLowerCase()} tasks are done. Pass my 3 questions in the care plan to unlock the next one.`)
+    : brenda("Mornin', Jenny!",`You're ${wk} weeks along. ${TRIS[cur].tasks.filter(x=>!S.done[x.id]).length} more tasks and we can do your ${TRIS[cur].stage.toLowerCase()} sign-off.`);
+  $("#v-home").innerHTML=hm+`
+   <div class="panel">
+    <div class="due">
+     <svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Week ${wk} of 40">
+      <circle cx="60" cy="60" r="48" fill="none" stroke="var(--sunk)" stroke-width="12"/>
+      <circle class="arc" cx="60" cy="60" r="48" fill="none" stroke="var(--scrub)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 60 60)"/>
+      <text x="60" y="58" text-anchor="middle" font-size="26">${born?"40":wk}</text>
+      <text x="60" y="78" text-anchor="middle" font-size="10" fill="var(--muted)">of 40 weeks</text>
+     </svg>
+     <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+      <span class="eyebrow">Your farm's gestational age</span>
+      <h2>${born?"Delivered! Your farm feeds itself.":"Expecting a living farm"}</h2>
+      <p class="lede">${born?"Every part of the farm now feeds another. Keep charting and it only gets healthier.":"Each task you finish moves your due date closer. Each trimester unlocks when you pass the last one's sign-off."}</p>
+     </div>
+    </div>
+    <div class="stage-row">${stages}</div>
+   </div>
+   ${born?"":`<div class="panel next">
+     <span class="eyebrow">Next up · ${TRIS[cur].stage}</span>
+     <h3 style="font-size:1.2rem">${nextT?esc(nextT.title):"Trimester sign-off"}</h3>
+     <p class="lede">${nextT?esc(nextT.why):"All tasks done. Take the 3-question sign-off to unlock the next trimester."}</p>
+     <a class="btn" href="#plan">Open care plan</a>
+   </div>`}
+   <div class="panel">
+    <span class="eyebrow">Latest Soil APGAR</span>
+    ${last?`<div class="total"><span class="num">${last.total}</span><span>/10 · ${esc(last.bed)} · ${fmt(last.date)}</span></div><p class="verdict ${verdict(last.total)[1]}">${verdict(last.total)[0]}</p>`:`<p class="empty">No scores yet. Your first task is to score one bed so you have a baseline.</p>`}
+    <a class="btn ghost" href="#apgar">Score a bed</a>
+   </div>
+   <div class="panel">
+    <span class="eyebrow">Keep your farm safe</span>
+    <p class="lede">Your progress lives on this phone. Save a backup every so often, and before you ever switch phones.</p>
+    <div class="t-actions">
+     <button class="btn" id="backup" type="button">Back up my farm</button>
+     <button class="btn ghost" id="restore" type="button">Restore a backup</button>
+    </div>
+    <input type="file" id="restore-file" accept="application/json,.json" hidden>
+   </div>
+   <button class="btn ghost" id="replay-tour" type="button">Replay Brenda's tour</button>
+   <p class="savenote">Progress is saved on this device.</p>`;
+}
+
+$("#v-home").addEventListener("click",async e=>{
+  if(e.target.id==="replay-tour") openTour();
+  if(e.target.id==="backup"){
+    const name=`delivery-garden-backup-${today()}.json`;
+    const blob=new Blob([JSON.stringify({app:"jennys-delivery-garden",v:1,saved:new Date().toISOString(),data:S},null,2)],{type:"application/json"});
+    try{ const f=new File([blob],name,{type:"application/json"}); if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:"Delivery Garden backup"}); return; } }catch(err){ if(err&&err.name==="AbortError") return; }
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+    toast("Backup saved. Keep it somewhere safe!");
+  }
+  if(e.target.id==="restore") $("#restore-file").click();
+});
+$("#v-home").addEventListener("change",e=>{
+  if(e.target.id!=="restore-file"||!e.target.files[0]) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const j=JSON.parse(r.result); const d=j.data||j; if(!d||typeof d!=="object"||!("done" in d)) throw 0;
+      S=Object.assign({done:{},quiz:{},apgar:[],chart:[]},d); S.toured=true; save(); render(); toast("Farm restored. Welcome back!"); }
+    catch(err){ toast("That file isn't a Delivery Garden backup."); } };
+  r.readAsText(e.target.files[0]); e.target.value="";
+});
+
+/* ---------------- Plan ---------------- */
+const quizPick={};
+function renderPlan(){
+  const ci=TRIS.findIndex(t=>!triPassed(t));
+  const pm=ci===-1?brenda("Every trimester signed off!","You did the whole care plan. Your farm is delivered.")
+   : ci===0?brenda("One bed, one baby","We're starting small on purpose. Tap a task to see the steps, then mark it done.")
+   : ci===1?brenda("Welcome to the second trimester!","Now your goats, cows and chickens start feeding the garden. Same rules: small tasks, then my sign-off.")
+   : brenda("Third trimester, the home stretch!","Time to connect the whole farm. You've got this, Jenny.");
+  $("#v-plan").innerHTML=pm+`<div><span class="eyebrow">Care plan</span><h2 style="font-size:1.7rem;margin-top:4px">Crawl, walk, run</h2><p class="lede" style="margin-top:6px">Small, weekend-sized jobs. Finish a trimester's tasks, pass its sign-off, and the next one opens.</p></div>`+
+  TRIS.map((t,i)=>{
+    const open=triOpen(i), passed=triPassed(t), n=t.tasks.filter(x=>S.done[x.id]).length;
+    const pill=passed?`<span class="pill done">Signed off</span>`:open?`<span class="pill go">${n}/${t.tasks.length} done</span>`:`<span class="pill">Locked</span>`;
+    if(!open) return `<article class="panel tri locked" aria-disabled="true"><div class="tri-head"><div><span class="eyebrow">${t.stage} · ${t.nick}</span><h2>${t.title}</h2></div>${pill}</div><p class="lockmsg">Opens after the ${TRIS[i-1].stage.toLowerCase()} sign-off.</p></article>`;
+    const tasks=t.tasks.map(x=>`
+     <details class="task ${S.done[x.id]?"is-done":""}">
+      <summary><span class="chk" aria-hidden="true">${S.done[x.id]?"✓":""}</span><span class="t-title">${esc(x.title)}</span><span class="t-time">${esc(x.time)}</span></summary>
+      <div class="t-body">
+       <p>${esc(x.why)}</p>
+       <ol>${x.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>
+       <div class="ld"><b>From the L&amp;D floor</b>${esc(x.ld)}</div>
+       ${x.safety?`<p class="safety">Safety: ${esc(x.safety)}</p>`:""}
+       <div class="t-actions">
+        <button class="btn ${S.done[x.id]?"ghost":""}" data-toggle="${x.id}">${S.done[x.id]?"Mark not done":"Mark done"}</button>
+        <button class="linkbtn" data-ref="${x.ref}">Learn more in Reference</button>
+       </div>
+      </div>
+     </details>`).join("");
+    let quiz="";
+    if(triDone(t)){
+      if(passed) quiz=`<div class="quiz"><p class="signoff">Competency signed off. ${i<2?"Next trimester unlocked.":"Your farm is delivered!"}</p></div>`;
+      else quiz=`<div class="quiz" id="quiz-${t.id}"><span class="eyebrow">Trimester sign-off</span>${brenda("Competency check","Three quick questions, all about your own farm. Get all three right and I'll sign you off.",72)}`+
+        t.quiz.map((q,qi)=>`<div class="q"><p>${qi+1}. ${esc(q.q)}</p><div class="opts">${q.o.map((o,oi)=>`<button class="opt ${quizPick[t.id+qi]===oi?"pick":""}" data-q="${t.id}|${qi}|${oi}">${esc(o)}</button>`).join("")}</div><p class="why" id="why-${t.id}${qi}" hidden></p></div>`).join("")+
+        `<button class="btn" data-check="${t.id}">Check my answers</button></div>`;
+    }
+    return `<article class="panel tri"><div class="tri-head"><div><span class="eyebrow">${t.stage} · ${t.nick}</span><h2>${t.title}</h2></div>${pill}</div>
+      <p>${esc(t.intro)}</p>
+      <div><span class="eyebrow">By the end, you'll be able to</span><ul class="goals" style="margin-top:6px">${t.goals.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>
+      <p class="lede"><b>For your farm:</b> ${esc(t.farm)}</p>
+      ${tasks}${quiz}</article>`;
+  }).join("");
+}
+$("#v-plan").addEventListener("click",e=>{
+  const tg=e.target.closest("[data-toggle]"); if(tg){ const id=tg.dataset.toggle; S.done[id]=!S.done[id]; save(); const openId=id; render(); const d=[...document.querySelectorAll("#v-plan details")].find(x=>x.querySelector(`[data-toggle="${openId}"]`)); if(d&&!S.done[id]) d.open=true; if(S.done[id]) toast("Nice work. Logged it."); return; }
+  const rf=e.target.closest("[data-ref]"); if(rf){ go("ref",rf.dataset.ref); return; }
+  const op=e.target.closest("[data-q]"); if(op){ const [t,qi,oi]=op.dataset.q.split("|"); quizPick[t+qi]=+oi; op.parentNode.querySelectorAll(".opt").forEach(b=>b.classList.toggle("pick",b===op)); return; }
+  const ck=e.target.closest("[data-check]"); if(ck){
+    const t=TRIS.find(x=>x.id===ck.dataset.check); let ok=true;
+    t.quiz.forEach((q,qi)=>{ const pick=quizPick[t.id+qi]; const box=document.querySelector(`#quiz-${t.id}`).querySelectorAll(".q")[qi]; box.querySelectorAll(".opt").forEach((b,oi)=>{b.classList.remove("right","wrong"); if(oi===pick) b.classList.add(pick===q.a?"right":"wrong");});
+      const w=$(`#why-${t.id}${qi}`); w.hidden=pick===undefined; w.textContent=pick===q.a?"Correct. "+q.why:"Not quite. Have another look in Reference.";
+      if(pick!==q.a) ok=false; });
+    if(ok){ S.quiz[t.id]=true; save(); setTimeout(()=>{render();renderOverlay(CELEBRATE[t.id]);},700); }
+    else toast("Brenda says: so close! Check the hints and try again.");
+  }
+});
+
+/* ---------------- APGAR ---------------- */
+let draft={bed:"",date:today(),s:{}};
+function renderApgar(){
+  const beds=[...new Set(S.apgar.map(a=>a.bed))];
+  const tot=APGAR.reduce((n,r)=>n+(draft.s[r.k]??0),0), filled=APGAR.every(r=>draft.s[r.k]!==undefined);
+  const v=verdict(tot);
+  $("#v-apgar").innerHTML=brenda("Vitals time!","Dig one spadeful from the bed and score what you see. Same as a newborn: 0, 1 or 2 for each sign.")+`
+   <div><span class="eyebrow">Assessment</span><h2 style="font-size:1.7rem;margin-top:4px">Soil APGAR</h2><p class="lede" style="margin-top:6px">Five checks, 0 to 2 each, just like a newborn. Dig one spadeful and score what you see.</p></div>
+   <div class="panel">
+    <div class="field"><label for="ap-bed">Bed or area</label><input type="text" id="ap-bed" list="ap-beds" placeholder="e.g. Bed 1 by the fence" value="${esc(draft.bed)}"><datalist id="ap-beds">${beds.map(b=>`<option value="${esc(b)}">`).join("")}</datalist></div>
+    <div class="field"><label for="ap-date">Date</label><input type="date" id="ap-date" value="${draft.date}"></div>
+    <div>${APGAR.map(r=>`<div class="score-row"><div><div class="nm">${r.nm}</div><div class="hint">${r.hint}${draft.s[r.k]!==undefined?" · "+r.s[draft.s[r.k]]:""}</div></div>
+      <div class="seg" role="group" aria-label="${r.nm} score">${[0,1,2].map(n=>`<button aria-pressed="${draft.s[r.k]===n}" class="${draft.s[r.k]===n?"on":""}" data-sc="${r.k}|${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
+    <div class="total"><span class="num">${tot}</span><span>/10</span>${filled?`<span class="verdict ${v[1]}">${v[0]}</span>`:""}</div>
+    <button class="btn" id="ap-save" ${filled?"":"disabled"}>Save score</button>
+   </div>
+   <div class="panel"><span class="eyebrow">Scoring guide</span>
+    <div class="tbl"><table class="scale"><thead><tr><th>Sign</th><th>0</th><th>1</th><th>2</th></tr></thead><tbody>
+     ${APGAR.map(r=>`<tr><td>${r.nm}</td>${r.s.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}
+    </tbody></table></div>
+    <p class="why">7–10 thriving · 4–6 needs support · 0–3 intensive care</p>
+   </div>
+   <div class="panel"><span class="eyebrow">History</span>
+    ${S.apgar.length?`<div class="hist">${S.apgar.map((a,i)=>({a,i})).reverse().map(({a,i})=>`<div class="hrow"><span class="sc ${verdict(a.total)[1]}">${a.total}</span><div><div style="font-weight:600">${esc(a.bed)}</div><div class="meta">${fmt(a.date)} · ${verdict(a.total)[0]}</div></div><button class="del" data-del-ap="${i}">Remove</button></div>`).join("")}</div>`:`<p class="empty">Your scores will show up here, newest first, so you can watch each bed improve over time.</p>`}
+   </div>`;
+}
+$("#v-apgar").addEventListener("input",e=>{ if(e.target.id==="ap-bed") draft.bed=e.target.value; if(e.target.id==="ap-date") draft.date=e.target.value; });
+$("#v-apgar").addEventListener("click",e=>{
+  const b=e.target.closest("[data-sc]"); if(b){ const [k,n]=b.dataset.sc.split("|"); draft.s[k]=+n; renderApgar(); return; }
+  if(e.target.id==="ap-save"){ const total=APGAR.reduce((n,r)=>n+draft.s[r.k],0); S.apgar.push({bed:draft.bed.trim()||"Unnamed bed",date:draft.date||today(),s:{...draft.s},total}); S.apgar.sort((a,b)=>a.date.localeCompare(b.date)); save(); draft={bed:draft.bed,date:today(),s:{}}; toast("Score saved"); render(); return; }
+  const d=e.target.closest("[data-del-ap]"); if(d){ if(d.dataset.sure){ S.apgar.splice(+d.dataset.delAp,1); save(); render(); } else { d.dataset.sure="1"; d.textContent="Tap again to remove"; } }
+});
+
+/* ---------------- Chart ---------------- */
+let note={date:today(),area:"",S:"",O:"",A:"",P:""};
+function renderChart(){
+  $("#v-chart").innerHTML=brenda("If it isn't charted…","…it didn't happen! Even one line after a task builds a record you'll love looking back on.")+`
+   <div><span class="eyebrow">Documentation</span><h2 style="font-size:1.7rem;margin-top:4px">Farm chart</h2><p class="lede" style="margin-top:6px">Chart it like a patient, in SOAP format. If it isn't charted, it didn't happen.</p></div>
+   <div class="panel">
+    <div class="soap">
+     <div class="field"><label for="n-date">Date</label><input type="date" id="n-date" value="${note.date}"></div>
+     <div class="field"><label for="n-area">Area</label><input type="text" id="n-area" placeholder="Bed 1, chicken run, compost…" value="${esc(note.area)}"></div>
+    </div>
+    <div class="field"><label for="n-S">S · Subjective</label><textarea id="n-S" placeholder="How does it look and feel to you? e.g. Soil feels softer underfoot.">${esc(note.S)}</textarea></div>
+    <div class="field"><label for="n-O">O · Objective</label><textarea id="n-O" placeholder="What did you measure? e.g. 6 worms, water soaked in 8 min.">${esc(note.O)}</textarea></div>
+    <div class="field"><label for="n-A">A · Assessment</label><textarea id="n-A" placeholder="What do you think is going on? e.g. Mulch is working.">${esc(note.A)}</textarea></div>
+    <div class="field"><label for="n-P">P · Plan</label><textarea id="n-P" placeholder="What's next? e.g. Top up mulch, rescore in a month.">${esc(note.P)}</textarea></div>
+    <button class="btn" id="n-save">Add to chart</button>
+   </div>
+   <div class="panel"><span class="eyebrow">Chart history</span>
+    ${S.chart.length?S.chart.map((n,i)=>({n,i})).reverse().map(({n,i})=>`<div class="note"><div class="nh"><span>${fmt(n.date)} · ${esc(n.area||"Farm")}</span><button class="del" data-del-n="${i}">Remove</button></div><dl>${["S","O","A","P"].filter(k=>n[k]).map(k=>`<dt>${k}</dt><dd>${esc(n[k])}</dd>`).join("")}</dl></div>`).join(""):`<p class="empty">No notes yet. A quick note after each task, even one line, builds a record you'll love looking back on.</p>`}
+   </div>`;
+}
+$("#v-chart").addEventListener("input",e=>{ const m={"n-date":"date","n-area":"area","n-S":"S","n-O":"O","n-A":"A","n-P":"P"}[e.target.id]; if(m) note[m]=e.target.value; });
+$("#v-chart").addEventListener("click",e=>{
+  if(e.target.id==="n-save"){ if(!(note.S||note.O||note.A||note.P).trim()){ toast("Write at least one line first"); return; } S.chart.push({...note}); S.chart.sort((a,b)=>a.date.localeCompare(b.date)); save(); note={date:today(),area:"",S:"",O:"",A:"",P:""}; toast("Charted"); render(); return; }
+  const d=e.target.closest("[data-del-n]"); if(d){ if(d.dataset.sure){ S.chart.splice(+d.dataset.delN,1); save(); render(); } else { d.dataset.sure="1"; d.textContent="Tap again to remove"; } }
+});
+
+/* ---------------- Reference ---------------- */
+let refQ="";
+function renderRef(){
+  const q=refQ.toLowerCase();
+  const list=REFS.filter(r=>!q||(r.title+r.sum+r.body).toLowerCase().includes(q));
+  $("#v-ref").innerHTML=brenda("Curious about something?","Every idea in the care plan lives here. Search it or tap one to read more.")+`
+   <div><span class="eyebrow">Always open</span><h2 style="font-size:1.7rem;margin-top:4px">Reference desk</h2><p class="lede" style="margin-top:6px">Every idea in the care plan, explained simply, with trusted places to dig deeper.</p></div>
+   <div class="field search"><label for="ref-q">Search</label><input type="text" id="ref-q" placeholder="compost, worms, manure…" value="${esc(refQ)}"></div>
+   <div class="refs">${list.length?list.map(r=>`<details class="ref" id="ref-${r.id}"><summary><div><h3>${r.title}</h3><p class="why">${r.sum}</p></div><span class="pill">Read</span></summary><div class="r-body">${r.body}${r.links.length?`<div><span class="eyebrow">Go deeper</span><ul style="margin-top:6px">${r.links.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join("")}</ul></div>`:""}</div></details>`).join(""):`<p class="empty">Nothing matches "${esc(refQ)}". Try a simpler word like soil or manure.</p>`}</div>`;
+}
+$("#v-ref").addEventListener("input",e=>{ if(e.target.id==="ref-q"){ refQ=e.target.value; const pos=e.target.selectionStart; renderRef(); const i=$("#ref-q"); i.focus(); i.setSelectionRange(pos,pos); } });
+
+/* ---------------- Router ---------------- */
+const VIEWS=["home","plan","apgar","chart","ref"];
+let current="home";
+function render(){ renderHome(); renderPlan(); renderApgar(); renderChart(); renderRef(); if(cloud) document.querySelectorAll(".savenote").forEach(n=>n.textContent="Saved to your account, so it follows you to any device."); }
+function show(v){ current=VIEWS.includes(v)?v:"home"; VIEWS.forEach(x=>$("#v-"+x).hidden=x!==current); document.querySelectorAll("nav.tabs a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.v===current)); document.querySelectorAll("nav.tabs a").forEach(a=>{ if(a.dataset.v===current) a.setAttribute("aria-current","page"); }); }
+function go(v,refId){ location.hash=v; show(v); window.scrollTo(0,0);
+  if(refId){ refQ=""; renderRef(); const el=$("#ref-"+refId); if(el){ el.open=true; el.classList.add("flash"); setTimeout(()=>el.classList.remove("flash"),1500); el.scrollIntoView({block:"start"}); window.scrollBy(0,-70); } } }
+window.addEventListener("hashchange",()=>{ show(location.hash.slice(1)); window.scrollTo(0,0); });
+render(); show(location.hash.slice(1));
+if(!S.toured) openTour();
+</script>
+
+<script>
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+</script>
+</body></html>

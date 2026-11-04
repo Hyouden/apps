@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>APP NAME</title>
+<meta name="theme-color" content="#2F7D68">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SHORT NAME">
+<style>
+:root{--bg:#F4F7F5;--fg:#1F2A25;--accent:#2F7D68;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+[hidden]{display:none!important}
+main{max-width:640px;margin:0 auto;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{color:var(--accent)}
+</style>
+</head><body>
+<main>
+  <h1>APP NAME</h1>
+  <p>Replace this with the app. Keep any saved data under a localStorage key that starts with this app's folder name.</p>
+</main>
+<script>
+const STORE_KEY = "APP-SLUG-v1"; // unique per app: every app on this site shares one browser storage
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>
