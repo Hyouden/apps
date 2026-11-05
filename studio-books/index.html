@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Studio Books</title>
+<meta name="theme-color" content="#141414">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Studio Books">
+<link rel="stylesheet" href="app.css">
+<style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html,body{margin:0;background:#141414;color:#f2eee6}[hidden]{display:none!important}</style>
+</head><body>
+<div id="app">
+  <main class="screen"><p class="fine" style="padding-top:40vh;text-align:center">Opening Studio Books…</p></main>
+</div>
+<div id="sheet-root" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<!-- Data lives in this phone's IndexedDB ("studio-books"), not localStorage, so it can't clash with other shelf apps. -->
+<script src="app.js"></script>
+</body></html>
