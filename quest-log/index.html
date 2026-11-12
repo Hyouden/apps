@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Quest Log</title>
-<meta name="theme-color" content="#11151a">
+<meta name="theme-color" content="#0f0c14">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/favicon-64.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -13,173 +13,226 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: hero banner (level, XP, gold) on top; tabs Quests / Hero / Loot; quests grouped Dailies, Bosses, Main, Side; bottom sheet for add/edit. Single dark "dungeon" theme by choice. */
+/* Layout: hero strip (level, XP, gold) on top; tabs Dungeon / Camp / Hero / Loot. Dungeon tab = pixel battle scene, monster HP, then the floor's steps (each step is an attack). Single dark 8-bit theme by choice. */
 :root {
-  --bg: #11151a;
-  --panel: #1a2028;
-  --panel2: #212934;
-  --ink: #edf0e8;
-  --muted: #95a0ad;
-  --line: #2d3744;
+  --bg: #0f0c14;
+  --panel: #1a1622;
+  --panel2: #241f2f;
+  --ink: #f0ecdf;
+  --muted: #9a93a8;
+  --line: #352e44;
   --xp: #7ee07a;
   --gold: #f4c542;
-  --boss: #ff5a5f;
-  --main: #8c7cff;
-  --daily: #48c6ef;
-  --side: #c9d1d9;
+  --hp: #ff5a5f;
+  --power: #48c6ef;
   --font-display: "Pixelify Sans", "Courier New", monospace;
   --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --r-c: #b9c0c9; --r-r: #4aa8ff; --r-e: #c07bff; --r-l: #ffb02e;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--font-body); -webkit-tap-highlight-color: transparent; }
-.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 14px;
-  padding: calc(env(safe-area-inset-top, 0px) + 14px) max(14px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 96px) max(14px, env(safe-area-inset-left, 0px)); }
-button { font: inherit; color: inherit; }
-button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) max(14px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 40px) max(14px, env(safe-area-inset-left, 0px)); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
 
-.hero { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; background: linear-gradient(135deg, #1f2833, #161c23); border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; }
-.crest { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 14px; background: radial-gradient(circle at 50% 35%, #33404f, #1a2028); border: 2px solid var(--gold); font: 700 1.7rem var(--font-display); color: var(--gold); position: relative; }
-.crest small { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #241a00; font: 700 .7rem var(--font-display); padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
-.hname { font: 700 1.25rem var(--font-display); margin: 0; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.htitle { color: var(--muted); font-size: .85rem; }
-.bar { height: 12px; border-radius: 6px; background: #0d1116; border: 1px solid var(--line); overflow: hidden; margin: 6px 0 4px; }
-.bar i { display: block; height: 100%; background: linear-gradient(90deg, #4fbf4b, var(--xp)); transition: width .5s; }
-.stats { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.strip { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: center; background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.strip canvas { width: 48px; height: 48px; background: #0b0910; border-radius: 8px; border: 2px solid var(--gold); }
+.hname { font: 700 1.05rem var(--font-display); margin: 0; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.sub { color: var(--muted); font: 400 .8rem var(--font-body); }
+.bar { height: 10px; border-radius: 3px; background: #08060c; border: 1px solid var(--line); overflow: hidden; margin: 4px 0 3px; }
+.bar i { display: block; height: 100%; background: var(--xp); transition: width .4s; }
+.bar.hp i { background: var(--hp); } .bar.pw i { background: var(--power); }
+.stats { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .gold { color: var(--gold); font-weight: 700; }
 
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--panel); border: 2px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; }
-.tab { font: 700 1rem var(--font-display); min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 4px; gap: 4px; }
+.tab { font: 700 .95rem var(--font-display); min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+section.view { display: grid; gap: 12px; }
 
-h2 { font: 700 1rem var(--font-display); margin: 8px 0 6px; display: flex; justify-content: space-between; align-items: baseline; letter-spacing: .03em; }
-h2 span { font: 400 .8rem var(--font-body); color: var(--muted); }
-.group { display: grid; gap: 8px; }
-.quest { --q: var(--side); display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--q); border-radius: 12px; padding: 8px 10px 8px 6px; }
-.quest.daily { --q: var(--daily); } .quest.main { --q: var(--main); } .quest.boss { --q: var(--boss); }
-.quest.done { opacity: .55; }
-.quest.done .qt { text-decoration: line-through; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; min-height: 44px; padding: 6px 12px; border-radius: 10px; border: 2px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; font: 700 .85rem var(--font-display); text-align: left; }
+.chip small { display: block; font: 400 .7rem var(--font-body); }
+.chip[aria-pressed="true"] { border-color: var(--gold); color: var(--ink); }
+.weekbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: #14212a; border: 2px solid #24495c; border-radius: 12px; padding: 8px 12px; font-size: .88rem; }
+.weekbar b { font-family: var(--font-display); color: var(--power); }
+
+.stage { position: relative; border: 3px solid var(--line); border-radius: 12px; overflow: hidden; background: #000; }
+.stage canvas { width: 100%; height: auto; }
+.stage .tag { position: absolute; left: 8px; top: 6px; font: 700 .8rem var(--font-display); background: rgba(8,6,12,.75); padding: 2px 8px; border-radius: 6px; }
+.stage .crit { position: absolute; right: 8px; top: 6px; font: 700 .8rem var(--font-display); background: var(--power); color: #04202b; padding: 2px 8px; border-radius: 6px; }
+.mon { display: grid; gap: 2px; }
+.mon .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.mon b { font: 700 1.05rem var(--font-display); }
+.floornav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.floornav span { font: 700 .9rem var(--font-display); text-align: center; flex: 1; }
+.sq { width: 44px; height: 44px; border-radius: 10px; border: 2px solid var(--line); background: var(--panel); cursor: pointer; font: 700 1.1rem var(--font-display); }
+.sq:disabled { opacity: .35; }
+
+.list { display: grid; gap: 8px; }
+.item { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px 4px 4px; min-height: 52px; }
+.item.done { opacity: .55; } .item.done .t { text-decoration: line-through; }
 .check { width: 44px; height: 44px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
-.check span { width: 26px; height: 26px; border: 2px solid var(--q); border-radius: 7px; display: grid; place-items: center; font-size: 1rem; color: var(--bg); }
-.done .check span { background: var(--q); }
-.qbody { min-width: 0; cursor: pointer; background: none; border: 0; text-align: left; padding: 4px 0; }
-.qt { display: block; font-weight: 700; overflow-wrap: anywhere; }
-.qm { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; font-size: .75rem; color: var(--muted); }
-.pill { border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; }
-.xp { font: 700 .85rem var(--font-display); color: var(--xp); text-align: right; white-space: nowrap; }
-.hp { height: 8px; border-radius: 4px; background: #0d1116; overflow: hidden; margin-top: 6px; border: 1px solid #3b2224; }
-.hp i { display: block; height: 100%; background: var(--boss); }
-.empty { color: var(--muted); font-size: .9rem; margin: 0; padding: 4px 2px; }
-
-.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); min-height: 56px; padding: 0 22px; border-radius: 16px; border: 0; background: var(--gold); color: #241a00; font: 700 1.05rem var(--font-display); box-shadow: 0 10px 30px rgba(0,0,0,.45); cursor: pointer; }
-
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 10px; }
-.skill { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: .9rem; }
-.skill .bar { grid-column: 1 / -1; height: 8px; margin: 2px 0 0; }
-.skill b { font-family: var(--font-display); }
-.ach { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-.badge { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: .82rem; color: var(--muted); }
-.badge b { display: block; font-family: var(--font-display); color: var(--ink); font-size: .95rem; }
-.badge.locked { opacity: .45; filter: grayscale(1); }
-.logrow { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; padding: 6px 0; border-top: 1px solid var(--line); }
-.logrow:first-child { border-top: 0; }
-.logrow span:last-child { color: var(--xp); white-space: nowrap; font-family: var(--font-display); }
-.loot { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
-.loot b { display: block; }
-.loot small { color: var(--muted); }
-.btn { min-height: 44px; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); font: 700 .95rem var(--font-display); cursor: pointer; }
-.btn.gold { background: var(--gold); color: #241a00; border-color: transparent; }
-.btn.danger { color: var(--boss); }
-.btn:disabled { opacity: .45; cursor: default; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.check span { width: 26px; height: 26px; border: 2px solid var(--hp); border-radius: 4px; display: grid; place-items: center; color: var(--bg); font-weight: 700; }
+.camp .check span { border-color: var(--power); }
+.done .check span { background: var(--hp); } .camp .done .check span { background: var(--power); }
+.t { overflow-wrap: anywhere; font-weight: 700; }
+.t small { display: block; font-weight: 400; color: var(--power); font-size: .75rem; }
+.xp { font: 700 .8rem var(--font-display); color: var(--xp); white-space: nowrap; }
+.del { background: none; border: 0; color: var(--muted); width: 36px; height: 44px; cursor: pointer; }
+.empty { color: var(--muted); font-size: .9rem; margin: 0; grid-column: 1 / -1; }
+h2 { font: 700 1rem var(--font-display); margin: 6px 0 0; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+h2 span { font: 400 .8rem var(--font-body); color: var(--muted); text-align: right; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; }
 .note { color: var(--muted); font-size: .85rem; margin: 0; }
+.add { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+input[type=text], input[type=number], select, textarea { min-height: 44px; border-radius: 8px; border: 1px solid var(--line); background: #0b0910; padding: 8px 10px; width: 100%; }
+textarea { min-height: 150px; resize: vertical; }
+.btn { min-height: 44px; padding: 8px 14px; border-radius: 10px; border: 2px solid var(--line); background: var(--panel2); cursor: pointer; font: 700 .9rem var(--font-display); }
+.btn.gold { background: var(--gold); color: #241a00; border-color: transparent; }
+.btn.danger { color: var(--hp); }
+.btn:disabled { opacity: .45; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field { display: grid; gap: 4px; font-size: .82rem; color: var(--muted); }
 
-.scrim { position: fixed; inset: 0; background: rgba(5,8,12,.7); display: grid; align-items: end; z-index: 10; }
-.sheet { background: var(--panel); border-top: 2px solid var(--line); border-radius: 20px 20px 0 0; max-height: 92vh; overflow: auto; padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 18px) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 12px; width: 100%; max-width: 560px; margin: 0 auto; }
-.sheet h3 { font: 700 1.2rem var(--font-display); margin: 0; }
-.field { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); }
-.field input, .field select { min-height: 46px; border-radius: 10px; border: 1px solid var(--line); background: #0f1318; color: var(--ink); font: 1rem var(--font-body); padding: 8px 12px; }
-.seg { display: flex; flex-wrap: wrap; gap: 6px; }
-.seg button { min-height: 40px; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--line); background: #0f1318; color: var(--muted); cursor: pointer; font-size: .9rem; }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: transparent; font-weight: 700; }
-.steps { display: grid; gap: 6px; }
-.steprow { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 4px; background: #0f1318; border-radius: 10px; }
-.steprow.done span.t { text-decoration: line-through; color: var(--muted); }
-.steprow button { width: 44px; height: 44px; border: 0; background: none; cursor: pointer; color: var(--muted); }
-.addstep { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-.addstep input { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: #0f1318; color: var(--ink); font: 1rem var(--font-body); padding: 8px 12px; }
+.creator { display: grid; grid-template-columns: 112px 1fr; gap: 12px; align-items: start; }
+.creator canvas { width: 112px; height: 140px; background: #0b0910; border-radius: 10px; border: 2px solid var(--line); }
+.sw { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw button { width: 36px; height: 36px; border-radius: 8px; border: 2px solid var(--line); cursor: pointer; padding: 0; }
+.sw button[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--bg) inset; }
+.sw.txt button { width: auto; padding: 0 10px; background: #0b0910; font-size: .8rem; }
+.gear { display: flex; flex-wrap: wrap; gap: 6px; }
+.gear button { min-height: 40px; padding: 4px 10px; border-radius: 8px; border: 2px solid var(--rc, var(--line)); background: #0b0910; cursor: pointer; font-size: .82rem; color: var(--rc, var(--ink)); }
+.gear button[aria-pressed="true"] { background: var(--rc); color: #0b0910; font-weight: 700; }
+.pets { display: grid; gap: 10px; }
+.pet { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; }
+.pet canvas { width: 40px; height: 32px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--panel2); border-radius: 10px; padding: 8px; text-align: center; font-size: .75rem; color: var(--muted); }
+.stat b { display: block; font: 700 1.2rem var(--font-display); color: var(--ink); }
+.days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; align-items: end; height: 60px; }
+.days i { background: var(--xp); border-radius: 2px 2px 0 0; min-height: 2px; opacity: .9; }
+.trophies { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.trophy { background: var(--panel2); border: 2px solid var(--gold); border-radius: 10px; padding: 10px; text-align: center; font-size: .8rem; color: var(--muted); }
+.trophy canvas { width: 40px; height: 44px; margin: 0 auto 4px; }
+.trophy b { display: block; color: var(--ink); font-family: var(--font-display); }
+.logrow { display: flex; justify-content: space-between; gap: 10px; font-size: .86rem; padding: 6px 0; border-top: 1px solid var(--line); }
+.logrow:first-child { border-top: 0; }
+.loot { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.loot small { color: var(--muted); display: block; }
 
-.toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translateX(-50%); background: #263140; border: 2px solid var(--gold); color: var(--ink); padding: 10px 16px; border-radius: 12px; font: 700 .95rem var(--font-display); z-index: 20; display: flex; gap: 12px; align-items: center; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
-.toast button { background: none; border: 0; color: var(--gold); cursor: pointer; font: 700 .9rem var(--font-display); padding: 4px 0; }
-.levelup { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(5,8,12,.8); z-index: 30; text-align: center; }
-.levelup div { background: var(--panel); border: 3px solid var(--gold); border-radius: 20px; padding: 28px 30px; display: grid; gap: 8px; }
-.levelup b { font: 700 2.2rem var(--font-display); color: var(--gold); }
-.levelup p { margin: 0; color: var(--muted); }
-.float { position: fixed; font: 700 1rem var(--font-display); color: var(--xp); pointer-events: none; z-index: 25; }
+.scrim { position: fixed; inset: 0; background: rgba(5,3,9,.78); display: grid; place-items: center; z-index: 10; padding: 16px; }
+.modal { background: var(--panel); border: 3px solid var(--rc, var(--gold)); border-radius: 16px; padding: 18px; display: grid; gap: 10px; width: 100%; max-width: 380px; max-height: 90vh; overflow: auto; text-align: center; }
+.modal.left { text-align: left; }
+.modal h3 { font: 700 1.3rem var(--font-display); margin: 0; color: var(--rc, var(--gold)); }
+.modal canvas { margin: 0 auto; width: 128px; height: 160px; background: #0b0910; border-radius: 10px; }
+.modal p { margin: 0; color: var(--muted); }
+.modal .big { font: 700 1.15rem var(--font-display); }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%); background: #2a2438; border: 2px solid var(--gold); padding: 8px 14px; border-radius: 10px; font: 700 .9rem var(--font-display); z-index: 20; display: flex; gap: 12px; align-items: center; width: max-content; max-width: 92vw; }
+.toast button { background: none; border: 0; color: var(--gold); cursor: pointer; font: inherit; padding: 4px 0; }
+.float { position: fixed; font: 700 1rem var(--font-display); color: var(--xp); pointer-events: none; z-index: 25; white-space: nowrap; }
 @media (prefers-reduced-motion: no-preference) {
   .float { animation: rise .9s ease-out forwards; }
   @keyframes rise { to { transform: translateY(-46px); opacity: 0; } }
-  .levelup div { animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
-  @keyframes pop { from { transform: scale(.7); } }
+  .modal { animation: pop .3s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes pop { from { transform: scale(.8); } }
 }
 @media (prefers-reduced-motion: reduce) { .float { display: none; } }
 </style>
 </head><body>
 <div class="wrap">
-  <section class="hero" aria-label="Your hero">
-    <div class="crest" id="crest">?<small id="lvl">LV 1</small></div>
+  <div class="strip">
+    <canvas id="face" width="16" height="16" aria-hidden="true"></canvas>
     <div>
-      <p class="hname"><span id="hname">Adventurer</span><span class="htitle" id="htitle"></span></p>
-      <div class="bar" role="progressbar" aria-label="XP to next level" id="xpbar"><i id="xpfill"></i></div>
+      <p class="hname"><span id="hname"></span><span class="sub" id="htitle"></span></p>
+      <div class="bar" id="xpbar" role="progressbar" aria-label="XP to next level"><i id="xpfill"></i></div>
       <div class="stats"><span id="xptext"></span><span class="gold" id="goldtext"></span></div>
     </div>
-  </section>
+  </div>
 
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="quests" type="button">Quests</button>
+    <button class="tab" role="tab" data-tab="dungeon" type="button">Dungeon</button>
+    <button class="tab" role="tab" data-tab="camp" type="button">Camp</button>
     <button class="tab" role="tab" data-tab="hero" type="button">Hero</button>
     <button class="tab" role="tab" data-tab="loot" type="button">Loot</button>
   </div>
 
-  <section id="v-quests">
-    <h2>Dailies <span id="dailynote"></span></h2>
-    <div class="group" id="g-daily"></div>
-    <h2>Bosses <span>big dreaded jobs, one hit at a time</span></h2>
-    <div class="group" id="g-boss"></div>
-    <h2>Main quests <span>bigger goals with steps</span></h2>
-    <div class="group" id="g-main"></div>
-    <h2>Side quests</h2>
-    <div class="group" id="g-side"></div>
-    <h2 id="donehead" hidden>Completed today</h2>
-    <div class="group" id="g-done"></div>
+  <section class="view" id="v-dungeon">
+    <div class="weekbar" id="weekbar" hidden><span><b>This week</b> <span id="weektext"></span></span><button class="btn" id="weeknext" type="button">Next up</button></div>
+    <div class="chips" id="dchips"></div>
+    <div class="stage">
+      <canvas id="scene" width="192" height="96" aria-hidden="true"></canvas>
+      <span class="tag" id="floortag"></span><span class="crit" id="crittag" hidden>POWER HIT READY</span>
+    </div>
+    <div class="mon">
+      <div class="row"><b id="mname"></b><span class="sub" id="mhp"></span></div>
+      <div class="bar hp"><i id="hpfill"></i></div>
+    </div>
+    <div class="floornav"><button class="sq" id="fprev" type="button" aria-label="Previous floor">◀</button><span id="fname"></span><button class="sq" id="fnext" type="button" aria-label="Next floor">▶</button></div>
+    <div class="list" id="steps"></div>
+    <button class="btn danger" id="ddel" type="button" hidden>Delete this dungeon</button>
   </section>
 
-  <section id="v-hero" hidden>
+  <section class="view camp" id="v-camp" hidden>
     <div class="card">
-      <h2 style="margin:0">Skills</h2>
-      <div id="skills" class="group"></div>
+      <h2 style="margin:0">Power meter <span id="pwtext"></span></h2>
+      <div class="bar pw"><i id="pwfill"></i></div>
+      <p class="note">Training charges the meter. When it's full, your next dungeon hit is a power hit: double XP and a guaranteed loot drop.</p>
     </div>
-    <h2>Achievements <span id="achcount"></span></h2>
-    <div class="ach" id="ach"></div>
+    <h2>Daily training <span id="streaktext"></span></h2>
+    <div class="list" id="dailies"></div>
+    <div class="add"><input type="text" id="newdaily" maxlength="60" placeholder="Add a daily habit" aria-label="New daily habit"><button class="btn" id="adddaily" type="button">Add</button></div>
+    <h2>Side quests <span>quick one-offs</span></h2>
+    <div class="list" id="sides"></div>
+    <div class="add"><input type="text" id="newside" maxlength="80" placeholder="Add a side quest" aria-label="New side quest"><button class="btn" id="addside" type="button">Add</button></div>
+  </section>
+
+  <section class="view" id="v-hero" hidden>
+    <div class="card">
+      <div class="creator">
+        <canvas id="preview" width="32" height="40" aria-hidden="true"></canvas>
+        <div class="list">
+          <label class="field" for="nameinput">Hero name<input type="text" id="nameinput" maxlength="20" autocomplete="off"></label>
+          <div class="field">Skin<div class="sw" id="sw-skin"></div></div>
+        </div>
+      </div>
+      <div class="field">Hair<div class="sw txt" id="sw-hair"></div></div>
+      <div class="field">Hair color<div class="sw" id="sw-hairc"></div></div>
+      <div class="field">Outfit color<div class="sw" id="sw-outfit"></div></div>
+    </div>
+    <h2>Gear <span id="gearbonus"></span></h2>
+    <div class="card" id="gear"></div>
+    <h2>Companions <span>each one with you adds +3% gold</span></h2>
+    <div class="card pets" id="pets"></div>
+    <h2>Trophy hall <span id="trophycount"></span></h2>
+    <div class="trophies" id="trophies"></div>
+    <h2>Stats</h2>
+    <div class="card">
+      <div class="grid3" id="statgrid"></div>
+      <div class="field">Hits landed, last 14 days<div class="days" id="days"></div></div>
+    </div>
     <h2>Adventure log</h2>
     <div class="card" id="log"></div>
-    <h2>Settings</h2>
+    <h2>Backup</h2>
     <div class="card">
-      <label class="field" for="nameinput">Hero name<input id="nameinput" maxlength="24" autocomplete="off"></label>
-      <p class="note">Your quests live on this phone. Back up now and then so a new phone doesn't wipe your hero.</p>
+      <p class="note">Your hero, gear and progress live on this phone. Back up now and then.</p>
       <div class="row2"><button class="btn" id="backup" type="button">Back up</button><button class="btn" id="restore" type="button">Restore</button></div>
       <input type="file" id="restoreFile" accept="application/json,.json" hidden>
     </div>
   </section>
 
-  <section id="v-loot" hidden>
-    <p class="note">Spend gold from finished quests on real rewards you set for yourself.</p>
-    <div class="group" id="loot"></div>
+  <section class="view" id="v-loot" hidden>
+    <p class="note">Spend gold on real rewards you set for yourself.</p>
+    <div class="list" id="rewards"></div>
     <div class="card">
-      <label class="field" for="lootname">New reward<input id="lootname" maxlength="60" placeholder="e.g. Buy that new game"></label>
+      <label class="field" for="lootname">New reward<input type="text" id="lootname" maxlength="60" placeholder="e.g. Buy that new game"></label>
       <div class="row2">
-        <label class="field" for="lootcost">Cost in gold<input id="lootcost" type="number" inputmode="numeric" min="1" value="50"></label>
+        <label class="field" for="lootcost">Cost in gold<input id="lootcost" type="number" inputmode="numeric" min="1" value="100"></label>
         <button class="btn gold" id="lootadd" type="button" style="align-self:end">Add reward</button>
       </div>
     </div>
@@ -188,350 +241,509 @@ h2 span { font: 400 .8rem var(--font-body); color: var(--muted); }
   </section>
 </div>
 
-<button class="fab" id="fab" type="button">+ New quest</button>
-<div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="scrim" id="scrim" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status" hidden><span id="tmsg"></span><button id="tundo" type="button" hidden>Undo</button></div>
-<div class="levelup" id="levelup" hidden><div><b id="lvtext">LEVEL 2</b><p id="lvsub"></p><button class="btn gold" id="lvok" type="button">Onward</button></div></div>
 
 <script>
-const KEY = "quest-log-v1"; // every app on this site shares one browser storage
+const KEY = "quest-log-v2", OLD = "quest-log-v1"; // every app on this site shares one browser storage
 const $ = id => document.getElementById(id);
-const DIFF = { easy: { label: "Easy", xp: 10 }, med: { label: "Medium", xp: 25 }, hard: { label: "Hard", xp: 50 }, epic: { label: "Epic", xp: 100 } };
-const TYPES = { daily: "Daily", side: "Side quest", main: "Main quest", boss: "Boss" };
-const SKILLS = {
-  body:   { label: "Body",   hint: "workouts, mobility, sleep" },
-  shred:  { label: "Shred",  hint: "skate, snow, bike, disc golf" },
-  mind:   { label: "Mind",   hint: "reading, learning, philosophy" },
-  craft:  { label: "Craft",  hint: "work, code, building things" },
-  home:   { label: "Home",   hint: "chores, pets, errands, money" },
-  social: { label: "Social", hint: "friends, family, partner" }
-};
-const TITLES = ["Peasant", "Squire", "Adventurer", "Ranger", "Knight", "Champion", "Hero", "Warlord", "Archmage", "Legend", "Mythic"];
 const today = () => new Date().toLocaleDateString("en-CA");
 const uid = () => Math.random().toString(36).slice(2, 9);
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const XP = { easy: 10, med: 25, hard: 50, epic: 100 };
+const TITLES = ["Peasant", "Squire", "Adventurer", "Ranger", "Knight", "Champion", "Hero", "Warlord", "Archmage", "Legend", "Mythic"];
 
-function starter() {
-  const t = today();
-  return {
-    hero: { name: "Adventurer", xp: 0, gold: 0 },
-    skills: {},
-    quests: [
-      { id: uid(), type: "daily", title: "Feed and play with the crew", diff: "easy", skill: "home", steps: [], doneDates: [], created: t },
-      { id: uid(), type: "daily", title: "10-minute mobility flow", diff: "easy", skill: "body", steps: [], doneDates: [], created: t },
-      { id: uid(), type: "daily", title: "Read 10 pages", diff: "easy", skill: "mind", steps: [], doneDates: [], created: t },
-      { id: uid(), type: "boss", title: "The Garage of Doom", diff: "epic", skill: "home", steps: [{ t: "Pull everything out", done: false }, { t: "Sort keep / sell / toss", done: false }, { t: "Haul the junk", done: false }, { t: "Put it all back neat", done: false }], created: t },
-      { id: uid(), type: "main", title: "Learn a new trick", diff: "hard", skill: "shred", steps: [{ t: "Watch a breakdown", done: false }, { t: "Practice 3 sessions", done: false }, { t: "Land it clean", done: false }], created: t },
-      { id: uid(), type: "side", title: "Answer that email you've been avoiding", diff: "med", skill: "craft", steps: [], created: t }
-    ],
-    rewards: [
-      { id: uid(), title: "Guilt-free gaming night", cost: 60 },
-      { id: uid(), title: "Takeout of my choice", cost: 120 },
-      { id: uid(), title: "New board, game or gear", cost: 600 }
-    ],
-    claimed: [], log: [], ach: {}, best: 0
-  };
+// ---------- Pixel art ----------
+const BODY = [
+"................","................","................",
+".....sssssss....",".....sssesse....",".....sssssss....","......sssss.....",
+"....ooooooooo...","...sooooooooos..","...sooooooooos..","...sOoooooooOs..","....ooooooooo...",
+"....pppp.pppp...","....pppp.pppp...","....pppp.pppp...","....bbbb.bbbb..."];
+const HAIR = {
+  short:  { label: "Short", rows: ["", ".....hhhhhhh....", "....hhhhhhhhh...", "....hh..........", "....h..........."] },
+  long:   { label: "Long", rows: ["", ".....hhhhhhh....", "....hhhhhhhhh...", "....hh..........", "....hh..........", "....hh..........", "...hhh..........", "...hh..........."] },
+  mohawk: { label: "Mohawk", rows: ["........hh......", ".......hhhh.....", "......hhhhhh...."] },
+  curly:  { label: "Curly", rows: ["......hhhhh.....", "....hhhhhhhhh...", "...hhhhhhhhhhh..", "...hh...........", "...hh..........."] },
+  bald:   { label: "Bald", rows: [] }
+};
+const SKINS = ["#f6d3b3", "#e8b98f", "#c98f62", "#a06a43", "#6f4628", "#8fd18a"];
+const HAIRC = ["#2b1d14", "#6b4423", "#c9a14a", "#b5432e", "#d8d8e0", "#48c6ef", "#e85fa8"];
+const OUTFITS = ["#3b7dd8", "#d84b4b", "#3fa66b", "#8c5cd6", "#e08a2e", "#2f3640", "#e6e1d3", "#22b3a6"];
+const shade = hex => { const n = parseInt(hex.slice(1), 16); const f = c => Math.round(c * .68); return "#" + [n >> 16, n >> 8 & 255, n & 255].map(c => f(c).toString(16).padStart(2, "0")).join(""); };
+// Gear art: head/weapon/back overlays in hero coordinates; armor recolors the outfit.
+const ART = {
+  cap:     { y: 1, rows: [".....ccccccc....", "....cccccccccCC."] },
+  beanie:  { y: 0, rows: [".......ww.......", ".....ccccccc....", "....ccccccccc...", "....CCCCCCCCC..."] },
+  helmet:  { y: 1, rows: [".....ccccccc....", "....ccccccccc...", "....cc......c...", "....c..........."] },
+  goggles: { y: 4, rows: ["....kCccCccC...."] },
+  wizard:  { y: -3, rows: ["........c.......", ".......ccc......", "......ccwcc.....", ".....ccccccc....", "...CCCCCCCCCCC.."] },
+  crown:   { y: 1, rows: [".....c.c.c.c....", ".....cwcCcwc...."] },
+  sword:   { x: 12, y: 1, rows: ["..c.", "..c.", "..c.", "..c.", "..c.", "..c.", "..c.", ".ggg", "..n.", "..n."] },
+  axe:     { x: 12, y: 1, rows: ["cc..", "ccn.", "ccn.", "C.n.", "..n.", "..n.", "..n.", "..n.", "..n.", "..n."] },
+  staff:   { x: 12, y: 0, rows: ["..c.", ".cwc", "..c.", "..n.", "..n.", "..n.", "..n.", "..n.", "..n.", "..n.", "..n.", "..n.", "..n."] },
+  wrench:  { x: 12, y: 2, rows: [".c.c", ".ccc", "..c.", "..c.", "..c.", "..c.", "..c.", "..c.", "..C."] },
+  disc:    { x: 12, y: 6, rows: [".cc.", "cccc", "cwCc", ".cc."] },
+  deck:    { x: 12, y: 1, rows: [".wcw", "..c.", "..c.", "..c.", "..c.", "..c.", "..c.", "..c.", ".wcw"] },
+  board:   { x: 0, y: 2, rows: ["..cc", "..cc", "..cC", "..cc", "..wc", "..cc", "..cC", "..cc", "..wc", "..cc", "..cc", "..cc"] },
+  cape:    { x: 1, y: 7, rows: ["..cc", ".ccc", ".ccc", ".ccc", "cccc", "cccC", "ccCC"] },
+  pack:    { x: 1, y: 7, rows: ["..cc", ".ccc", ".cCc", ".ccc"] }
+};
+const R = { c: ["Common", 2], r: ["Rare", 4], e: ["Epic", 7], l: ["Legendary", 12] };
+const ITEMS = [
+  ["rusty", "weapon", "Rusty Sword", "c", "sword", "#9aa3ad"], ["wrench", "weapon", "Trusty Wrench", "c", "wrench", "#b8c0c8"],
+  ["pdisc", "weapon", "Practice Disc", "c", "disc", "#ff8a4c"], ["cap", "head", "Thrift Cap", "c", "cap", "#d84b4b"],
+  ["beanie", "head", "Wool Beanie", "c", "beanie", "#3fa66b"], ["hoodie", "armor", "Grey Hoodie", "c", null, "#7b8491"],
+  ["flannel", "armor", "Lucky Flannel", "c", null, "#b5432e"], ["pack", "back", "Daypack", "c", "pack", "#8a6a3b"],
+  ["steel", "weapon", "Steel Sword", "r", "sword", "#dfe7ef"], ["axe", "weapon", "Battle Axe", "r", "axe", "#c8d0d8"],
+  ["deck", "weapon", "Shred Deck", "r", "deck", "#e85fa8"], ["bikehelm", "head", "Trail Helmet", "r", "helmet", "#22b3a6"],
+  ["goggles", "head", "Snow Goggles", "r", "goggles", "#ff9d2e"], ["chain", "armor", "Chainmail", "r", null, "#aab4c0"],
+  ["jacket", "armor", "Shred Jacket", "r", null, "#19c2b0"], ["powboard", "back", "Pow Board", "r", "board", "#4aa8ff"],
+  ["staff", "weapon", "Staff of Focus", "e", "staff", "#c07bff"], ["wizhat", "head", "Wizard Hat", "e", "wizard", "#6b4bd6"],
+  ["knight", "head", "Knight Helm", "e", "helmet", "#cfd8e3"], ["plate", "armor", "Plate Armor", "e", null, "#8fa3bd"],
+  ["cape", "back", "Hero Cape", "e", "cape", "#d83a3a"], ["ace", "weapon", "Ace Driver", "e", "disc", "#f4c542"],
+  ["storm", "weapon", "Stormbreaker", "l", "sword", "#5ff0ff"], ["crown", "head", "Crown of Done", "l", "crown", "#f4c542"],
+  ["dragonmail", "armor", "Dragonscale Mail", "l", null, "#2fbf6b"], ["aurora", "back", "Aurora Board", "l", "board", "#b56bff"]
+].map(([id, slot, name, rar, art, color]) => ({ id, slot, name, rar, art, color }));
+const item = id => ITEMS.find(i => i.id === id);
+const SLOTS = { weapon: "Weapon", head: "Head", armor: "Armor", back: "Back" };
+
+const MON = {
+  slime: ["", "", "", "", "", "", "", ".....mmmmmm.....", "...mmmmmmmmmm...", "..mmmmmmmmmmmm..", "..mmekmmmmekmm..", ".mmmmmmmmmmmmmm.", ".mmmmmkkkkmmmmm.", ".mMmmmmmmmmmmMm.", ".MMMMMMMMMMMMMM.", "..MMMMMMMMMMMM.."],
+  bat: ["", "", "", "..m..........m..", ".mmm........mmm.", ".mmmm..mm..mmmm.", "mmmmmmmmmmmmmmmm", "mmmmmmekkemmmmmm", "mMmmmmmmmmmmmmMm", "m..mmmmwwmmmm..m", "....mmmmmmmm....", ".....MM..MM....."],
+  skeleton: [".....wwwwww.....", "....wwwwwwww....", "....wkkwwkkw....", "....wkkwwkkw....", "....wwwkkwww....", ".....wkwkwk.....", ".......ww.......", "...wwwwwwwwww...", "...w..wwww..w...", "...w.wwkkww.w...", "...w..wwww..w...", "......wwww......", ".....ww..ww.....", ".....ww..ww.....", ".....ww..ww.....", "....www..www...."],
+  ghost: ["", ".....mmmmmm.....", "....mmmmmmmm....", "...mmmmmmmmmm...", "...mmkkmmkkmm...", "...mmkkmmkkmm...", "...mmmmmmmmmm...", "...mmmmkkmmmm...", "...mmmmkkmmmm...", "...mmmmmmmmmm...", "...mmmmmmmmmm...", "...mMmmmmmmMm...", "...mm.mmmm.mm...", "...m...mm...m..."],
+  goblin: ["", "", "......mmmm......", ".mm..mmmmmm..mm.", "..mmmmmmmmmmmm..", "...mmekmmekmm...", "....mmmmmmmm....", "....mmkwwkmm....", ".....mmmmmm.....", "....nnnnnnnn....", "...mnnnnnnnnm...", "...mnnnnnnnnm...", "...m.nnnnnn.m...", ".....nn..nn.....", ".....mm..mm.....", "....mmm..mmm...."],
+  mimic: ["", "", "", "", "", "", "..nnnnnnnnnnnn..", ".nnggnnnnnnggnn.", ".nnneknnnneknnn.", ".wkwkwkwkwkwkw..", ".krrrrrrrrrrrrk.", ".kwkwkwkwkwkwkk.", ".nnnnnnnnnnnnnn.", ".nnnnnnggnnnnnn.", ".nnnnnnggnnnnnn.", ".NNNNNNNNNNNNNN."],
+  golem: ["", "", ".....mmmmmm.....", ".....mrmmrm.....", ".....mmmmmm.....", "..mmmmmmmmmmmm..", ".mmmmmmmmmmmmmm.", ".mmMmmmmmmmMmmm.", ".mm.mmmmmmmm.mm.", ".mm.mmmMMmmm.mm.", ".mm.mmmmmmmm.mm.", ".MM.mmmmmmmm.MM.", "....mmmmmmmm....", "....mmm..mmm....", "....mmm..mmm....", "...MMMM..MMMM..."],
+  dragon: ["", "", "", "...mm......m....", "..mmmm....mmm...", ".mekmmm..mmmmm..", "mmmmmmm.mmmmmmm.", "wmwmmmmmmmmmmmmm", ".rrmmmmmmmmmmmm.", "...mmmMMMMmmmmm.", "...mmMMMMMMmmm..", "..mmmMMMMMMmmm..", "..mmmmMMMMmmmm.m", "..mm.mmmmmm.mmmm", "..mm..mmmm..mmm.", ".mmm..mm.....m.."]
+};
+const MONCOL = { slime: "#5fd35f", bat: "#9a6bd6", skeleton: "#e8e4d8", ghost: "#cfe6ff", goblin: "#7fbf4a", mimic: "#8a5a2b", golem: "#8d97a6", dragon: "#e0483a" };
+const THEMES = {
+  stone:  { brick: "#2b2f3b", mortar: "#171a22", floor: "#3b4252", label: "Stone" },
+  moss:   { brick: "#26382b", mortar: "#131c15", floor: "#3a5240", label: "Moss" },
+  ice:    { brick: "#27405a", mortar: "#132131", floor: "#4a6e8f", label: "Ice" },
+  ember:  { brick: "#472a25", mortar: "#22110f", floor: "#6a3a2e", label: "Ember" },
+  violet: { brick: "#352a52", mortar: "#18112b", floor: "#4d3d78", label: "Violet" }
+};
+const CHEST = ["..gggggggg..", ".nnnnnnnnnn.", "nnnnnnnnnnnn", "nnnnnggnnnnn", "kkkkkggkkkkk", "nnnnnggnnnnn", "nnnnnnnnnnnn", "NNNNNNNNNNNN"];
+const TROPHY = ["gggggggggg", "g.gggggg.g", "g.gggggg.g", ".ggggggggg", "..gggggg..", "...gggg...", "....gg....", "....gg....", "...gggg...", "..nnnnnn..", "..nnnnnn.."];
+const TPAL = { g: "#f4c542", n: "#7a5230" };
+const DOG = ["......d.d.", "......ddd.", "......dedk", "d.....ddd.", ".dddddddd.", ".dddddddd.", ".d.d..d.d.", ".d.d..d.d."];
+const CAT = ["......d.d.", "......ddd.", "d.....ded.", "d.....ddd.", ".ddddddd..", ".ddddddd..", ".d.d.d.d..", ".d.d.d.d.."];
+const PETCOL = ["#d9a05b", "#3a3a40", "#f1ede4", "#8a5a2b", "#9aa3ad", "#e08a2e"];
+const petPal = p => ({ d: p.color, e: p.color === "#3a3a40" ? "#f1ede4" : "#111118", k: "#111118" });
+
+function grid(ctx, rows, pal, x, y, s, flash) {
+  for (let r = 0; r < rows.length; r++) { const row = rows[r]; for (let c = 0; c < row.length; c++) { const col = pal[row[c]]; if (!col) continue; ctx.fillStyle = flash || col; ctx.fillRect(x + c * s, y + r * s, s, s); } }
 }
-let S;
-function load() { try { S = JSON.parse(localStorage.getItem(KEY)); } catch {} if (!S || !S.hero) S = starter(); S.skills = S.skills || {}; S.ach = S.ach || {}; S.log = S.log || []; S.claimed = S.claimed || []; }
+function drawArt(ctx, key, color, x, y, s) {
+  const a = ART[key]; if (!a) return;
+  grid(ctx, a.rows, { c: color, C: shade(color), w: "#ffffff", k: "#111118", g: "#f4c542", n: "#7a5230" }, x + (a.x || 0) * s, y + (a.y || 0) * s, s);
+}
+function drawHero(ctx, x, y, s, look, equip) {
+  const eq = k => equip && equip[k] ? item(equip[k]) : null;
+  const back = eq("back"), armor = eq("armor"), head = eq("head"), weapon = eq("weapon");
+  if (back) drawArt(ctx, back.art, back.color, x, y, s);
+  const oc = armor ? armor.color : look.outfit;
+  grid(ctx, BODY, { s: look.skin, e: "#111118", o: oc, O: shade(oc), p: "#2d3445", b: "#191c24" }, x, y, s);
+  const coversHair = head && ["helmet", "beanie", "wizard"].includes(head.art);
+  if (!coversHair) grid(ctx, (HAIR[look.hair] || HAIR.short).rows, { h: look.hairc }, x, y, s);
+  if (head) drawArt(ctx, head.art, head.color, x, y, s);
+  if (weapon) drawArt(ctx, weapon.art, weapon.color, x, y, s);
+}
+function drawMonster(ctx, sprite, x, y, s, flash) {
+  const c = MONCOL[sprite] || "#9aa3ad";
+  grid(ctx, MON[sprite] || MON.slime, { m: c, M: shade(c), e: "#ffffff", k: "#111118", w: "#f4f1e6", r: "#ff3b3b", n: "#8a5a2b", N: "#5c3a1a", g: "#f4c542" }, x, y, s, flash);
+}
+
+// ---------- State ----------
+let S, PLAN = { dungeons: [], week: null };
+function fresh() {
+  return { v: 2, hero: { name: "Adventurer", xp: 0, gold: 0, look: { skin: SKINS[1], hair: "short", hairc: HAIRC[0], outfit: OUTFITS[0] } },
+    done: {}, dailies: [{ id: uid(), t: "Read 10 pages", dates: [] }, { id: uid(), t: "Tidy one thing", dates: [] }], method: [],
+    sides: [], sideDone: {}, power: 0, inv: [], equip: {}, pets: [
+      { id: "p1", kind: "dog", name: "Huck", color: PETCOL[0], out: true }, { id: "p2", kind: "dog", name: "Sol", color: PETCOL[1], out: true },
+      { id: "p3", kind: "cat", name: "Belly", color: PETCOL[4], out: true }, { id: "p4", kind: "cat", name: "Button", color: PETCOL[5], out: true }],
+    trophies: {}, local: [], rewards: [{ id: uid(), title: "Guilt-free gaming night", cost: 100 }, { id: uid(), title: "Takeout of my choice", cost: 200 }, { id: uid(), title: "New board, game or gear", cost: 1000 }],
+    claimed: [], log: [], best: 0, sel: {} };
+}
+function migrate(o) {
+  const s = fresh();
+  try {
+    s.hero.name = o.hero.name || s.hero.name; s.hero.xp = o.hero.xp || 0; s.hero.gold = o.hero.gold || 0;
+    if (o.rewards && o.rewards.length) s.rewards = o.rewards; s.claimed = o.claimed || []; s.best = o.best || 0;
+    const ds = (o.quests || []).filter(q => q.type === "daily");
+    if (ds.length) s.dailies = ds.map(q => ({ id: q.id, t: q.title, dates: q.doneDates || [] }));
+    for (const q of (o.quests || [])) {
+      if (q.type === "daily" || q.done) continue;
+      if ((q.steps || []).length) { const d = buildLocal(q.title, q.steps.map(x => x.t), "stone"); q.steps.forEach((x, i) => { if (x.done) s.done[d.id + "-" + i] = { d: today(), xp: 0, gold: 0 }; }); s.local.push(d); }
+      else s.sides.push({ id: q.id, t: q.title });
+    }
+  } catch {}
+  return s;
+}
+function load() {
+  S = null; try { S = JSON.parse(localStorage.getItem(KEY)); } catch {}
+  if (!S || !S.hero) { let o = null; try { o = JSON.parse(localStorage.getItem(OLD)); } catch {} S = o && o.hero ? migrate(o) : fresh(); save(); }
+  const f = fresh(); for (const k in f) if (S[k] === undefined || S[k] === null) S[k] = f[k];
+  S.hero.look = Object.assign(f.hero.look, S.hero.look || {});
+}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
 
-// Level L needs 60*L*(L+1)/2 total XP to pass: 60, 180, 360, 600...
+const SPR = ["slime", "bat", "goblin", "skeleton", "ghost", "mimic", "golem"];
+const MNAMES = { slime: "Slime of Someday", bat: "Distraction Bat", goblin: "Excuse Goblin", skeleton: "Bone-Idle Skeleton", ghost: "Ghost of Good Intentions", mimic: "Busywork Mimic", golem: "Inertia Golem", dragon: "The Final Boss" };
+function buildLocal(name, steps, theme) {
+  const id = "L" + uid(), floors = [], per = steps.length <= 4 ? steps.length : 3;
+  for (let i = 0, n = 0; i < steps.length; i += per, n++) {
+    const boss = i + per >= steps.length && steps.length > 2, sprite = boss ? "dragon" : SPR[n % SPR.length];
+    floors.push({ id: id + "-f" + n, name: boss ? "Boss lair" : "Level " + (n + 1), sprite, monster: MNAMES[sprite], boss, steps: steps.slice(i, i + per).map((t, j) => ({ id: id + "-" + (i + j), t })) });
+  }
+  return { id, name, theme: theme || "stone", floors, local: true };
+}
+const dungeons = () => [...(PLAN.dungeons || []), ...S.local];
+const isDone = st => !!S.done[st.id];
+const floorLeft = f => f.steps.filter(s => !isDone(s)).length;
+const dLeft = d => d.floors.reduce((n, f) => n + floorLeft(f), 0);
+const dTotal = d => d.floors.reduce((n, f) => n + f.steps.length, 0);
+const firstOpen = d => { const i = d.floors.findIndex(f => floorLeft(f) > 0); return i < 0 ? d.floors.length - 1 : i; };
+
 const needFor = L => 30 * L * (L + 1);
 function levelOf(xp) { let L = 1; while (xp >= needFor(L)) L++; return L; }
-function skillLevel(xp) { let L = 1; while (xp >= 15 * L * (L + 1)) L++; return L; }
+const titleOf = L => TITLES[Math.min(TITLES.length - 1, Math.floor((L - 1) / 3))];
+const gearBonus = () => Object.values(S.equip).reduce((n, id) => n + (id && item(id) ? R[item(id).rar][1] : 0), 0);
+const petBonus = () => S.pets.filter(p => p.out).length * 3;
 
 function streak() {
-  const dailies = S.quests.filter(q => q.type === "daily");
-  if (!dailies.length) return 0;
-  const allDone = d => dailies.every(q => (q.doneDates || []).includes(d) || q.created > d);
-  let n = 0; const d = new Date(); d.setHours(12);
-  if (!allDone(today())) d.setDate(d.getDate() - 1);
-  while (n < 3650) { const k = d.toLocaleDateString("en-CA"); if (!allDone(k) || dailies.every(q => q.created > k)) break; n++; d.setDate(d.getDate() - 1); }
+  const ds = S.dailies; if (!ds.length) return 0;
+  const all = d => ds.every(q => (q.dates || []).includes(d));
+  let n = 0; const d = new Date(); d.setHours(12); if (!all(today())) d.setDate(d.getDate() - 1);
+  while (n < 3650 && all(d.toLocaleDateString("en-CA"))) { n++; d.setDate(d.getDate() - 1); }
   return n;
 }
 
+// ---------- Feedback ----------
 let toastT;
 function toast(msg, undo) {
   const t = $("toast"); $("tmsg").textContent = msg; t.hidden = false;
   $("tundo").hidden = !undo; $("tundo").onclick = () => { t.hidden = true; undo && undo(); };
-  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, undo ? 5000 : 2200);
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, undo ? 5000 : 2400);
 }
-function floatXP(el, txt) {
-  const r = el.getBoundingClientRect(); const f = document.createElement("div");
-  f.className = "float"; f.textContent = txt; f.style.left = (r.left + r.width / 2 - 20) + "px"; f.style.top = (r.top - 6) + "px";
+function floatText(el, txt, color) {
+  const r = el.getBoundingClientRect(), f = document.createElement("div");
+  f.className = "float"; f.textContent = txt; if (color) f.style.color = color; f.style.left = Math.max(8, r.left) + "px"; f.style.top = (r.top - 4) + "px";
   document.body.append(f); setTimeout(() => f.remove(), 950);
 }
+function modal(html, cls, rc) {
+  const m = $("modal"); m.className = "modal" + (cls ? " " + cls : ""); m.style.setProperty("--rc", rc || "var(--gold)"); m.innerHTML = html; $("scrim").hidden = false; return m;
+}
+const closeModal = () => { $("scrim").hidden = true; };
+function ask(html, cls, rc) { return new Promise(res => { const m = modal(html, cls, rc); const bs = m.querySelectorAll("[data-r]"); bs.forEach(b => b.onclick = () => { closeModal(); res(b.dataset.r); }); bs[bs.length - 1].focus(); }); }
 
-function grant(xp, gold, quest, label, el) {
+function gain(xp, gold, label) {
   const before = levelOf(S.hero.xp);
   S.hero.xp += xp; S.hero.gold += gold;
-  if (quest && quest.skill) S.skills[quest.skill] = (S.skills[quest.skill] || 0) + xp;
-  S.log.unshift({ t: label, xp, gold, d: today() }); S.log = S.log.slice(0, 200);
-  if (el) floatXP(el, "+" + xp + " XP");
-  const after = levelOf(S.hero.xp);
-  checkAch();
-  save();
-  if (after > before) setTimeout(() => {
-    $("lvtext").textContent = "LEVEL " + after;
-    $("lvsub").textContent = "You are now a " + TITLES[Math.min(TITLES.length - 1, Math.floor((after - 1) / 3))] + ".";
-    $("levelup").hidden = false; $("lvok").focus();
-  }, 350);
+  S.log.unshift({ t: label, xp, gold, d: today() }); S.log = S.log.slice(0, 150);
+  S.best = Math.max(S.best || 0, streak()); save(); renderStrip();
+  return levelOf(S.hero.xp) > before ? levelOf(S.hero.xp) : 0;
 }
-function ungrant(xp, gold, quest) {
-  S.hero.xp = Math.max(0, S.hero.xp - xp); S.hero.gold = Math.max(0, S.hero.gold - gold);
-  if (quest && quest.skill) S.skills[quest.skill] = Math.max(0, (S.skills[quest.skill] || 0) - xp);
-  S.log.shift(); save();
-}
-$("lvok").onclick = () => $("levelup").hidden = true;
+function lose(xp, gold) { S.hero.xp = Math.max(0, S.hero.xp - xp); S.hero.gold = Math.max(0, S.hero.gold - gold); save(); renderStrip(); }
 
-const ACH = [
-  ["first", "First blood", "Finish your first quest", () => S.log.length >= 1],
-  ["ten", "Getting busy", "Finish 10 quests", () => S.log.filter(l => l.xp > 0).length >= 10],
-  ["fifty", "Quest machine", "Finish 50 quests", () => S.log.filter(l => l.xp > 0).length >= 50],
-  ["boss", "Boss slayer", "Defeat a boss", () => S.log.some(l => l.boss)],
-  ["streak3", "Warming up", "3-day daily streak", () => S.best >= 3],
-  ["streak7", "On a roll", "7-day daily streak", () => S.best >= 7],
-  ["streak30", "Unbreakable", "30-day daily streak", () => S.best >= 30],
-  ["lv5", "Seasoned", "Reach level 5", () => levelOf(S.hero.xp) >= 5],
-  ["lv10", "Veteran", "Reach level 10", () => levelOf(S.hero.xp) >= 10],
-  ["loot", "Treat yo self", "Claim a reward", () => S.claimed.length >= 1],
-  ["rich", "Dragon hoard", "Hold 500 gold", () => S.hero.gold >= 500],
-  ["wide", "Well rounded", "Level 3 in every skill", () => Object.keys(SKILLS).every(k => skillLevel(S.skills[k] || 0) >= 3)]
-];
-function checkAch() {
-  S.best = Math.max(S.best || 0, streak());
-  for (const [id, name] of ACH) if (!S.ach[id] && ACH.find(a => a[0] === id)[3]()) { S.ach[id] = today(); setTimeout(() => toast("Achievement: " + name), 900); }
+// ---------- Scene ----------
+const scene = { fx: null, d: null, f: null };
+const sctx = $("scene").getContext("2d");
+function drawScene(now) {
+  const c = sctx, d = scene.d, f = scene.f, th = THEMES[(d && d.theme) || "stone"] || THEMES.stone;
+  c.fillStyle = th.mortar; c.fillRect(0, 0, 192, 96);
+  c.fillStyle = th.brick;
+  for (let y = 0, r = 0; y < 80; y += 8, r++) for (let x = (r % 2 ? -8 : 0); x < 192; x += 16) c.fillRect(x + 1, y + 1, 14, 6);
+  c.fillStyle = th.floor; c.fillRect(0, 80, 192, 16); c.fillStyle = "rgba(255,255,255,.12)"; c.fillRect(0, 80, 192, 1);
+  const fl = REDUCED ? 0 : Math.floor(now / 160) % 3;
+  for (const tx of [12, 178]) { c.fillStyle = "rgba(255,170,60,.09)"; c.fillRect(tx - 9, 20, 20, 26); c.fillStyle = "#7a5230"; c.fillRect(tx, 34, 2, 10); c.fillStyle = "#ff9d2e"; c.fillRect(tx - 1, 28 + (fl === 1 ? 1 : 0), 4, 6); c.fillStyle = "#ffe27a"; c.fillRect(tx, 30 + (fl === 2 ? 1 : 0), 2, 3); }
+  if (!d || !f) return;
+  const bob = REDUCED ? 0 : Math.floor(now / 420) % 2, fx = scene.fx, t = fx ? (now - fx.start) / fx.dur : 0;
+  let hx = 70, mshake = 0, flash = null, mAlpha = 1;
+  if (fx && fx.kind === "attack") { const p = t < .4 ? t / .4 : t < .6 ? 1 : Math.max(0, 1 - (t - .6) / .4); hx = 70 + Math.round(44 * p); if (t >= .35 && t < .7) { flash = fx.crit ? "#aef4ff" : "#ffffff"; mshake = (Math.floor(now / 40) % 2 ? 2 : -2); } }
+  if (fx && fx.kind === "die") mAlpha = Math.floor(now / 70) % 2 ? .2 : .9;
+  S.pets.filter(p => p.out).forEach((p, i) => grid(c, p.kind === "cat" ? CAT : DOG, petPal(p), i * 16, 64 - ((bob + i) % 2), 2));
+  drawHero(c, hx, 48 - bob, 2, S.hero.look, S.equip);
+  const alive = floorLeft(f) > 0 || (fx && fx.wasAlive);
+  if (!alive) {
+    if (dLeft(d) === 0) grid(c, TROPHY, TPAL, 140, 80 - 33, 3);
+    else grid(c, CHEST, { g: "#f4c542", n: "#8a5a2b", N: "#5c3a1a", k: "#111118" }, 144, 80 - 16, 2);
+  } else {
+    const s = f.boss ? 3 : 2, flies = f.sprite === "bat" || f.sprite === "ghost", mx = (f.boss ? 138 : 148) + mshake, my = 80 - 16 * s + (flies ? -8 - bob * 2 : 0);
+    c.globalAlpha = mAlpha; drawMonster(c, f.sprite, mx, my, s, flash); c.globalAlpha = 1;
+  }
+  if (fx && now - fx.start >= fx.dur) fx.finish();
+}
+function play(kind, dur, extra) {
+  if (REDUCED) return Promise.resolve();
+  return new Promise(res => { const fx = Object.assign({ kind, dur, start: performance.now() }, extra); fx.finish = () => { if (scene.fx === fx) scene.fx = null; res(); }; scene.fx = fx; setTimeout(fx.finish, dur + 150); });
+}
+let tab = "dungeon";
+function loop(now) { if (tab === "dungeon" && !document.hidden) drawScene(now); requestAnimationFrame(loop); }
+
+// ---------- Loot ----------
+const TABLE = { hit: { c: 70, r: 25, e: 5 }, kill: { c: 48, r: 36, e: 14, l: 2 }, boss: { r: 45, e: 43, l: 12 }, clear: { e: 60, l: 40 } };
+function roll(kind) {
+  const w = TABLE[kind]; let n = Math.random() * Object.values(w).reduce((a, b) => a + b, 0), rar = "c";
+  for (const [k, v] of Object.entries(w)) { if (n < v) { rar = k; break; } n -= v; }
+  const order = ["c", "r", "e", "l"], i = order.indexOf(rar), tryR = k => { const pool = ITEMS.filter(x => x.rar === order[k] && !S.inv.includes(x.id)); return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null; };
+  for (let k = i; k < 4; k++) { const it = tryR(k); if (it) return it; }
+  for (let k = i - 1; k >= 0; k--) { const it = tryR(k); if (it) return it; }
+  return null;
+}
+async function giveLoot(kind) {
+  const it = roll(kind);
+  if (!it) { const g = { hit: 15, kill: 40, boss: 120, clear: 300 }[kind]; S.hero.gold += g; save(); renderStrip(); toast("You own every item. +" + g + " gold instead"); return; }
+  S.inv.push(it.id); save();
+  const p = ask('<h3>' + R[it.rar][0] + ' loot!</h3><canvas id="lootcv" width="32" height="40"></canvas><div class="big"></div><p>' + SLOTS[it.slot] + " · +" + R[it.rar][1] + '% XP while equipped</p><div class="row2"><button class="btn" data-r="bag" type="button">Keep in bag</button><button class="btn gold" data-r="equip" type="button">Equip</button></div>', "", "var(--r-" + it.rar + ")");
+  $("modal").querySelector(".big").textContent = it.name;
+  drawHero($("lootcv").getContext("2d"), 0, 8, 2, S.hero.look, Object.assign({}, S.equip, { [it.slot]: it.id }));
+  if (await p === "equip") { S.equip[it.slot] = it.id; save(); renderStrip(); }
 }
 
-function renderHero() {
-  const L = levelOf(S.hero.xp), lo = L > 1 ? needFor(L - 1) : 0, hi = needFor(L);
-  $("crest").firstChild.textContent = (S.hero.name || "A").trim().charAt(0).toUpperCase() || "A";
-  $("lvl").textContent = "LV " + L;
-  $("hname").textContent = S.hero.name || "Adventurer";
-  $("htitle").textContent = TITLES[Math.min(TITLES.length - 1, Math.floor((L - 1) / 3))];
-  const pct = Math.round(((S.hero.xp - lo) / (hi - lo)) * 100);
+// ---------- Dungeon tab ----------
+let curD = null, curF = 0, busy = false;
+function pickDungeon(id, floor) {
+  const ds = dungeons(); curD = ds.find(d => d.id === id) || ds.find(d => dLeft(d) > 0) || ds[0] || null;
+  if (curD) { curF = floor != null ? floor : firstOpen(curD); S.sel = { d: curD.id }; save(); }
+  renderDungeon();
+}
+function weekInfo() {
+  const w = PLAN.week; if (!w || !(w.focus || []).length) return null;
+  const all = []; for (const d of dungeons()) d.floors.forEach((f, fi) => f.steps.forEach(s => { if (w.focus.includes(s.id)) all.push({ d, fi, s }); }));
+  return all.length ? { all, left: all.filter(x => !isDone(x.s)) } : null;
+}
+function renderDungeon() {
+  const ds = dungeons(), chips = $("dchips"); chips.innerHTML = "";
+  for (const d of ds) {
+    const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.setAttribute("aria-pressed", String(!!curD && d.id === curD.id));
+    const n = document.createElement("span"); n.textContent = d.name; const sm = document.createElement("small"); const tot = dTotal(d), left = dLeft(d);
+    sm.textContent = left ? (tot - left) + "/" + tot + " hits" : "Cleared 🏆"; b.append(n, sm); b.onclick = () => { if (!busy) pickDungeon(d.id); }; chips.append(b);
+  }
+  const nb = document.createElement("button"); nb.className = "chip"; nb.type = "button"; nb.innerHTML = "+ New<small>dungeon</small>"; nb.onclick = newDungeon; chips.append(nb);
+  const wk = weekInfo(); $("weekbar").hidden = !wk;
+  if (wk) { $("weektext").textContent = (wk.all.length - wk.left.length) + " of " + wk.all.length + " hits landed"; $("weeknext").hidden = !wk.left.length; $("weeknext").onclick = () => { if (busy) return; const x = wk.left[0]; pickDungeon(x.d.id, x.fi); $("steps").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" }); }; }
+  const d = curD; scene.d = d; scene.f = d ? d.floors[curF] : null;
+  $("ddel").hidden = !(d && d.local);
+  if (!d) { $("mname").textContent = "No dungeons yet"; $("mhp").textContent = ""; $("hpfill").style.width = "0"; $("fname").textContent = ""; $("floortag").textContent = ""; $("steps").innerHTML = '<p class="empty">Tap + New to build a dungeon from a goal.</p>'; return; }
+  const f = d.floors[curF], left = floorLeft(f), tot = f.steps.length;
+  $("floortag").textContent = d.name + (d.goal ? " · " + d.goal : ""); $("crittag").hidden = S.power < 100 || !left;
+  $("mname").textContent = left ? f.monster + (f.boss ? " · BOSS" : "") : (dLeft(d) ? "Floor cleared" : "Dungeon cleared!");
+  $("mhp").textContent = left ? "HP " + left + "/" + tot : ""; $("hpfill").style.width = (left / tot * 100) + "%";
+  $("fname").textContent = "Floor " + (curF + 1) + " of " + d.floors.length + " · " + f.name;
+  $("fprev").disabled = curF === 0; $("fnext").disabled = curF === d.floors.length - 1;
+  const box = $("steps"); box.innerHTML = ""; const focus = (PLAN.week && PLAN.week.focus) || [];
+  for (const st of f.steps) {
+    const done = isDone(st), el = document.createElement("div"); el.className = "item" + (done ? " done" : "");
+    const chk = document.createElement("button"); chk.className = "check"; chk.type = "button"; chk.innerHTML = "<span>" + (done ? "✓" : "") + "</span>";
+    chk.setAttribute("aria-label", (done ? "Undo: " : "Attack: ") + st.t); chk.onclick = () => done ? unhit(st) : hit(d, f, st, chk);
+    const t = document.createElement("span"); t.className = "t"; t.textContent = st.t; if (focus.includes(st.id) && !done) { const sm = document.createElement("small"); sm.textContent = "This week"; t.append(sm); }
+    const xp = document.createElement("span"); xp.className = "xp"; xp.textContent = done ? "" : stepXP(f, st) + " XP";
+    el.append(chk, t, xp); box.append(el);
+  }
+}
+const stepXP = (f, st) => (XP[st.diff] || XP.med) * (f.boss ? 2 : 1);
+$("fprev").onclick = () => { if (busy) return; curF--; renderDungeon(); }; $("fnext").onclick = () => { if (busy) return; curF++; renderDungeon(); };
+function unhit(st) { if (busy) return; const r = S.done[st.id]; delete S.done[st.id]; lose(r.xp || 0, r.gold || 0); renderDungeon(); }
+async function hit(d, f, st, el) {
+  if (busy) return; busy = true;
+  try {
+    const crit = S.power >= 100, xp = Math.round(stepXP(f, st) * (crit ? 2 : 1) * (1 + gearBonus() / 100)), gold = Math.round(xp / 2 * (1 + petBonus() / 100));
+    S.done[st.id] = { d: today(), xp, gold }; if (crit) S.power = 0;
+    let lv = gain(xp, gold, st.t);
+    floatText(el, (crit ? "POWER HIT +" : "+") + xp + " XP", crit ? "var(--power)" : null);
+    const killed = floorLeft(f) === 0, cleared = dLeft(d) === 0;
+    renderDungeon();
+    await play("attack", 520, { crit, wasAlive: true });
+    if (killed) {
+      await play("die", 600, { wasAlive: true });
+      const b = f.boss ? 60 : 20; lv = gain(b, b, "Slew " + f.monster) || lv;
+      await giveLoot(f.boss ? "boss" : "kill");
+    } else if (crit || Math.random() < .2) await giveLoot("hit");
+    if (cleared) {
+      const first = !S.trophies[d.id];
+      if (first) { S.trophies[d.id] = { name: d.name, goal: d.goal || "", d: today() }; lv = gain(200, 150, "Cleared " + d.name) || lv; }
+      const p = ask('<h3>Dungeon cleared!</h3><canvas id="tcv" width="10" height="11" style="width:100px;height:110px"></canvas><div class="big"></div><p>' + (first ? "A trophy now hangs in your hall. +200 XP, +150 gold." : "Cleared again.") + '</p><button class="btn gold" data-r="ok" type="button">Claim</button>');
+      $("modal").querySelector(".big").textContent = d.name; grid($("tcv").getContext("2d"), TROPHY, TPAL, 0, 0, 1);
+      await p; if (first) await giveLoot("clear");
+    }
+    if (lv) await ask('<h3>LEVEL ' + lv + '</h3><p>You are now a ' + titleOf(lv) + '.</p><button class="btn gold" data-r="ok" type="button">Onward</button>');
+    if (killed && !cleared) curF = firstOpen(d);
+  } finally { busy = false; renderDungeon(); }
+}
+
+const TEMPLATES = {
+  "": [], hobby: ["Pick the hobby and why", "Get the starter gear", "Find a tutorial or class", "First real session", "Practice 5 more times", "Make or do one thing to show someone"],
+  ship: ["Write down what it does in 3 sentences", "Sketch the screens", "Build the first working version", "Use it for a week", "Fix the top 3 annoyances", "Share it with someone"],
+  trick: ["Watch a breakdown of the trick", "Drill the setup on flat ground", "Three practice sessions", "Film an attempt and review it", "Land it once", "Land it three times in a row"]
+};
+function newDungeon() {
+  if (busy) return;
+  modal('<h3>New dungeon</h3><label class="field" for="nd-name">Goal<input type="text" id="nd-name" maxlength="50" placeholder="e.g. Restore the old BMX"></label>' +
+    '<div class="row2"><label class="field" for="nd-theme">Look<select id="nd-theme">' + Object.entries(THEMES).map(([k, v]) => '<option value="' + k + '">' + v.label + "</option>").join("") + '</select></label>' +
+    '<label class="field" for="nd-tpl">Start from<select id="nd-tpl"><option value="">Blank</option><option value="hobby">New hobby</option><option value="ship">Ship a project</option><option value="trick">Learn a trick</option></select></label></div>' +
+    '<label class="field" for="nd-steps">Steps, one per line. Every 3 steps is a floor, and the last floor is the boss.<textarea id="nd-steps"></textarea></label>' +
+    '<div class="row2"><button class="btn" id="nd-cancel" type="button">Cancel</button><button class="btn gold" id="nd-ok" type="button">Build it</button></div>', "left");
+  $("nd-tpl").onchange = () => { $("nd-steps").value = TEMPLATES[$("nd-tpl").value].join("\n"); };
+  $("nd-cancel").onclick = closeModal;
+  $("nd-ok").onclick = () => {
+    const name = $("nd-name").value.trim(), steps = $("nd-steps").value.split("\n").map(s => s.trim()).filter(Boolean).slice(0, 60);
+    if (!name) return $("nd-name").focus(); if (!steps.length) return $("nd-steps").focus();
+    const d = buildLocal(name, steps, $("nd-theme").value); S.local.push(d); save(); closeModal(); pickDungeon(d.id); toast("Dungeon built");
+  };
+  $("nd-name").focus();
+}
+$("ddel").onclick = () => { if (busy) return; const d = curD, i = S.local.indexOf(d); if (i < 0) return; S.local.splice(i, 1); save(); pickDungeon(null); toast("Dungeon deleted", () => { S.local.splice(i, 0, d); save(); pickDungeon(d.id); }); };
+
+// ---------- Camp ----------
+function methodToday() { try { const m = JSON.parse(localStorage.getItem("method-v1")); return !!(m && (m.log || []).some(e => e.d === today())); } catch { return false; } }
+function syncMethod() {
+  if (methodToday() && !S.method.includes(today())) { S.method.push(today()); S.method = S.method.slice(-60); S.power = Math.min(100, S.power + 50); gain(30, 15, "Method session"); toast("Method session synced: +30 XP, power charged"); }
+}
+function charge(n) { S.power = Math.max(0, Math.min(100, S.power + n)); }
+function row(box, text, done, xpText, onCheck, onDel, sub) {
+  const el = document.createElement("div"); el.className = "item" + (done ? " done" : "");
+  const chk = document.createElement("button"); chk.className = "check"; chk.type = "button"; chk.innerHTML = "<span>" + (done ? "✓" : "") + "</span>"; chk.setAttribute("aria-label", (done ? "Undo: " : "Done: ") + text);
+  if (onCheck) chk.onclick = () => onCheck(chk); else chk.disabled = true;
+  const t = document.createElement("span"); t.className = "t"; t.textContent = text; if (sub) { const sm = document.createElement("small"); sm.textContent = sub; t.append(sm); }
+  const right = document.createElement("span"); right.style.display = "flex"; right.style.alignItems = "center";
+  const xp = document.createElement("span"); xp.className = "xp"; xp.textContent = done ? "" : xpText; right.append(xp);
+  if (onDel) { const d = document.createElement("button"); d.className = "del"; d.type = "button"; d.textContent = "✕"; d.setAttribute("aria-label", "Delete: " + text); d.onclick = onDel; right.append(d); }
+  el.append(chk, t, right); box.append(el);
+}
+function renderCamp() {
+  syncMethod();
+  $("pwfill").style.width = S.power + "%"; $("pwtext").textContent = S.power >= 100 ? "FULL: power hit ready" : S.power + "%";
+  const s = streak(); $("streaktext").textContent = s ? "🔥 " + s + "-day streak" : "resets each day";
+  const db = $("dailies"); db.innerHTML = "";
+  row(db, "Method workout", S.method.includes(today()), "auto", null, null, "Checks itself when you finish a session in Method on this phone");
+  for (const q of S.dailies) {
+    q.dates = q.dates || []; const done = q.dates.includes(today());
+    row(db, q.t, done, "10 XP", el => {
+      if (done) { q.dates = q.dates.filter(d => d !== today()); charge(-34); lose(10, 5); }
+      else { q.dates = q.dates.concat(today()).slice(-400); charge(34); gain(10, 5, q.t); floatText(el, "+10 XP · power up", "var(--power)"); if (S.dailies.every(x => (x.dates || []).includes(today()))) toast("All training done · streak " + streak() + " 🔥"); }
+      save(); renderCamp();
+    }, () => { const i = S.dailies.indexOf(q); S.dailies.splice(i, 1); save(); renderCamp(); toast("Daily removed", () => { S.dailies.splice(i, 0, q); save(); renderCamp(); }); });
+  }
+  const sb = $("sides"); sb.innerHTML = "";
+  const plan = ((PLAN.week && PLAN.week.side) || []).map(x => ({ id: x.id, t: x.t, plan: true })), all = [...plan, ...S.sides].filter(x => !S.sideDone[x.id] || S.sideDone[x.id].d === today());
+  if (!all.length) sb.innerHTML = '<p class="empty">No side quests. Nice.</p>';
+  for (const q of all) {
+    const done = !!S.sideDone[q.id];
+    row(sb, q.t, done, "15 XP", el => {
+      if (done) { const r = S.sideDone[q.id]; delete S.sideDone[q.id]; lose(r.xp, r.gold); charge(-10); }
+      else { S.sideDone[q.id] = { d: today(), xp: 15, gold: 8 }; charge(10); gain(15, 8, q.t); floatText(el, "+15 XP"); }
+      save(); renderCamp();
+    }, q.plan ? null : () => { const i = S.sides.indexOf(q); S.sides.splice(i, 1); save(); renderCamp(); toast("Side quest removed", () => { S.sides.splice(i, 0, q); save(); renderCamp(); }); }, q.plan ? "This week" : "");
+  }
+}
+function adder(input, btn, fn) { const go = () => { const v = $(input).value.trim(); if (!v) return $(input).focus(); fn(v); $(input).value = ""; save(); renderCamp(); }; $(btn).onclick = go; $(input).onkeydown = e => { if (e.key === "Enter") go(); }; }
+adder("newdaily", "adddaily", v => S.dailies.push({ id: uid(), t: v, dates: [] }));
+adder("newside", "addside", v => S.sides.push({ id: uid(), t: v }));
+
+// ---------- Hero tab ----------
+function renderStrip() {
+  const L = levelOf(S.hero.xp), lo = L > 1 ? needFor(L - 1) : 0, hi = needFor(L), pct = Math.round((S.hero.xp - lo) / (hi - lo) * 100);
+  $("hname").textContent = S.hero.name + " · LV " + L; $("htitle").textContent = titleOf(L);
   $("xpfill").style.width = pct + "%"; $("xpbar").setAttribute("aria-valuenow", pct);
-  $("xptext").textContent = (S.hero.xp - lo) + " / " + (hi - lo) + " XP to level " + (L + 1);
-  $("goldtext").textContent = S.hero.gold + " gold";
+  $("xptext").textContent = (S.hero.xp - lo) + " / " + (hi - lo) + " XP"; $("goldtext").textContent = S.hero.gold + " gold";
+  const f = $("face").getContext("2d"); f.clearRect(0, 0, 16, 16); drawHero(f, 0, 2, 1, S.hero.look, { head: S.equip.head, armor: S.equip.armor });
 }
+function swatches(id, list, key, isText) {
+  const box = $(id); box.innerHTML = "";
+  list.forEach((v, n) => {
+    const b = document.createElement("button"); b.type = "button"; const val = isText ? v[0] : v;
+    if (isText) b.textContent = v[1]; else { b.style.background = v; b.setAttribute("aria-label", "Color " + (n + 1)); }
+    b.setAttribute("aria-pressed", String(S.hero.look[key] === val));
+    b.onclick = () => { S.hero.look[key] = val; save(); renderHero(); renderStrip(); }; box.append(b);
+  });
+}
+function renderHero() {
+  const p = $("preview").getContext("2d"); p.clearRect(0, 0, 32, 40); drawHero(p, 0, 8, 2, S.hero.look, S.equip);
+  if (document.activeElement !== $("nameinput")) $("nameinput").value = S.hero.name;
+  swatches("sw-skin", SKINS, "skin"); swatches("sw-hairc", HAIRC, "hairc"); swatches("sw-outfit", OUTFITS, "outfit");
+  swatches("sw-hair", Object.entries(HAIR).map(([k, v]) => [k, v.label]), "hair", true);
+  const g = $("gear"); g.innerHTML = ""; $("gearbonus").textContent = "+" + gearBonus() + "% XP from gear";
+  for (const [slot, label] of Object.entries(SLOTS)) {
+    const f = document.createElement("div"); f.className = "field"; f.textContent = label; const wrap = document.createElement("div"); wrap.className = "gear";
+    const own = S.inv.map(item).filter(i => i && i.slot === slot);
+    if (!own.length) { const e = document.createElement("span"); e.className = "empty"; e.textContent = "Nothing yet. Monsters drop gear."; wrap.append(e); }
+    for (const it of own) { const b = document.createElement("button"); b.type = "button"; b.textContent = it.name; b.style.setProperty("--rc", "var(--r-" + it.rar + ")"); const on = S.equip[slot] === it.id; b.setAttribute("aria-pressed", String(on)); b.title = R[it.rar][0]; b.onclick = () => { S.equip[slot] = on ? null : it.id; save(); renderHero(); renderStrip(); }; wrap.append(b); }
+    f.append(wrap); g.append(f);
+  }
+  const pb = $("pets"); pb.innerHTML = "";
+  for (const pet of S.pets) {
+    const r = document.createElement("div"); r.className = "pet"; const cv = document.createElement("canvas"); cv.width = 10; cv.height = 8; grid(cv.getContext("2d"), pet.kind === "cat" ? CAT : DOG, petPal(pet), 0, 0, 1);
+    const mid = document.createElement("div"); mid.className = "list"; mid.style.gap = "6px";
+    const inp = document.createElement("input"); inp.type = "text"; inp.maxLength = 14; inp.value = pet.name; inp.id = "pet-" + pet.id; inp.setAttribute("aria-label", "Name of " + pet.kind); inp.oninput = () => { pet.name = inp.value; save(); };
+    const sw = document.createElement("div"); sw.className = "sw"; PETCOL.forEach((c, n) => { const b = document.createElement("button"); b.type = "button"; b.style.background = c; b.setAttribute("aria-label", "Coat color " + (n + 1)); b.setAttribute("aria-pressed", String(pet.color === c)); b.onclick = () => { pet.color = c; save(); renderHero(); }; sw.append(b); });
+    mid.append(inp, sw);
+    const tg = document.createElement("button"); tg.className = "btn"; tg.type = "button"; tg.textContent = pet.out ? "With me" : "At home"; tg.setAttribute("aria-pressed", String(pet.out)); tg.onclick = () => { pet.out = !pet.out; save(); renderHero(); };
+    r.append(cv, mid, tg); pb.append(r);
+  }
+  const tb = $("trophies"); tb.innerHTML = ""; const tr = Object.values(S.trophies); $("trophycount").textContent = tr.length ? tr.length + " earned" : "";
+  if (!tr.length) tb.innerHTML = '<p class="empty">Clear a dungeon to hang its trophy here.</p>';
+  for (const t of tr) { const el = document.createElement("div"); el.className = "trophy"; const cv = document.createElement("canvas"); cv.width = 10; cv.height = 11; grid(cv.getContext("2d"), TROPHY, TPAL, 0, 0, 1); const b = document.createElement("b"); b.textContent = t.name; el.append(cv, b, document.createTextNode((t.goal ? t.goal + " · " : "") + new Date(t.d + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }))); tb.append(el); }
+  const slain = dungeons().reduce((n, d) => n + d.floors.filter(f => floorLeft(f) === 0).length, 0);
+  const stats = [[levelOf(S.hero.xp), "Level"], [Object.keys(S.done).length, "Hits landed"], [slain, "Monsters slain"], [tr.length, "Dungeons cleared"], [S.inv.length + "/" + ITEMS.length, "Gear found"], [Math.max(S.best || 0, streak()), "Best streak"]];
+  const sg = $("statgrid"); sg.innerHTML = ""; for (const [v, l] of stats) { const el = document.createElement("div"); el.className = "stat"; const b = document.createElement("b"); b.textContent = v; el.append(b, document.createTextNode(l)); sg.append(el); }
+  const counts = [], d0 = new Date(); d0.setHours(12); for (let i = 13; i >= 0; i--) { const d = new Date(d0); d.setDate(d.getDate() - i); const k = d.toLocaleDateString("en-CA"); counts.push(Object.values(S.done).filter(x => x.d === k).length + Object.values(S.sideDone).filter(x => x.d === k).length); }
+  const mx = Math.max(1, ...counts), dy = $("days"); dy.innerHTML = ""; counts.forEach(n => { const i = document.createElement("i"); i.style.height = (n / mx * 100) + "%"; i.title = n + " hits"; dy.append(i); });
+  const lg = $("log"); lg.innerHTML = ""; if (!S.log.length) lg.innerHTML = '<p class="empty">Your deeds show up here.</p>';
+  for (const l of S.log.slice(0, 20)) { const r = document.createElement("div"); r.className = "logrow"; const a = document.createElement("span"); a.textContent = l.t; const b = document.createElement("span"); b.textContent = l.xp ? "+" + l.xp + " XP" : "−" + l.gold + " gold"; b.style.color = l.xp ? "var(--xp)" : "var(--gold)"; b.style.whiteSpace = "nowrap"; r.append(a, b); lg.append(r); }
+}
+$("nameinput").oninput = () => { S.hero.name = $("nameinput").value.trim() || "Adventurer"; save(); renderStrip(); };
 
-function questRow(q) {
-  const isDaily = q.type === "daily";
-  const done = isDaily ? (q.doneDates || []).includes(today()) : !!q.done;
-  const el = document.createElement("div"); el.className = "quest " + q.type + (done ? " done" : "");
-  const chk = document.createElement("button"); chk.className = "check"; chk.type = "button";
-  chk.setAttribute("aria-label", (done ? "Undo " : "Complete ") + q.title);
-  chk.innerHTML = "<span>" + (done ? "✓" : "") + "</span>";
-  const steps = q.steps || [], left = steps.filter(s => !s.done).length;
-  if ((q.type === "boss" || q.type === "main") && steps.length && left > 0 && !done) chk.setAttribute("aria-label", "Open " + q.title + " to hit its next step");
-  chk.onclick = () => complete(q, chk);
-  const body = document.createElement("button"); body.className = "qbody"; body.type = "button";
-  const t = document.createElement("span"); t.className = "qt"; t.textContent = q.title;
-  const m = document.createElement("span"); m.className = "qm";
-  const pills = [DIFF[q.diff].label, SKILLS[q.skill] ? SKILLS[q.skill].label : null];
-  if (steps.length) pills.push((steps.length - left) + "/" + steps.length + " steps");
-  if (isDaily) { const n = (q.doneDates || []).length; if (n) pills.push("done " + n + "×"); }
-  for (const p of pills.filter(Boolean)) { const s = document.createElement("span"); s.className = "pill"; s.textContent = p; m.append(s); }
-  body.append(t, m);
-  if (q.type === "boss" && steps.length) { const hp = document.createElement("div"); hp.className = "hp"; hp.innerHTML = "<i></i>"; hp.firstChild.style.width = (left / steps.length * 100) + "%"; hp.setAttribute("aria-label", "Boss HP " + left + " of " + steps.length); body.append(hp); }
-  body.onclick = () => openQuest(q);
-  const xp = document.createElement("span"); xp.className = "xp"; xp.textContent = rewardFor(q).xp + " XP";
-  el.append(chk, body, xp);
-  return el;
-}
-function rewardFor(q) { const base = DIFF[q.diff].xp; const xp = q.type === "boss" ? base * 2 : base; return { xp, gold: Math.round(xp / 2) }; }
-
-function complete(q, el) {
-  const r = rewardFor(q);
-  if (q.type === "daily") {
-    q.doneDates = q.doneDates || [];
-    if (q.doneDates.includes(today())) { q.doneDates = q.doneDates.filter(d => d !== today()); ungrant(r.xp, r.gold, q); render(); return; }
-    q.doneDates.push(today()); grant(r.xp, r.gold, q, q.title, el);
-    const s = streak(); render();
-    if (S.quests.filter(x => x.type === "daily").every(x => (x.doneDates || []).includes(today()))) toast("All dailies done · streak " + s + " 🔥");
-    return;
-  }
-  if (q.done) { q.done = false; ungrant(r.xp, r.gold, q); render(); return; }
-  const left = (q.steps || []).filter(s => !s.done);
-  if ((q.type === "boss" || q.type === "main") && left.length) { openQuest(q); return; }
-  finish(q, el);
-}
-function finish(q, el) {
-  const r = rewardFor(q);
-  q.done = true; q.doneOn = today();
-  grant(r.xp, r.gold, q, q.title, el);
-  if (q.type === "boss") { S.log[0].boss = true; checkAch(); save(); }
-  render();
-  toast((q.type === "boss" ? "Boss defeated! " : "Quest complete! ") + "+" + r.gold + " gold", () => { q.done = false; ungrant(r.xp, r.gold, q); render(); });
-}
-
-function render() {
-  renderHero();
-  const groups = { daily: [], boss: [], main: [], side: [] }, doneToday = [];
-  for (const q of S.quests) {
-    if (q.type !== "daily" && q.done) { if (q.doneOn === today()) doneToday.push(q); continue; }
-    groups[q.type].push(q);
-  }
-  for (const [k, list] of Object.entries(groups)) {
-    const g = $("g-" + k); g.innerHTML = "";
-    if (!list.length) { g.innerHTML = '<p class="empty">' + { daily: "No dailies yet. Add a habit you want to keep.", boss: "No bosses. Got a dreaded job? Make it a boss.", main: "No main quests right now.", side: "No side quests. Nice." }[k] + "</p>"; continue; }
-    list.forEach(q => g.append(questRow(q)));
-  }
-  $("donehead").hidden = !doneToday.length;
-  const gd = $("g-done"); gd.innerHTML = ""; doneToday.forEach(q => gd.append(questRow(q)));
-  const s = streak(); $("dailynote").textContent = s ? "🔥 " + s + "-day streak" : "resets each day";
-}
-
-function renderHeroTab() {
-  const sk = $("skills"); sk.innerHTML = "";
-  for (const [k, v] of Object.entries(SKILLS)) {
-    const xp = S.skills[k] || 0, L = skillLevel(xp), lo = L > 1 ? 15 * (L - 1) * L : 0, hi = 15 * L * (L + 1);
-    const el = document.createElement("div"); el.className = "skill";
-    el.innerHTML = '<b></b><span class="htitle"></span><div class="bar"><i></i></div>';
-    el.querySelector("b").textContent = v.label + " · LV " + L;
-    el.querySelector("span").textContent = v.hint;
-    el.querySelector("i").style.width = Math.round((xp - lo) / (hi - lo) * 100) + "%";
-    sk.append(el);
-  }
-  const a = $("ach"); a.innerHTML = ""; let got = 0;
-  for (const [id, name, desc] of ACH) {
-    const on = !!S.ach[id]; if (on) got++;
-    const b = document.createElement("div"); b.className = "badge" + (on ? "" : " locked");
-    b.innerHTML = "<b></b><span></span>"; b.querySelector("b").textContent = (on ? "🏆 " : "🔒 ") + name; b.querySelector("span").textContent = desc;
-    a.append(b);
-  }
-  $("achcount").textContent = got + " / " + ACH.length;
-  const lg = $("log"); lg.innerHTML = "";
-  if (!S.log.length) lg.innerHTML = '<p class="empty">Finished quests show up here.</p>';
-  for (const l of S.log.slice(0, 25)) {
-    const r = document.createElement("div"); r.className = "logrow";
-    const a1 = document.createElement("span"); a1.textContent = l.t; const a2 = document.createElement("span");
-    a2.textContent = l.xp ? "+" + l.xp + " XP" : "−" + l.gold + " gold"; if (!l.xp) a2.style.color = "var(--gold)";
-    r.append(a1, a2); lg.append(r);
-  }
-  $("nameinput").value = S.hero.name || "";
-}
-$("nameinput").oninput = () => { S.hero.name = $("nameinput").value.trim() || "Adventurer"; save(); renderHero(); };
-
+// ---------- Loot tab (real rewards) ----------
 function renderLoot() {
-  const box = $("loot"); box.innerHTML = "";
-  if (!S.rewards.length) box.innerHTML = '<p class="empty">Add a reward below.</p>';
+  const box = $("rewards"); box.innerHTML = ""; if (!S.rewards.length) box.innerHTML = '<p class="empty">Add a reward below.</p>';
   for (const r of S.rewards) {
-    const el = document.createElement("div"); el.className = "loot";
-    el.innerHTML = '<div><b></b><small></small></div><div style="display:flex;gap:6px"><button class="btn" type="button" aria-label="Delete reward">✕</button><button class="btn gold" type="button">Claim</button></div>';
-    el.querySelector("b").textContent = r.title; el.querySelector("small").textContent = r.cost + " gold";
-    const [del, buy] = el.querySelectorAll("button");
+    const el = document.createElement("div"); el.className = "loot"; el.innerHTML = '<div><b></b><small></small></div><div style="display:flex;gap:6px"><button class="btn" type="button" aria-label="Delete reward">✕</button><button class="btn gold" type="button">Claim</button></div>';
+    el.querySelector("b").textContent = r.title; el.querySelector("small").textContent = r.cost + " gold"; const [del, buy] = el.querySelectorAll("button");
     buy.disabled = S.hero.gold < r.cost; if (buy.disabled) buy.textContent = (r.cost - S.hero.gold) + " to go";
-    buy.onclick = () => {
-      S.hero.gold -= r.cost; S.claimed.unshift({ t: r.title, d: today(), cost: r.cost });
-      S.log.unshift({ t: "Claimed: " + r.title, xp: 0, gold: r.cost, d: today() }); checkAch(); save(); renderHero(); renderLoot();
-      toast("Enjoy it. You earned it.", () => { S.hero.gold += r.cost; S.claimed.shift(); S.log.shift(); save(); renderHero(); renderLoot(); });
-    };
+    buy.onclick = () => { S.hero.gold -= r.cost; S.claimed.unshift({ t: r.title, d: today(), cost: r.cost }); S.log.unshift({ t: "Claimed: " + r.title, xp: 0, gold: r.cost, d: today() }); save(); renderStrip(); renderLoot(); toast("Enjoy it. You earned it.", () => { S.hero.gold += r.cost; S.claimed.shift(); S.log.shift(); save(); renderStrip(); renderLoot(); }); };
     del.onclick = () => { const i = S.rewards.indexOf(r); S.rewards.splice(i, 1); save(); renderLoot(); toast("Reward deleted", () => { S.rewards.splice(i, 0, r); save(); renderLoot(); }); };
     box.append(el);
   }
-  const c = $("claimed"); c.innerHTML = "";
-  if (!S.claimed.length) c.innerHTML = '<p class="empty">Nothing claimed yet.</p>';
+  const c = $("claimed"); c.innerHTML = ""; if (!S.claimed.length) c.innerHTML = '<p class="empty">Nothing claimed yet.</p>';
   for (const x of S.claimed.slice(0, 20)) { const r = document.createElement("div"); r.className = "logrow"; const a = document.createElement("span"); a.textContent = x.t; const b = document.createElement("span"); b.textContent = new Date(x.d + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }); b.style.color = "var(--muted)"; r.append(a, b); c.append(r); }
 }
-$("lootadd").onclick = () => {
-  const t = $("lootname").value.trim(), c = Math.max(1, parseInt($("lootcost").value, 10) || 0);
-  if (!t) { $("lootname").focus(); return; }
-  S.rewards.push({ id: uid(), title: t, cost: c }); $("lootname").value = ""; save(); renderLoot();
-};
-
-// ---------- Sheet: add / edit quest ----------
-function closeSheet() { $("scrim").hidden = true; }
-$("scrim").onclick = e => { if (e.target === $("scrim")) closeSheet(); };
-document.addEventListener("keydown", e => { if (e.key === "Escape") { closeSheet(); $("levelup").hidden = true; } });
-
-function seg(name, opts, val) {
-  return '<div class="seg" role="group" aria-label="' + name + '" data-seg="' + name + '">' +
-    Object.entries(opts).map(([k, v]) => '<button type="button" data-v="' + k + '" aria-pressed="' + (k === val) + '">' + (v.label || v) + "</button>").join("") + "</div>";
-}
-function openQuest(q) {
-  const isNew = !q;
-  const d = q ? JSON.parse(JSON.stringify(q)) : { id: uid(), type: "side", title: "", diff: "med", skill: "craft", steps: [], doneDates: [], created: today() };
-  const sh = $("sheet");
-  sh.innerHTML = '<h3>' + (isNew ? "New quest" : "Edit quest") + '</h3>' +
-    '<label class="field" for="qtitle">Quest<input id="qtitle" maxlength="80" autocomplete="off" placeholder="What needs doing?"></label>' +
-    '<div class="field">Type' + seg("type", TYPES, d.type) + '</div>' +
-    '<div class="field">Difficulty' + seg("diff", DIFF, d.diff) + '</div>' +
-    '<div class="field">Skill' + seg("skill", SKILLS, d.skill) + '</div>' +
-    '<div class="field" id="stepsfield">Steps <span id="stephint"></span><div class="steps" id="steps"></div>' +
-    '<div class="addstep"><input id="newstep" maxlength="80" placeholder="Add a step" aria-label="New step"><button class="btn" id="addstep" type="button">Add</button></div></div>' +
-    '<p class="note" id="rewardnote"></p>' +
-    '<div class="row2">' + (isNew ? '<button class="btn" id="cancel" type="button">Cancel</button>' : '<button class="btn danger" id="delq" type="button">Delete</button>') +
-    '<button class="btn gold" id="saveq" type="button">' + (isNew ? "Add quest" : "Save") + '</button></div>';
-  $("qtitle").value = d.title;
-  const live = isNew ? null : S.quests.find(x => x.id === q.id);
-  function paint() {
-    sh.querySelectorAll("[data-seg]").forEach(g => g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === d[g.dataset.seg]))));
-    $("stepsfield").hidden = d.type === "daily";
-    $("stephint").textContent = d.type === "boss" ? "(each step is a hit on its HP)" : d.type === "main" ? "(each step earns a little XP)" : "(optional)";
-    const r = rewardFor(d); $("rewardnote").textContent = "Reward: " + r.xp + " XP and " + r.gold + " gold" + (d.type === "daily" ? " each day." : d.type === "boss" ? " when it falls (bosses pay double)." : ".");
-    const st = $("steps"); st.innerHTML = "";
-    d.steps.forEach((s, i) => {
-      const row = document.createElement("div"); row.className = "steprow" + (s.done ? " done" : "");
-      row.innerHTML = '<button type="button"></button><span class="t"></span><button type="button" aria-label="Remove step">✕</button>';
-      const [tick, , rm] = row.children; row.children[1].textContent = s.t;
-      tick.textContent = s.done ? "☑" : "☐"; tick.setAttribute("aria-label", (s.done ? "Undo " : "Do ") + s.t);
-      tick.onclick = () => {
-        s.done = !s.done;
-        if (!isNew && live) {
-          live.steps = JSON.parse(JSON.stringify(d.steps));
-          const stepXP = d.type === "boss" ? 5 : 5;
-          if (s.done) grant(stepXP, 0, live, (d.type === "boss" ? "Hit " : "Step: ") + s.t, tick); else ungrant(stepXP, 0, live);
-          if (live.steps.every(x => x.done)) { closeSheet(); finish(live, tick); return; }
-          render();
-        }
-        paint();
-      };
-      rm.onclick = () => { d.steps.splice(i, 1); paint(); };
-      st.append(row);
-    });
-  }
-  sh.querySelectorAll("[data-seg]").forEach(g => g.onclick = e => { const b = e.target.closest("button"); if (!b) return; d[g.dataset.seg] = b.dataset.v; paint(); });
-  const addStep = () => { const v = $("newstep").value.trim(); if (!v) return; d.steps.push({ t: v, done: false }); $("newstep").value = ""; paint(); $("newstep").focus(); };
-  $("addstep").onclick = addStep; $("newstep").onkeydown = e => { if (e.key === "Enter") addStep(); };
-  $("saveq").onclick = () => {
-    d.title = $("qtitle").value.trim(); if (!d.title) { $("qtitle").focus(); return; }
-    if (d.type === "daily") d.steps = [];
-    if (isNew) S.quests.push(d); else Object.assign(live, d, { doneDates: live.doneDates, done: live.done, doneOn: live.doneOn });
-    save(); closeSheet(); render(); toast(isNew ? "Quest accepted" : "Quest updated");
-  };
-  if (isNew) $("cancel").onclick = closeSheet;
-  else $("delq").onclick = () => { const i = S.quests.indexOf(live); S.quests.splice(i, 1); save(); closeSheet(); render(); toast("Quest abandoned", () => { S.quests.splice(i, 0, live); save(); render(); }); };
-  paint(); $("scrim").hidden = false; if (isNew) setTimeout(() => $("qtitle").focus(), 50);
-}
-$("fab").onclick = () => openQuest(null);
+$("lootadd").onclick = () => { const t = $("lootname").value.trim(), c = Math.max(1, parseInt($("lootcost").value, 10) || 0); if (!t) return $("lootname").focus(); S.rewards.push({ id: uid(), title: t, cost: c }); $("lootname").value = ""; save(); renderLoot(); };
 
 // ---------- Backup ----------
 $("backup").onclick = () => {
-  const name = "quest-log-backup-" + today() + ".json";
-  const blob = new Blob([JSON.stringify({ app: "quest-log", S }, null, 1)], { type: "application/json" });
-  const file = new File([blob], name, { type: "application/json" });
+  const name = "quest-log-backup-" + today() + ".json", blob = new Blob([JSON.stringify({ app: "quest-log", v: 2, S }, null, 1)], { type: "application/json" }), file = new File([blob], name, { type: "application/json" });
   if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Quest Log backup" }).catch(() => {}); return; }
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("Backup saved");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("Backup saved");
 };
 $("restore").onclick = () => { $("restoreFile").value = ""; $("restoreFile").click(); };
 $("restoreFile").onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
-  try { const d = JSON.parse(await f.text()); if (!d || d.app !== "quest-log" || !d.S || !d.S.hero) throw 0; S = d.S; save(); load(); render(); renderHeroTab(); toast("Hero restored"); }
+  try { const d = JSON.parse(await f.text()); if (!d || d.app !== "quest-log" || !d.S || !d.S.hero) throw 0; S = d.v === 2 ? d.S : migrate(d.S); save(); load(); renderStrip(); pickDungeon(S.sel && S.sel.d); setTab("hero"); toast("Hero restored"); }
   catch { toast("That isn't a Quest Log backup"); }
 };
 
+// ---------- Shell ----------
 function setTab(t) {
-  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
-  $("v-quests").hidden = t !== "quests"; $("v-hero").hidden = t !== "hero"; $("v-loot").hidden = t !== "loot";
-  $("fab").hidden = t !== "quests";
-  if (t === "hero") renderHeroTab(); if (t === "loot") renderLoot(); if (t === "quests") render();
+  if (busy) return;
+  tab = t; document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  for (const k of ["dungeon", "camp", "hero", "loot"]) $("v-" + k).hidden = k !== t;
+  if (t === "dungeon") renderDungeon(); if (t === "camp") renderCamp(); if (t === "hero") renderHero(); if (t === "loot") renderLoot();
 }
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => setTab(b.dataset.tab));
-document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("scrim").hidden && !$("modal").querySelector("[data-r]")) closeModal(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !busy) { syncMethod(); renderStrip(); if (tab === "camp") renderCamp(); if (tab === "dungeon") renderDungeon(); } });
 
-load(); setTab("quests");
+async function start() {
+  load(); renderStrip(); setTab("dungeon"); requestAnimationFrame(loop);
+  try { const r = await fetch("plan.json", { cache: "no-cache" }); const p = await r.json(); if (p && Array.isArray(p.dungeons)) PLAN = p; } catch {}
+  PLAN.dungeons = (PLAN.dungeons || []).filter(d => d && d.id && d.name && Array.isArray(d.floors) && d.floors.length && d.floors.every(f => f && Array.isArray(f.steps) && f.steps.length));
+  for (const d of PLAN.dungeons) for (const f of d.floors) { f.monster = f.monster || MNAMES[f.sprite] || "Monster"; f.name = f.name || "Floor"; }
+  pickDungeon(S.sel && S.sel.d); syncMethod(); renderStrip();
+}
+start();
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
 </script>
 </body></html>

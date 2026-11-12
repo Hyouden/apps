@@ -1,14 +1,14 @@
 {
   "name": "Quest Log",
   "short_name": "Quest Log",
-  "description": "Your to-dos as quests: XP, levels, dailies, bosses and real-life loot",
+  "description": "An 8-bit dungeon crawler where your real goals are the dungeons",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#11151a",
-  "theme_color": "#11151a",
+  "background_color": "#0f0c14",
+  "theme_color": "#0f0c14",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

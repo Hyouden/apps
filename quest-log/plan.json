@@ -1,0 +1,339 @@
+{
+ "version": 1,
+ "updated": "2026-11-12",
+ "dungeons": [
+  {
+   "id": "rent-house",
+   "name": "The Landlord's Keep",
+   "goal": "Rent out the house",
+   "theme": "stone",
+   "floors": [
+    {
+     "id": "rent-house-f1",
+     "name": "Gatehouse of Rules",
+     "sprite": "slime",
+     "monster": "HOA Ooze",
+     "steps": [
+      {
+       "id": "rent-house-f1-s1",
+       "t": "Check the HOA's rental rules and caps"
+      },
+      {
+       "id": "rent-house-f1-s2",
+       "t": "Check city rental license or registration"
+      },
+      {
+       "id": "rent-house-f1-s3",
+       "t": "Check the mortgage's occupancy terms"
+      },
+      {
+       "id": "rent-house-f1-s4",
+       "t": "Decide: self-manage or property manager"
+      }
+     ]
+    },
+    {
+     "id": "rent-house-f2",
+     "name": "Vault of Coin",
+     "sprite": "goblin",
+     "monster": "Budget Goblin",
+     "steps": [
+      {
+       "id": "rent-house-f2-s1",
+       "t": "Price the rent from local comps"
+      },
+      {
+       "id": "rent-house-f2-s2",
+       "t": "Switch to landlord insurance"
+      },
+      {
+       "id": "rent-house-f2-s3",
+       "t": "Open a separate rental bank account"
+      },
+      {
+       "id": "rent-house-f2-s4",
+       "t": "Talk to a CPA about rental taxes"
+      }
+     ]
+    },
+    {
+     "id": "rent-house-f3",
+     "name": "Hall of Pipes",
+     "sprite": "golem",
+     "monster": "Utility Golem",
+     "steps": [
+      {
+       "id": "rent-house-f3-s1",
+       "t": "Decide who pays which utility"
+      },
+      {
+       "id": "rent-house-f3-s2",
+       "t": "Finish repairs and safety devices"
+      },
+      {
+       "id": "rent-house-f3-s3",
+       "t": "Deep clean"
+      },
+      {
+       "id": "rent-house-f3-s4",
+       "t": "Photo and video every room"
+      },
+      {
+       "id": "rent-house-f3-s5",
+       "t": "Rekey the locks"
+      }
+     ]
+    },
+    {
+     "id": "rent-house-f4",
+     "name": "The Scriptorium",
+     "sprite": "skeleton",
+     "monster": "Lease Lich",
+     "steps": [
+      {
+       "id": "rent-house-f4-s1",
+       "t": "Get a state-specific lease"
+      },
+      {
+       "id": "rent-house-f4-s2",
+       "t": "Attach HOA rules and addenda"
+      },
+      {
+       "id": "rent-house-f4-s3",
+       "t": "Write down screening criteria"
+      }
+     ]
+    },
+    {
+     "id": "rent-house-f5",
+     "name": "Tenant's Gate",
+     "sprite": "dragon",
+     "monster": "The Vacancy Dragon",
+     "steps": [
+      {
+       "id": "rent-house-f5-s1",
+       "t": "List it with good photos"
+      },
+      {
+       "id": "rent-house-f5-s2",
+       "t": "Screen applicants"
+      },
+      {
+       "id": "rent-house-f5-s3",
+       "t": "Sign the lease and collect the deposit"
+      },
+      {
+       "id": "rent-house-f5-s4",
+       "t": "Move-in walkthrough and hand over keys"
+      }
+     ],
+     "boss": true
+    }
+   ]
+  },
+  {
+   "id": "shred-peak",
+   "name": "Shred Peak",
+   "goal": "Fitness and shred",
+   "theme": "ice",
+   "floors": [
+    {
+     "id": "shred-peak-f1",
+     "name": "Base Lodge",
+     "sprite": "bat",
+     "monster": "Stiffness Bat",
+     "steps": [
+      {
+       "id": "shred-peak-f1-s1",
+       "t": "Do 3 Method sessions in one week"
+      },
+      {
+       "id": "shred-peak-f1-s2",
+       "t": "Wax and tune the board"
+      },
+      {
+       "id": "shred-peak-f1-s3",
+       "t": "Pick one trick to learn this season"
+      }
+     ]
+    },
+    {
+     "id": "shred-peak-f2",
+     "name": "Mid-Mountain",
+     "sprite": "ghost",
+     "monster": "Ghost of Last Season",
+     "steps": [
+      {
+       "id": "shred-peak-f2-s1",
+       "t": "First day on snow"
+      },
+      {
+       "id": "shred-peak-f2-s2",
+       "t": "Film an attempt at the trick"
+      },
+      {
+       "id": "shred-peak-f2-s3",
+       "t": "Keep a 4-week mobility streak"
+      }
+     ]
+    },
+    {
+     "id": "shred-peak-f3",
+     "name": "The Summit",
+     "sprite": "golem",
+     "monster": "The Yeti",
+     "steps": [
+      {
+       "id": "shred-peak-f3-s1",
+       "t": "Land the trick clean"
+      },
+      {
+       "id": "shred-peak-f3-s2",
+       "t": "Ride a 6-inch powder day"
+      },
+      {
+       "id": "shred-peak-f3-s3",
+       "t": "Land it three times in a row"
+      }
+     ],
+     "boss": true
+    }
+   ]
+  },
+  {
+   "id": "tpm-tower",
+   "name": "The Tower of Linear",
+   "goal": "Work and career",
+   "theme": "violet",
+   "floors": [
+    {
+     "id": "tpm-tower-f1",
+     "name": "The Lobby",
+     "sprite": "slime",
+     "monster": "Backlog Slime",
+     "steps": [
+      {
+       "id": "tpm-tower-f1-s1",
+       "t": "Build a saved view for my program"
+      },
+      {
+       "id": "tpm-tower-f1-s2",
+       "t": "Set up one automation"
+      },
+      {
+       "id": "tpm-tower-f1-s3",
+       "t": "Learn 10 keyboard shortcuts"
+      }
+     ]
+    },
+    {
+     "id": "tpm-tower-f2",
+     "name": "Engine Room",
+     "sprite": "mimic",
+     "monster": "Status Mimic",
+     "steps": [
+      {
+       "id": "tpm-tower-f2-s1",
+       "t": "Ship the weekly update 4 weeks running"
+      },
+      {
+       "id": "tpm-tower-f2-s2",
+       "t": "Build a risk dashboard"
+      },
+      {
+       "id": "tpm-tower-f2-s3",
+       "t": "Tune up the standup format"
+      }
+     ]
+    },
+    {
+     "id": "tpm-tower-f3",
+     "name": "The Spire",
+     "sprite": "dragon",
+     "monster": "Scope Creep the Endless",
+     "steps": [
+      {
+       "id": "tpm-tower-f3-s1",
+       "t": "Present one workflow improvement"
+      },
+      {
+       "id": "tpm-tower-f3-s2",
+       "t": "Write my program playbook"
+      }
+     ],
+     "boss": true
+    }
+   ]
+  },
+  {
+   "id": "app-forge",
+   "name": "The App Forge",
+   "goal": "Building apps",
+   "theme": "ember",
+   "floors": [
+    {
+     "id": "app-forge-f1",
+     "name": "The Workbench",
+     "sprite": "goblin",
+     "monster": "Bug Goblin",
+     "steps": [
+      {
+       "id": "app-forge-f1-s1",
+       "t": "Ship the rental checklist app"
+      },
+      {
+       "id": "app-forge-f1-s2",
+       "t": "Ship the Netflix watcher"
+      }
+     ]
+    },
+    {
+     "id": "app-forge-f2",
+     "name": "The Crucible",
+     "sprite": "ghost",
+     "monster": "Ghost in the Machine",
+     "steps": [
+      {
+       "id": "app-forge-f2-s1",
+       "t": "Ship the solo AI D&D game"
+      },
+      {
+       "id": "app-forge-f2-s2",
+       "t": "Polish the Quest Log"
+      }
+     ]
+    },
+    {
+     "id": "app-forge-f3",
+     "name": "The Great Anvil",
+     "sprite": "dragon",
+     "monster": "The Netcode Wyrm",
+     "steps": [
+      {
+       "id": "app-forge-f3-s1",
+       "t": "Tempest Isle: lobby and joining"
+      },
+      {
+       "id": "app-forge-f3-s2",
+       "t": "Tempest Isle: sync the match"
+      },
+      {
+       "id": "app-forge-f3-s3",
+       "t": "Playtest with friends"
+      }
+     ],
+     "boss": true
+    }
+   ]
+  }
+ ],
+ "week": {
+  "start": "2026-11-09",
+  "focus": [
+   "rent-house-f1-s1",
+   "shred-peak-f1-s3",
+   "tpm-tower-f1-s3"
+  ],
+  "side": []
+ }
+}

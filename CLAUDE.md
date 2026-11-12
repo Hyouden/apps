@@ -29,3 +29,14 @@ Live URL pattern: `https://<github-username>.github.io/<repo-name>/<app-folder>/
 - **Backups:** apps that keep personal records include a "Back up" / "Restore" button that saves a JSON file, since data lives only on that one phone.
 - **Privacy:** this repo and site are public. Don't commit anyone's personal data, addresses, or anything private.
 - **Phone-first:** design for a ~390px wide phone with safe-area padding, 44px+ tap targets, and test at that width.
+
+## Quest Log: "add to dungeon" requests
+
+The owner plans goals in chat and asks Claude to "add to dungeon" (or similar). Do that by editing `quest-log/plan.json` and pushing; the app loads it network-first, so no reinstall is needed.
+
+- `dungeons[]`: `{id, name, goal, theme, floors[]}`. `theme` is one of `stone | moss | ice | ember | violet`.
+- `floors[]`: `{id, name, sprite, monster, boss?, steps[]}`. `sprite` is one of `slime | bat | goblin | skeleton | ghost | mimic | golem | dragon`. Give the last floor `"boss": true`. Aim for 2 to 5 steps a floor.
+- `steps[]`: `{id, t, diff?}`. `diff` is `easy | med | hard | epic` (default `med`).
+- `week`: `{start: "YYYY-MM-DD" (Monday), focus: [step ids for this week], side: [{id, t}] one-off tasks}`.
+- **Never change or reuse an existing `id`.** Progress on each phone is stored by step id, so a changed id loses that step's progress. Append new steps and floors with new ids. Removing a step is fine.
+- This file is public. Keep steps free of addresses, money amounts, names of other people, employer details and travel dates.

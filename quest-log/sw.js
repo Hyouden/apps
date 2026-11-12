@@ -1,8 +1,8 @@
 // Offline support for Quest Log.
 // Pages load from the network first (so updates show up), falling back to the saved copy offline.
 // Icons and fonts are served from the saved copy for speed.
-const CACHE = "quest-log-v1";
-const SHELL = ["./", "./index.html", "./manifest.webmanifest",
+const CACHE = "quest-log-v2";
+const SHELL = ["./", "./index.html", "./plan.json", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png",
   "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];
 
@@ -20,6 +20,14 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+
+  // The plan is updated from chat: always try the network first, fall back to the saved copy offline.
+  if (url.origin === location.origin && url.pathname.endsWith("/plan.json")) {
+    e.respondWith(fetch(req).then(res => {
+      const copy = res.clone(); caches.open(CACHE).then(c => c.put("./plan.json", copy)); return res;
+    }).catch(() => caches.match("./plan.json")));
+    return;
+  }
 
   if (req.mode === "navigate" || (url.origin === location.origin && url.pathname.endsWith(".html"))) {
     e.respondWith(fetch(req).then(res => {
