@@ -1,7 +1,7 @@
 // Offline support for Daily Idea Card.
 // Pages load from the network first (so updates show up), falling back to the saved copy offline.
 // Icons and fonts are served from the saved copy for speed.
-const CACHE = "idea-card-v1";
+const CACHE = "idea-card-v2";
 const SHELL = ["./", "./index.html", "./deck.json", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png",
   "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];

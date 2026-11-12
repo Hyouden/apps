@@ -78,6 +78,17 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
 .empty { color: var(--muted); font-size: .9rem; margin: 0; }
 .keep { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .keep p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+.cardbar { display: flex; gap: 8px; }
+.icon { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: #10141a; color: var(--muted); font: 600 .85rem var(--font-display); cursor: pointer; }
+.icon svg { width: 18px; height: 18px; }
+.icon.hearted { color: #1a1406; background: var(--gold); border-color: transparent; }
+.icon.hearted svg path { fill: currentColor; }
+.icon:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.hidden-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: .92rem; }
+.hidden-row button { flex: none; }
+details summary { cursor: pointer; font-family: var(--font-display); color: var(--muted); min-height: 44px; display: flex; align-items: center; }
+.toast { display: flex; gap: 14px; align-items: center; }
+.toast button { background: none; border: 0; color: var(--gold); font: 700 .9rem var(--font-display); cursor: pointer; padding: 6px 0; }
 .toast { white-space: nowrap; position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: #2a3240; color: var(--ink); padding: 10px 16px; border-radius: 12px; font-family: var(--font-display); font-size: .9rem; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
 @media (prefers-reduced-motion: no-preference) {
   .card.flip { animation: deal .45s cubic-bezier(.2,.8,.2,1); }
@@ -101,6 +112,7 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
       <h3 class="title" id="title">Shuffling the deck…</h3>
       <p class="body" id="body"></p>
       <p class="chew"><b>Chew on it</b><span id="chew"></span></p>
+      <div class="cardbar"><button class="icon" id="heart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.1A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.8c0 5.7-7.5 10.1-7.5 10.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Keep</span></button><button class="icon" id="del" type="button" aria-label="Remove this card from the deck"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><span>Remove</span></button></div>
       <div class="serial"><span id="isnew"></span><span id="serial"></span></div>
     </div>
   </article>
@@ -108,13 +120,13 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
   <div class="actions">
     <button class="btn" id="today" type="button">Today's card</button>
     <button class="btn" id="shuffle" type="button">Draw another</button>
-    <button class="btn primary wide" id="save" type="button">Save to my collection</button>
   </div>
   <p class="status" id="status"></p>
 
   <section>
-    <h2>My collection <span id="count"></span></h2>
+    <h2>Kept cards <span id="count"></span></h2>
     <div class="saved" id="saved"></div>
+    <details id="hiddenbox" hidden><summary id="hidsum">Removed cards</summary><div id="hidlist"></div></details>
   </section>
 
   <section>
@@ -127,7 +139,7 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
     <input type="file" id="restoreFile" accept="application/json,.json" hidden>
   </section>
 </div>
-<div class="toast" id="toast" role="status" hidden></div>
+<div class="toast" id="toast" role="status" hidden><span id="tmsg"></span><button id="tundo" type="button" hidden>Undo</button></div>
 
 <script>
 const KEY = "idea-card-v1"; // every app on this site shares one browser storage
@@ -146,14 +158,23 @@ $("date").textContent = new Date().toLocaleDateString(undefined, { weekday: "lon
 let CARDS = [];
 let mood = "all";
 let current = null;
-let state = { saved: [], lastSeenCount: 0, mood: "all" };
+let state = { saved: [], hidden: [], lastSeenCount: 0, mood: "all" };
 
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.saved)) state = Object.assign(state, s); } catch {} mood = state.mood || "all"; }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.saved)) state = Object.assign(state, s); } catch {} mood = state.mood || "all"; state.hidden = state.hidden || []; }
 function save() { state.mood = mood; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
-function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+function toast(msg, undo) {
+  const t = $("toast"); $("tmsg").textContent = msg; t.hidden = false;
+  $("tundo").hidden = !undo; $("tundo").onclick = () => { t.hidden = true; undo && undo(); };
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, undo ? 5000 : 2200);
+}
+const isHidden = c => state.hidden.includes(c.id);
 
 function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return Math.abs(h); }
-function pool() { const p = mood === "all" ? CARDS : CARDS.filter(c => c.kind === mood); return p.length ? p : CARDS; }
+function pool() {
+  const live = CARDS.filter(c => !isHidden(c));
+  if (mood === "kept") { const k = live.filter(isSaved); return k.length ? k : live; }
+  const p = mood === "all" ? live : live.filter(c => c.kind === mood); return p.length ? p : live;
+}
 function todaysCard() { const p = pool(); return p[hash(todayKey + mood) % p.length]; }
 function randomCard() { const p = pool().filter(c => !current || c.id !== current.id); return p[Math.floor(Math.random() * p.length)] || pool()[0]; }
 const isSaved = c => state.saved.some(s => s.id === c.id);
@@ -175,12 +196,13 @@ function show(card) {
   const n = CARDS.indexOf(card);
   $("serial").textContent = n >= 0 ? "#" + String(n + 1).padStart(3, "0") + " / " + CARDS.length : "In your collection";
   $("isnew").textContent = daysOld(card) < 8 ? "New this week" : "";
-  $("save").textContent = isSaved(card) ? "Saved ✓" : "Save to my collection";
-  $("save").disabled = isSaved(card);
+  const on = isSaved(card), h = $("heart");
+  h.classList.toggle("hearted", on); h.querySelector("span").textContent = on ? "Kept" : "Keep";
+  h.setAttribute("aria-pressed", String(on)); h.setAttribute("aria-label", on ? "Remove from kept cards" : "Keep this card");
 }
 
 function renderMoods() {
-  const opts = [["all", "Any mood", null], ...Object.entries(KINDS).map(([k, v]) => [k, v.label, v.color])];
+  const opts = [["all", "Any mood", null], ["kept", "♥ Kept", "var(--gold)"], ...Object.entries(KINDS).map(([k, v]) => [k, v.label, v.color])];
   $("moods").innerHTML = "";
   for (const [k, label, color] of opts) {
     const b = document.createElement("button");
@@ -196,7 +218,8 @@ function renderSaved() {
   const box = $("saved");
   const list = state.saved;
   $("count").textContent = list.length ? list.length + " card" + (list.length === 1 ? "" : "s") : "";
-  if (!list.length) { box.innerHTML = '<p class="empty">Cards you save show up here.</p>'; return; }
+  renderHidden();
+  if (!list.length) { box.innerHTML = '<p class="empty">Tap the heart on any card to keep it here.</p>'; return; }
   box.innerHTML = "";
   [...list].reverse().forEach(card => {
     const row = document.createElement("div");
@@ -214,7 +237,7 @@ function renderSaved() {
 }
 
 function renderNew() {
-  const fresh = CARDS.filter(c => daysOld(c) < 8);
+  const fresh = CARDS.filter(c => daysOld(c) < 8 && !isHidden(c));
   const b = $("newbadge");
   if (state.lastSeenCount && CARDS.length > state.lastSeenCount && fresh.length) {
     const n = CARDS.length - state.lastSeenCount;
@@ -227,19 +250,36 @@ function renderNew() {
 
 $("today").onclick = () => show(todaysCard());
 $("shuffle").onclick = () => show(randomCard());
-$("save").onclick = () => {
-  if (!current || isSaved(current)) return;
-  const { id, kind, rarity, title, body, chew } = current;
-  state.saved.push({ id, kind, rarity, title, body, chew });
-  save(); renderSaved(); show(current); toast("Added to your collection");
+$("heart").onclick = () => {
+  if (!current) return;
+  if (isSaved(current)) { state.saved = state.saved.filter(s => s.id !== current.id); toast("Removed from kept cards"); }
+  else { const { id, kind, rarity, title, body, chew } = current; state.saved.push({ id, kind, rarity, title, body, chew }); toast("Kept ♥"); }
+  save(); renderSaved(); show(current);
 };
+$("del").onclick = () => {
+  const card = current; if (!card) return;
+  if (CARDS.filter(c => !isHidden(c)).length <= 1) return;
+  const wasSaved = state.saved.find(s => s.id === card.id);
+  state.hidden.push(card.id); state.saved = state.saved.filter(s => s.id !== card.id);
+  save(); renderSaved(); show(randomCard());
+  toast("Card removed", () => { state.hidden = state.hidden.filter(x => x !== card.id); if (wasSaved) state.saved.push(wasSaved); save(); renderSaved(); show(card); });
+};
+function renderHidden() {
+  const hid = state.hidden.map(id => CARDS.find(c => c.id === id)).filter(Boolean);
+  $("hiddenbox").hidden = !hid.length; $("hidsum").textContent = "Removed cards (" + hid.length + ")";
+  const hl = $("hidlist"); hl.innerHTML = "";
+  for (const c of hid) { const r = document.createElement("div"); r.className = "hidden-row"; const t = document.createElement("span"); t.textContent = c.title;
+    const b = document.createElement("button"); b.className = "btn small"; b.type = "button"; b.textContent = "Bring back";
+    b.onclick = () => { state.hidden = state.hidden.filter(x => x !== c.id); save(); renderHidden(); toast("Back in the deck"); };
+    r.append(t, b); hl.append(r); }
+}
 let sx = null;
 $("card").addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive: true });
 $("card").addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 60) show(randomCard()); });
 
 $("backup").onclick = () => {
   const name = "idea-card-backup-" + todayKey + ".json";
-  const blob = new Blob([JSON.stringify({ app: "idea-card", saved: state.saved }, null, 1)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ app: "idea-card", saved: state.saved, hidden: state.hidden }, null, 1)], { type: "application/json" });
   const file = new File([blob], name, { type: "application/json" });
   if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Idea Card backup" }).catch(() => {}); return; }
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove();
@@ -254,6 +294,7 @@ $("restoreFile").onchange = async e => {
     const ids = new Set(state.saved.map(s => s.id));
     let added = 0;
     for (const c of data.saved) if (c && c.id && c.title && !ids.has(c.id)) { state.saved.push(c); added++; }
+    if (Array.isArray(data.hidden)) state.hidden = [...new Set([...state.hidden, ...data.hidden])];
     save(); renderSaved(); show(current); toast(added ? "Restored " + added + " card" + (added === 1 ? "" : "s") : "Nothing new in that backup");
   } catch { toast("That file isn't an Idea Card backup"); }
 };
@@ -271,6 +312,7 @@ async function start() {
     return;
   }
   show(todaysCard());
+  renderSaved();
   renderNew();
 }
 start();
