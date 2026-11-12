@@ -38,5 +38,6 @@ The owner plans goals in chat and asks Claude to "add to dungeon" (or similar). 
 - `floors[]`: `{id, name, sprite, monster, boss?, steps[]}`. `sprite` is one of `slime | bat | goblin | skeleton | ghost | mimic | golem | dragon`. Give the last floor `"boss": true`. Aim for 2 to 5 steps a floor.
 - `steps[]`: `{id, t, diff?}`. `diff` is `easy | med | hard | epic` (default `med`).
 - `week`: `{start: "YYYY-MM-DD" (Monday), focus: [step ids for this week], side: [{id, t}] one-off tasks}`.
+- `history`: past weeks as `{start, focus}`. Before replacing `week`, append the old one here. Progress lives on the phone, so Claude can't see what's done: assume past focus steps are done unless the owner says otherwise.
 - **Never change or reuse an existing `id`.** Progress on each phone is stored by step id, so a changed id loses that step's progress. Append new steps and floors with new ids. Removing a step is fine.
 - This file is public. Keep steps free of addresses, money amounts, names of other people, employer details and travel dates.
