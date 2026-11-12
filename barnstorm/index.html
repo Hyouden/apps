@@ -1,0 +1,710 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Barnstorm</title>
+<meta name="description" content="Ashley's farm TikTok studio: daily shoot ideas, a 30-day plan, a viral check and a post log.">
+<meta name="theme-color" content="#1E1A17">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Barnstorm">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap">
+<style>
+/* Layout: phone-first. Dark barn header, cream paper body, one view at a time, fixed 5-tab bar. */
+:root{
+  --bg:#FBF4E8; --surface:#FFFFFF; --sunk:#F2E8D8; --line:#E6D7BF;
+  --fg:#1E1A17; --muted:#6B5F55;
+  --barn:#B8322A; --barn-ink:#FFFFFF; --hay:#F2C14E; --haysoft:#FCEBC0; --haytext:#6B4A08;
+  --pasture:#2F6E46; --pasturesoft:#DCEFE2;
+  --night:#1E1A17;
+  --tt-cyan:#25F4EE; --tt-pink:#FE2C55;
+  --f-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --f-body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--night)}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;margin:0;line-height:1.1;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--barn);outline-offset:2px;border-radius:8px}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--night);color:#fff;border-radius:0 0 24px 24px;overflow:hidden}
+header.top::after{content:"";position:absolute;right:-30px;top:-20px;width:150px;height:110px;opacity:.14;
+  background:radial-gradient(circle at 30% 40%,#fff 0 18px,transparent 19px),radial-gradient(circle at 70% 70%,#fff 0 26px,transparent 27px),radial-gradient(circle at 85% 20%,#fff 0 12px,transparent 13px)}
+header.top .wrap{padding-block:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+.brand{display:flex;flex-direction:column}
+.brand h1{font-size:1.45rem;letter-spacing:-.01em}
+.brand h1 span{color:var(--hay)}
+.brand small{font-size:.8rem;color:#CFC6BB}
+.daychip{font-family:var(--f-display);font-weight:800;font-size:.85rem;background:var(--barn);color:#fff;border-radius:999px;padding:6px 12px;white-space:nowrap}
+
+main{padding-block:18px 112px}
+.view{display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted)}
+.panel{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{font-size:1.3rem}
+.panel h3{font-size:1.05rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:999px;padding:11px 18px;min-height:44px;background:var(--night);color:#fff;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.red{background:var(--barn)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--fg)}
+.btn.sm{min-height:40px;padding:8px 14px;font-size:.9rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.pill{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.hay{background:var(--haysoft);color:var(--haytext)}
+.pill.green{background:var(--pasturesoft);color:var(--pasture)}
+.pill.red{background:var(--barn);color:#fff}
+
+/* Today's shoot card: looks like a phone screen with the on-screen hook */
+.shoot{background:var(--night);color:#fff;border:0;gap:14px}
+.shoot .eyebrow{color:var(--hay)}
+.shoot h2{font-size:1.5rem}
+.screen{position:relative;border-radius:16px;background:linear-gradient(160deg,#3a2f27,#15110e);padding:18px 54px 18px 16px;min-height:150px;display:flex;flex-direction:column;justify-content:center;gap:8px;overflow:hidden}
+.screen .hooktxt{font-family:var(--f-display);font-weight:800;font-size:1.25rem;line-height:1.15;background:#fff;color:var(--night);padding:6px 10px;border-radius:8px;align-self:flex-start;box-shadow:3px 3px 0 var(--tt-pink),-3px -3px 0 var(--tt-cyan)}
+.screen .rail{position:absolute;right:10px;bottom:12px;display:flex;flex-direction:column;gap:10px;font-size:1.2rem;opacity:.8}
+.screen small{color:#CFC6BB;font-size:.78rem}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.92rem}
+.kv b{color:var(--hay);font-weight:700}
+.shoot ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.copybox{background:#2b241f;border-radius:12px;padding:12px;font-size:.92rem;display:flex;flex-direction:column;gap:8px}
+.copybox p{white-space:pre-wrap;word-break:break-word}
+.shoot .btn.ghost{color:#fff;border-color:#4a3f37}
+
+.phase{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.phase div{border-radius:12px;padding:10px 8px;background:var(--sunk);font-size:.78rem;display:flex;flex-direction:column;gap:2px;min-width:0}
+.phase b{font-family:var(--f-display);font-size:.95rem}
+.phase .on{background:var(--barn);color:#fff}
+.phase .past{background:var(--pasturesoft)}
+
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.checks label{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);min-height:44px;cursor:pointer}
+.checks input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--pasture);flex:none}
+.checks small{display:block;color:var(--muted);font-size:.84rem}
+.checks label.on{background:var(--pasturesoft);border-color:transparent}
+.checks label.on span>b{text-decoration:line-through;text-decoration-thickness:2px;opacity:.7}
+
+details.rules summary{font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center}
+details.rules ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;color:var(--fg)}
+
+/* Ideas */
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:40px;font-weight:700;font-size:.88rem;white-space:nowrap}
+.chip.on{background:var(--night);border-color:var(--night);color:#fff}
+.idea{border:1.5px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.idea>button{all:unset;box-sizing:border-box;display:flex;gap:12px;align-items:flex-start;width:100%;padding:14px;cursor:pointer;min-height:44px}
+.idea .emo{font-size:1.6rem;line-height:1}
+.idea .t{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.idea .t b{font-family:var(--f-display);font-size:1.02rem}
+.idea .t span{color:var(--muted);font-size:.88rem}
+.idea .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;font-size:.92rem}
+.idea .body ol{margin:0;padding-left:1.2em}
+.idea .hookq{font-family:var(--f-display);font-weight:800;background:var(--haysoft);color:var(--haytext);padding:8px 10px;border-radius:10px}
+.idea.done{opacity:.75}
+
+/* Cast */
+.castgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{border:1.5px solid var(--line);background:var(--surface);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:4px;text-align:left;min-height:120px}
+.card .emo{font-size:2rem;line-height:1}
+.card b{font-family:var(--f-display);font-size:1.1rem}
+.card .nm{color:var(--barn);font-style:italic}
+.card span{color:var(--muted);font-size:.84rem}
+.card.add{border-style:dashed;align-items:center;justify-content:center;color:var(--muted);font-weight:700}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.88rem;font-weight:700;color:var(--muted)}
+.field input,.field select,.field textarea{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;background:var(--bg);font-weight:400;color:var(--fg);font-size:16px;width:100%}
+.field textarea{min-height:70px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.archetypes{display:flex;flex-wrap:wrap;gap:6px}
+
+/* Score */
+.scorehead{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.ring{width:110px;height:110px}
+.ring text{font-family:var(--f-display);font-weight:800}
+.verdict{font-family:var(--f-display);font-weight:800;font-size:1.3rem}
+.fixes{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px;font-size:.9rem}
+.pts{font-size:.72rem;font-weight:700;color:var(--muted);margin-left:auto;padding-left:8px;white-space:nowrap}
+.checks label .lab{flex:1}
+
+/* Log */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--sunk);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--f-display);font-size:1.35rem;line-height:1.1}
+.stat span{font-size:.74rem;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:center;font-size:.85rem}
+.bar .track{height:14px;background:var(--sunk);border-radius:999px;overflow:hidden}
+.bar .fill{height:100%;background:var(--barn);border-radius:999px}
+.bar .val{font-variant-numeric:tabular-nums;color:var(--muted);min-width:44px;text-align:right}
+.post{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
+.post .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.post .top b{font-family:var(--f-display)}
+.post .nums{font-size:.84rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.tip{background:var(--pasturesoft);color:var(--pasture);border-radius:12px;padding:10px 12px;font-size:.9rem}
+.tip.warn{background:var(--haysoft);color:var(--haytext)}
+
+/* Tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--night);padding-bottom:env(safe-area-inset-bottom,0px);border-radius:22px 22px 0 0}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-block:6px}
+nav.tabs button{border:0;background:transparent;color:#B9AEA3;display:flex;flex-direction:column;align-items:center;gap:1px;min-height:54px;justify-content:center;border-radius:14px;font-size:.72rem;font-weight:700}
+nav.tabs button .i{font-size:1.25rem;line-height:1.2}
+nav.tabs button[aria-current="page"]{color:#fff;background:#3a302a}
+
+dialog{border:0;border-radius:22px;padding:0;width:min(560px,calc(100% - 24px));max-height:calc(100dvh - 40px);background:var(--surface);color:var(--fg)}
+dialog::backdrop{background:rgba(20,15,12,.55)}
+dialog form{padding:18px;display:flex;flex-direction:column;gap:12px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--night);color:#fff;padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+</style>
+</head><body>
+<header class="top"><div class="wrap">
+  <div class="brand"><h1>Barn<span>storm</span></h1><small>moo. → the For You page</small></div>
+  <span class="daychip" id="daychip">Day 1</span>
+</div></header>
+
+<main class="wrap">
+  <section class="view" id="v-today"></section>
+  <section class="view" id="v-ideas" hidden></section>
+  <section class="view" id="v-cast" hidden></section>
+  <section class="view" id="v-score" hidden></section>
+  <section class="view" id="v-log" hidden></section>
+</main>
+
+<nav class="tabs" aria-label="Sections"><div class="wrap">
+  <button data-tab="today" aria-current="page"><span class="i">🎬</span>Today</button>
+  <button data-tab="ideas"><span class="i">💡</span>Ideas</button>
+  <button data-tab="cast"><span class="i">🐄</span>Cast</button>
+  <button data-tab="score"><span class="i">🔥</span>Check</button>
+  <button data-tab="log"><span class="i">📈</span>Log</button>
+</div></nav>
+
+<dialog id="dlg"><form method="dialog" id="dlgform"></form></dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const STORE_KEY = "barnstorm-v1"; // every app on this site shares storage, so keep this prefix
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const todayISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const daysBetween = (a,b) => Math.round((new Date(b+"T12:00") - new Date(a+"T12:00")) / 864e5);
+const uid = () => Math.random().toString(36).slice(2,9);
+
+/* ---------- Species + series ---------- */
+const SPECIES = {
+  cow:{e:"🐄",n:"cow",tags:["#cowsoftiktok","#cows"]},
+  goat:{e:"🐐",n:"goat",tags:["#goatsoftiktok","#goats"]},
+  pig:{e:"🐖",n:"pig",tags:["#pigsoftiktok","#potbellypig"]},
+  chicken:{e:"🐔",n:"chicken",tags:["#chickensoftiktok","#backyardchickens"]},
+  rooster:{e:"🐓",n:"rooster",tags:["#rooster","#chickensoftiktok"]},
+  turkey:{e:"🦃",n:"turkey",tags:["#turkey","#turkeysoftiktok"]},
+  duck:{e:"🦆",n:"duck",tags:["#ducksoftiktok","#ducks"]},
+  sheep:{e:"🐑",n:"sheep",tags:["#sheepoftiktok","#sheep"]},
+  alpaca:{e:"🦙",n:"alpaca",tags:["#alpacasoftiktok","#alpaca"]},
+  other:{e:"🐾",n:"animal",tags:["#animalsoftiktok"]},
+};
+const BASE_TAGS = ["#farmtok","#farmlife","#farmanimals"];
+
+const SERIES = {
+  snoot:{n:"Rate the Snoot",e:"👃",why:"Your nose-to-lens close-ups are already your signature. A score at the end makes people watch to the end and argue in the comments."},
+  drama:{n:"Barnyard Drama",e:"🎭",why:"Voiceover narration turns ordinary chores into a soap opera. Recurring characters make people follow to see what happens next."},
+  interview:{n:"Farm Interviews",e:"🎤",why:"Hold a mic out and cut to the animal's reaction. The timing does the comedy, so it's easy to make and easy to repeat."},
+  asmr:{n:"Snack ASMR",e:"🎃",why:"Crunching, munching and slurping get rewatched. Close mic, no music, short loop."},
+  facts:{n:"Farm Facts",e:"🧠",why:"A surprising fact gets saved and shared, and TikTok search sends people to it for months."},
+  pov:{n:"POV & Skits",e:"🤳",why:"You on camera reacting to the animals. Your face is in your best-looking clips, so lean into it."},
+  crew:{n:"Roll Call & Golden Hour",e:"🌄",why:"Your two most-viewed videos were wide shots of the whole crew. People love seeing the full cast together."},
+  reply:{n:"Comment Replies",e:"💬",why:"Replying to a comment with a video turns one viewer's question into a new post, and those viewers come back."},
+  season:{n:"Seasonal",e:"🍂",why:"Holiday and weather moments ride what everyone is already searching for that week."},
+};
+// Weekly rhythm: which series "Today" pulls from (0 = Sunday)
+const WEEK = {0:"reply",1:"snoot",2:"facts",3:"drama",4:"interview",5:"asmr",6:"crew"};
+
+/* ---------- Idea library. {a} and {b} become cast names (or "the cow") ---------- */
+const IDEAS = [
+ // Rate the Snoot
+ {id:"sn1",s:"snoot",sp:["cow","pig","goat","alpaca","sheep"],t:"Snoot of the Day",hook:"Rating every snoot on the farm. Today: {a}",shots:["Start with the nose already filling the lens, with no intro","Slowly pull back so the reveal of the whole face lands at second 3–4","One more boop or sniff","End on a big score card in text: \"{a}'s snoot: 9.5/10\""],len:"8–12s",cap:"Snoot review: {a} 👃 Who should I rate next?",bait:"Tell them which animal is next and let the comments vote.",sound:"Natural sniffing sound up front, a soft trending sound underneath."},
+ {id:"sn2",s:"snoot",sp:["any"],t:"Guess Whose Nose",hook:"Guess whose nose this is 👀",shots:["3 extreme close-ups of noses, 2 seconds each","On-screen numbers 1, 2, 3","Last shot pulls back to reveal all three animals side by side"],len:"10–15s",cap:"Guess the nose 👃 Answers at the end, no cheating. Comment your guesses before the reveal!",bait:"Viewers comment their guesses before the reveal, and those comments boost the video.",sound:"A quiz-show or ticking trending sound."},
+ {id:"sn3",s:"snoot",sp:["cow","pig"],t:"Snoot Tier List",hook:"Ranking every snoot on the farm (be honest)",shots:["Tier list labels on screen: S, A, B, C","One quick nose clip per animal","Drop each one into a tier with a pop sound","The last animal gets put in 'Too powerful to rank'"],len:"20–30s",cap:"The official farm snoot tier list. Who did I rank wrong?",bait:"Tier lists start arguments, and arguments mean comments.",sound:"A trending 'ranking' sound."},
+ {id:"sn4",s:"snoot",sp:["any"],t:"Boop Reaction",hook:"Booping {a} until she gets mad (she never does)",shots:["Finger comes in from off-screen and boops","Cut each reaction tight","Repeat 3 times, with a bigger reaction each time","End on the animal booping the camera back"],len:"8–12s",cap:"daily boop for {a} 👉👃",bait:"Ask: \"Should this be a daily thing?\"",sound:"Cartoon 'boop' sound effect each time."},
+
+ // Barnyard Drama
+ {id:"dr1",s:"drama",sp:["any"],t:"Reality-Show Narrator",hook:"Previously, on Barnyard Drama…",shots:["Film normal feeding time with lots of shots of animals looking at each other","Record a dead-serious reality-show voiceover about who's feuding","Add one confessional-style close-up per animal with their name on screen","End on a cliffhanger: \"Next week: {b} gets revenge\""],len:"30–45s",cap:"Barnyard Drama ep. 1: {a} vs {b}. Whose side are you on?",bait:"Ask viewers to pick a side. Make Part 2 if it pops.",sound:"Your voiceover with dramatic reality-show music underneath."},
+ {id:"dr2",s:"drama",sp:["any"],t:"Employee of the Month",hook:"Farm Employee of the Month goes to…",shots:["Drum-roll buildup with quick cuts of 3 nominees doing nothing useful","Reveal the winner with a 'certificate' in text","Short highlight reel of their 'achievements'","Cut to the loser being dramatic"],len:"15–25s",cap:"{a} won Employee of the Month for (checks notes) eating. Congrats queen 🏆",bait:"Ask: \"Who should win next month?\" Make it a monthly series.",sound:"Award-show fanfare."},
+ {id:"dr3",s:"drama",sp:["goat","pig","rooster","turkey"],t:"Reasons {a} Got Fired Today",hook:"Reasons {a} got fired today",shots:["Numbered list in on-screen text","One clip per 'offense': escaping, stealing feed, screaming, standing in the water bucket","End: \"Rehired 5 minutes later for being cute\""],len:"15–20s",cap:"{a} has been fired 47 times this month and rehired 47 times",bait:"Ask: \"What would your animal get fired for?\"",sound:"Upbeat comedic trending sound."},
+ {id:"dr4",s:"drama",sp:["any"],t:"Subtitled Gossip",hook:"I finally translated what they say at breakfast",shots:["Close-ups of animals 'talking' (moos, clucks, bleats)","Subtitles of the gossip they're 'saying' about each other and you","Running gag: everyone complains about the same animal"],len:"15–25s",cap:"Translated the barn group chat. {a} is being talked about again",bait:"Ask viewers to write the next line.",sound:"Real animal sounds. The subtitles carry the joke."},
+ {id:"dr5",s:"drama",sp:["any"],t:"Who Ate First?",hook:"Who's getting breakfast first? (it's chaos)",shots:["Wide shot of everyone charging the fence at feeding","Slow-mo replay of the winner","Freeze-frame with a 'photo finish' label"],len:"10–15s",cap:"Photo finish at breakfast 🏁 {a} cheated, I'm pretty sure",bait:"Ask people to guess the winner in the first second.",sound:"Racing commentary or a race horn."},
+
+ // Interviews
+ {id:"in1",s:"interview",sp:["any"],t:"Hard-Hitting Interview",hook:"Asking {a} the questions nobody else will",shots:["You on camera with a mic (a hairbrush works)","Ask a dumb serious question: \"Do you have any regrets?\"","Cut to the animal's reaction: a stare, chewing, or walking off","3 questions, with the best reaction last"],len:"15–25s",cap:"Interview with {a}. She had no comment. 🎤",bait:"Ask: \"What should I ask {a} next?\" Then reply to the best comment with a video.",sound:"Talk-show music under your voice."},
+ {id:"in2",s:"interview",sp:["any"],t:"Exit Interview",hook:"Exit interview with {a} after he escaped again",shots:["Find the animal somewhere it shouldn't be","Serious HR voice: \"Walk me through what happened\"","Cut to the animal's guilty face","Text: \"Case closed: he did it\""],len:"12–20s",cap:"HR is investigating {a}. Again.",bait:"Ask viewers for their escape-artist animal stories.",sound:"Your voice plus a crime-documentary sting."},
+ {id:"in3",s:"interview",sp:["any"],t:"Would You Rather",hook:"Asking the animals would you rather (they chose violence)",shots:["Hold up two treats or two options","Each animal 'chooses' one","Results tally on screen","The last animal eats both"],len:"15–25s",cap:"Would you rather: farm edition. {b} broke the rules",bait:"Ask: \"What should they choose between next?\"",sound:"Game-show sound."},
+
+ // ASMR
+ {id:"as1",s:"asmr",sp:["pig","goat","cow"],t:"Pumpkin Crunch",hook:"Sound on 🔊 {a} vs one pumpkin",shots:["Phone low, right next to the pumpkin","Leave the natural sound on with no music","Capture the first big crunch in the opening second","End when it's half gone so it loops"],len:"8–15s",cap:"post-Halloween pumpkin ASMR with {a} 🎃🔊",bait:"Ask viewers to rate the crunch out of 10.",sound:"Natural sound only. This is the whole point."},
+ {id:"as2",s:"asmr",sp:["cow","goat","alpaca","sheep"],t:"Hay Munch Loop",hook:"The most relaxing 10 seconds on the internet",shots:["Extreme close-up on chewing with the mic close","Steady phone (lean it on a post)","Cut so the last frame matches the first for a perfect loop"],len:"7–10s",cap:"munch munch munch. Sound on 🔊",bait:"Short loops get replays, and replays count heavily.",sound:"Natural chewing only."},
+ {id:"as3",s:"asmr",sp:["any"],t:"Treat Taste Test",hook:"{a} tries a new snack for the first time",shots:["Show the treat (watermelon, apple, carrot, pumpkin)","Close-up of the first bite","Text rating from the animal: ⭐⭐⭐⭐⭐","Bonus: the jealous animal in the background"],len:"10–20s",cap:"{a} reviews: watermelon. Verdict: obsessed",bait:"Ask: \"What should she try next?\" and do the top answer. Check it's safe for that animal first.",sound:"Natural crunch with a cute trending sound low underneath."},
+ {id:"as4",s:"asmr",sp:["chicken","duck","turkey"],t:"Scatter Feed Stampede",hook:"Sound on 🔊 the stampede starts in 3…2…1",shots:["Phone on the ground at bird height","Throw the scratch or treats","Let them run straight at the camera","Pecking ASMR to finish"],len:"8–12s",cap:"the daily stampede 🐔🔊",bait:"POV-at-ground-level shots get rewatched.",sound:"Natural sound."},
+
+ // Facts
+ {id:"fa1",s:"facts",sp:["cow"],t:"Cows Have No Top Teeth",hook:"Cows don't have top front teeth 🤯",shots:["Gently show the top of the mouth or a close-up of grazing","Text: they have a hard 'dental pad' instead","Show how they rip grass with their tongue","End: \"Follow for more things I learned working on a farm\""],len:"12–20s",cap:"Cows have no upper front teeth, just a dental pad. Did you know?? #cowfacts",bait:"Ask: \"What's a farm fact that blew your mind?\"",sound:"Your voice or text with a calm trending sound."},
+ {id:"fa2",s:"facts",sp:["goat"],t:"Goat Eyes",hook:"Why do goats have rectangle pupils?",shots:["Extreme close-up of the goat's eye","Text: horizontal pupils give them a super-wide view to spot predators","Show the goat turning its head (the pupils stay level)"],len:"10–15s",cap:"Goat pupils are rectangles so they can see almost all the way around 👁️ #goatfacts",bait:"Saves and shares come from 'I didn't know that!'",sound:"Mysterious trending sound."},
+ {id:"fa3",s:"facts",sp:["pig"],t:"Why Pigs Love Mud",hook:"Pigs aren't dirty. They're doing skincare",shots:["Pig in the mud or dirt","Text: pigs can barely sweat, so mud keeps them cool and acts as sunscreen","Satisfying flop into the dirt to finish"],len:"10–15s",cap:"Mud is a pig's sunscreen AND air conditioning ☀️🐖 #pigfacts",bait:"Myth-busting gets shared.",sound:"Spa or skincare trending sound for the joke."},
+ {id:"fa4",s:"facts",sp:["rooster","chicken","turkey"],t:"Dinosaurs on the Farm",hook:"Reminder that you're looking at a dinosaur",shots:["Low-angle shot of the bird walking toward the camera like a T-rex","Slow-mo the stomp","Text: birds are living dinosaurs"],len:"8–12s",cap:"Jurassic Farm 🦖 {a} is a living dinosaur and he knows it",bait:"Low angle and dramatic music do the work.",sound:"Epic or dramatic trending sound."},
+ {id:"fa5",s:"facts",sp:["any"],t:"Things I Didn't Know Before Farm Life",hook:"Things nobody tells you before you work on a farm",shots:["5 fast text facts, one clip each","For example: roosters crow all day, not just at sunrise; a cow's stomach has 4 compartments; sheep can recognize faces; alpacas mostly spit at each other","Last one is funny and personal"],len:"20–30s",cap:"Farm life is not what I expected 😭 Part 2?",bait:"End by asking \"Part 2?\" and make it if people ask.",sound:"Trending 'things I learned' sound."},
+ {id:"fa6",s:"facts",sp:["cow"],t:"Cow Vision",hook:"Cows can see almost all the way around them",shots:["Walk up behind the cow; she turns because she already saw you","Text: their eyes on the sides give them nearly panoramic vision, with a blind spot right behind","Cute stare to finish"],len:"10–15s",cap:"You can't sneak up on a cow 👀 #cowfacts",bait:"Ask: \"Did you know this?\"",sound:"Spy or sneaky trending sound."},
+
+ // POV & skits
+ {id:"pv1",s:"pov",sp:["any"],t:"POV: Morning Chores",hook:"POV: it's 6am and they ALL want breakfast",shots:["Shot from your eyes walking out (phone at chest)","Every animal yelling at you at once","Quick cuts to the beat","Last shot: your exhausted face, but you're smiling"],len:"12–20s",cap:"my coworkers are loud",bait:"Easy to relate to. Ask: \"What do your mornings sound like?\"",sound:"Trending sound with a beat drop for the cuts."},
+ {id:"pv2",s:"pov",sp:["any"],t:"Coworker Energy",hook:"My coworkers vs your coworkers",shots:["Text 'Your coworkers:' over a plain shot of an empty office chair or a blank wall","'My coworkers:' and then chaos: {a} screaming, {b} in the feed bin","Your face reacting"],len:"10–15s",cap:"wouldn't trade them for anything (maybe {b})",bait:"Office workers share this to coworkers, and shares are a strong signal.",sound:"Trending comparison sound."},
+ {id:"pv3",s:"pov",sp:["any"],t:"Expectation vs Reality",hook:"Farm life: expectation vs reality",shots:["Expectation: dreamy golden-hour slow-mo","Reality: mud, a goat on your back, a chicken in your bucket","Your face to end"],len:"10–15s",cap:"cottagecore lied to me 😭",bait:"The contrast is the hook. Very shareable.",sound:"Trending 'expectation vs reality' sound."},
+ {id:"pv4",s:"pov",sp:["any"],t:"Shocked Face Hook",hook:"You will not believe what {a} just did",shots:["Open on your face, shocked, already mid-sentence (no 'hey guys')","Whip-pan to the animal doing the thing","Back to your face for the reaction"],len:"8–15s",cap:"{a} WHY 😭",bait:"A face plus a mystery in the first second is a classic hook.",sound:"Your voice."},
+ {id:"pv5",s:"pov",sp:["any"],t:"Day in the Life",hook:"A day in my life working on a farm with {a} and {b}",shots:["10–12 clips of 1–2 seconds each: sunrise, feeding, a boop, a mess, a cuddle, sunset","Small text labels with the time on each","Cozy ending with the crew at golden hour"],len:"25–40s",cap:"day in my life as a farm hand 🌄 these animals are my whole personality now",bait:"Gets saved by people who daydream about farm life.",sound:"Cozy trending sound."},
+
+ // Crew + golden hour
+ {id:"cr1",s:"crew",sp:["any"],t:"Meet the Crew (PIN THIS)",hook:"Meet the farm crew (you'll have a favorite)",shots:["One clip per animal with name and personality on screen: '{a}: the diva'","Keep each 1.5–2 seconds","End on a wide shot of the whole crew"],len:"20–30s",cap:"Meet the cast 🐄🐐🐖🐓 Who's your favorite? I'll make more of them",bait:"Pin this video. New visitors watch it and follow for their favorite.",sound:"Cheerful 'intro' trending sound."},
+ {id:"cr2",s:"crew",sp:["any"],t:"Golden Hour Roll Call",hook:"End-of-day roll call 🌅",shots:["Wide shot at sunset with everyone in it","Name each animal in text as they move","Slow, cinematic phone movement"],len:"10–20s",cap:"roll call at golden hour. Everyone's accounted for (except {a}, as usual)",bait:"Your 746-view video was this kind of shot. Do more of these.",sound:"Soft, emotional trending sound."},
+ {id:"cr3",s:"crew",sp:["duck","goat","sheep"],t:"The Parade",hook:"The daily parade has begun",shots:["Animals walking in a line (ducks are perfect)","Phone low, letting them pass the lens","Add a marching-band sound"],len:"8–12s",cap:"daily parade route 🦆🦆🦆",bait:"Waddle videos loop well.",sound:"A marching or parade trending sound."},
+ {id:"cr4",s:"crew",sp:["any"],t:"Bedtime Check",hook:"Tucking the whole farm in for the night",shots:["Flashlight or barn light vibe","Say 'goodnight {a}' to each animal","Last one is already asleep"],len:"15–25s",cap:"goodnight from the barn 🌙",bait:"Cozy content gets saved and makes a good series ender.",sound:"Lullaby-style trending sound."},
+
+ // Comment replies + trends
+ {id:"rp1",s:"reply",sp:["any"],t:"Answer the Top Comment",hook:"Replying to the best comment from this week",shots:["Use TikTok's 'Reply with video' on a comment","Do exactly what they asked (\"show us {a} again!\")","Thank them by name in text"],len:"10–20s",cap:"you asked, {a} delivered",bait:"Commenters come back to see their reply, and others start asking too.",sound:"Whatever fits."},
+ {id:"rp2",s:"reply",sp:["any"],t:"Part 2 of Your Best Post",hook:"Part 2 because you asked 👀",shots:["Pick your highest-view post from the Log","Make the follow-up within 48 hours","Open with \"Part 2\" in text and the same first frame style"],len:"Same as Part 1",cap:"Part 2!! {a} returns",bait:"Part 2s ride the momentum while it's still being pushed.",sound:"Same sound as Part 1."},
+ {id:"rp3",s:"reply",sp:["any"],t:"Trend, But Farm",hook:"Doing the trend with farm animals",shots:["Open the Discover or Trending sounds page and pick a sound in the top few","Swap the people in the trend for animals","Keep it under 15 seconds"],len:"7–15s",cap:"they ate this trend 😤",bait:"A trending sound plus an unexpected subject gets noticed.",sound:"The trend's sound, of course."},
+
+ // Seasonal (Nov–Dec)
+ {id:"se1",s:"season",sp:["turkey"],t:"Turkey Pardon",hook:"Breaking: {a} has been officially pardoned 🦃",shots:["Formal 'announcement' in text over the turkey strutting","Mock press conference: you with a mic","{a} gobbles 'thank you'"],len:"12–20s",cap:"{a} is safe this Thanksgiving and he's being very smug about it 🦃",bait:"Post the week before Thanksgiving while everyone's searching turkey content.",sound:"News broadcast intro."},
+ {id:"se2",s:"season",sp:["any"],t:"What They're Thankful For",hook:"Asking the animals what they're thankful for",shots:["Interview-style","Each animal's 'answer' in subtitles: 'pumpkins', 'not being dinner', 'she scratches my ears'","End with what you're thankful for (them)"],len:"20–30s",cap:"farm Thanksgiving circle 🧡",bait:"Wholesome and seasonal.",sound:"Soft acoustic trending sound."},
+ {id:"se3",s:"season",sp:["cow","alpaca","sheep","goat"],t:"Frosty Breath",hook:"Cold mornings on the farm hit different",shots:["Backlit close-up on steamy breath at sunrise","Slow-mo","Fluffy winter coats"],len:"8–12s",cap:"winter coat season ❄️",bait:"Gorgeous and loopable.",sound:"Calm winter trending sound."},
+ {id:"se4",s:"season",sp:["any"],t:"Animal Advent Calendar",hook:"Day 1 of giving the farm animals an advent calendar",shots:["A daily safe treat reveal","Each day a different animal","Number the days on screen"],len:"8–15s",cap:"farm advent day 1 🎄 who gets tomorrow's?",bait:"A daily December series. 'Day X of' gives people a reason to follow.",sound:"Christmas trending sound."},
+ {id:"se5",s:"season",sp:["any"],t:"First Snow Reactions",hook:"The animals seeing snow for the first time this year",shots:["Each animal's first step into the snow","Zoomies, sniffs, confused faces","Funniest reaction last"],len:"12–20s",cap:"first snow reviews: mixed ❄️",bait:"Post the same morning it snows. Timing is everything.",sound:"Upbeat winter sound."},
+];
+
+const ARCHETYPES = ["The Diva","The Menace","The Gentle Giant","The Gossip","The Escape Artist","The Foodie","The Boss","The Baby","The Drama Queen","The Philosopher"];
+
+/* ---------- 30-day plan ---------- */
+const PHASES = [
+ {id:"p1",n:"Set the stage",d:[1,3],tasks:[
+  ["p1a","Get the OK from the farm owners","Agree on what stays off camera: the house, the road, signs, license plates and anything that shows where the farm is."],
+  ["p1b","Switch to a Business account","In TikTok: Settings → Account → switch to a Business account so you get Analytics (views per video, watch time and when your followers are online). It's free."],
+  ["p1c","Name the cast","Give every animal a name and a personality in the Cast tab. Recurring characters are how farm accounts grow."],
+  ["p1d","Rewrite your bio","Say what people get, like \"daily drama from the barn 🐄 meet the crew ↓\". Keep \"moo.\" in it."],
+  ["p1e","Film and pin \"Meet the Crew\"","Use the Meet the Crew idea, then pin it so every new visitor sees it first."],
+  ["p1f","Batch film 5 clips","One trip to the barn gives you 3–5 days of content. Film way more than you need."],
+ ]},
+ {id:"p2",n:"Find the hit",d:[4,14],tasks:[
+  ["p2a","Post 1 video a day","Use Today's shoot. Consistency matters more than any single video. If life happens, aim for at least 4 a week."],
+  ["p2b","Run every post through Check","Aim for 75+ before posting. Never post without on-screen text in the first second."],
+  ["p2c","Reply to every comment in the first hour","Early comments and replies help a new post get pushed further."],
+  ["p2d","Log views 24 hours after posting","The Log tab works out which series are winning."],
+  ["p2e","Try every series at least once","You can't know what your audience likes until you test it."],
+ ]},
+ {id:"p3",n:"Double down",d:[15,30],tasks:[
+  ["p3a","Make more of your top 2 series","Check Log → 'What's working'. Give the winners 4–5 slots a week."],
+  ["p3b","Make a Part 2 of any post that beats 2× your average","Do it within 48 hours, while it's still being pushed."],
+  ["p3c","Do one 'reply with video' per week","Answer the best comment with a new video."],
+  ["p3d","Do one trend per week with a farm twist","Pick a sound from TikTok's trending list."],
+  ["p3e","Try one longer story (45–90s)","Barnyard Drama or Day in the Life. Longer videos earn more watch time when they hold attention."],
+ ]},
+];
+
+const RULES = [
+ "The first second decides everything: open on motion, a face, or a nose in the lens. No \"hey guys\" and no slow pan.",
+ "Always put a hook in big text on screen, even when the sound is on. Many people scroll muted.",
+ "Keep it short: 7–15s for loops and jokes, 20–35s for stories. Cut every boring frame.",
+ "End so it loops (the last frame matches the first) or on the payoff. No outros.",
+ "Give people a reason to comment: a score, a guess, a vote or \"who's next?\"",
+ "Use the same names and the same series titles every time, so people come back for characters they know.",
+ "Post 1 a day for 30 days. Your Analytics will tell you the best time; until then try 11am–1pm or 6–9pm.",
+ "Captions: one hook line, a few search words (\"pot belly pig\", \"cow\"), and 3–5 hashtags. Not 20.",
+ "Animals come first: no stressing them for a shot, no unsafe treats, no faking. Viewers can tell.",
+ "Keep the farm's location private: no address, road, signs or plates in frame.",
+];
+
+/* ---------- Viral check ---------- */
+const CHECKS = [
+ ["hook",18,"Something happens in the first second","A nose in the lens, a face, motion or chaos. No slow intro.","Cut the first 1–2 seconds until something is happening on frame one."],
+ ["text",12,"On-screen hook text from frame one","It tells people why to keep watching.","Add big text that opens a question: \"Rating every snoot on the farm\"."],
+ ["char",10,"A named character from the cast","People follow characters, not 'a cow'.","Say the animal's name on screen and in the caption."],
+ ["len",10,"Short enough to earn every second","7–15s for jokes and loops, 20–35s for stories.","Trim until it feels slightly too short."],
+ ["loop",10,"Loops or ends on the payoff","No outro, no 'bye', no fade to black.","End right on the punchline or match the last frame to the first."],
+ ["comment",8,"A reason to comment","A score, a guess, a vote, or 'who's next?'","Add a question to the end text or the caption."],
+ ["share",8,"A reason to share or save","Funny enough to send, or a fact worth saving.","Ask yourself who would send this to a friend. If nobody would, punch up the joke."],
+ ["caption",6,"Caption has search words and 3–5 hashtags","Like 'pot belly pig' or 'highland cow', plus #farmtok.","Copy the caption from Today and add one animal search word."],
+ ["sound",6,"Good audio","A trending sound kept low under natural sounds, or your voice.","Add a trending sound at 10–20% volume under the real audio."],
+ ["visual",6,"Vertical, bright and steady at animal eye level","Get low and use daylight.","Reshoot from the animal's eye height in daylight."],
+ ["cc",3,"Auto-captions on if there's talking","Turn them on in the editor.","Turn on auto-captions before posting."],
+ ["time",3,"Posting when your followers are online","Check Analytics → Followers.","Save it as a draft and post in your best window."],
+];
+
+/* ---------- State ---------- */
+function defaultState(){
+  return {
+    start:null, plan:{}, done:{}, saved:{}, check:{}, shuffle:{}, baseline:290,
+    cast:[
+      {id:uid(),sp:"cow",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"goat",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"pig",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"rooster",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"turkey",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"duck",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"sheep",name:"",vibe:"",bit:""},
+      {id:uid(),sp:"chicken",name:"",vibe:"",bit:""},
+    ],
+    posts:[]
+  };
+}
+let S;
+try { S = Object.assign(defaultState(), JSON.parse(localStorage.getItem(STORE_KEY) || "null") || {}); } catch { S = defaultState(); }
+const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch {} };
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,1800); }
+async function copy(text){ try { await navigator.clipboard.writeText(text); toast("Copied ✓"); } catch { prompt("Copy this:", text); } }
+
+/* ---------- Helpers: fill names ---------- */
+function castFor(spList, seed=0){
+  const named = S.cast.filter(c=>c.name.trim());
+  const pool = spList.includes("any") ? S.cast : S.cast.filter(c=>spList.includes(c.sp));
+  const pref = pool.filter(c=>c.name.trim());
+  const list = pref.length ? pref : (pool.length ? pool : (named.length ? named : S.cast));
+  if (!list.length) return [{sp:spList[0]==="any"?"cow":spList[0],name:""}];
+  const i = seed % list.length;
+  return [list[i], list[(i+1)%list.length]];
+}
+const label = c => c && c.name.trim() ? c.name.trim() : "the " + (SPECIES[c?.sp]||SPECIES.other).n;
+function fillIdea(idea, seed=0){
+  const [a,b0] = castFor(idea.sp, seed);
+  let b = b0;
+  if (!b || b===a) { const others = S.cast.filter(c=>c!==a); b = others.length ? others[seed % others.length] : a; }
+  const A = label(a), B = label(b);
+  const f = s => s.replace(/\{a\}/g,A).replace(/\{b\}/g,B);
+  const tagSet = [...BASE_TAGS, ...((SPECIES[a?.sp]||SPECIES.other).tags)].slice(0,5);
+  return {...idea, t:f(idea.t), hook:f(idea.hook), shots:idea.shots.map(f), cap:f(idea.cap), bait:f(idea.bait), star:a, tags:tagSet};
+}
+const dayNum = () => S.start ? Math.max(1, daysBetween(S.start, todayISO()) + 1) : 0;
+function phaseFor(d){ return PHASES.find(p=>d>=p.d[0] && d<=p.d[1]) || (d>30 ? null : PHASES[0]); }
+
+function seasonalActive(){
+  const m = new Date().getMonth(); // Nov=10, Dec=11
+  return m===10 || m===11;
+}
+function todaysIdea(){
+  const t = todayISO();
+  const dow = new Date(t+"T12:00").getDay();
+  const d = dayNum();
+  let series = WEEK[dow];
+  if (d && d<=3) series = "crew"; // stage-setting days: meet the crew first
+  if (seasonalActive() && dow===4 && d>3) series = "season"; // Thursdays in Nov–Dec: seasonal
+  let pool = IDEAS.filter(i=>i.s===series);
+  if (series==="season"){ const m=new Date().getMonth(); pool = pool.filter(i => m===10 ? ["se1","se2","se3"].includes(i.id) : ["se3","se4","se5"].includes(i.id)); }
+  if (d && d<=1) pool = IDEAS.filter(i=>i.id==="cr1");
+  const fresh = pool.filter(i=>!S.done[i.id]);
+  const list = fresh.length ? fresh : pool;
+  const n = (S.shuffle[t]||0);
+  const seed = Math.abs([...t].reduce((h,c)=>h*31+c.charCodeAt(0)|0,7));
+  const idea = list[(seed + n) % list.length];
+  return fillIdea(idea, seed + n);
+}
+const captionText = i => `${i.cap}\n\n${i.tags.join(" ")}`;
+
+/* ---------- Views ---------- */
+function renderToday(){
+  const d = dayNum();
+  $("#daychip").textContent = d ? (d<=30 ? `Day ${d} / 30` : `Day ${d}`) : "Ready?";
+  const v = $("#v-today");
+  if (!S.start){
+    v.innerHTML = `
+    <div class="panel shoot">
+      <p class="eyebrow">Ashley's 30-day push</p>
+      <h2>Your farm is the content. This app turns it into a plan.</h2>
+      <p>You already have the hard part: a whole cast of animals and a great nose-cam style. What's been missing is hooks, names and series. That's how farm accounts go from a few hundred views to the For You page.</p>
+      <ul style="margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px">
+        <li><b style="color:var(--hay)">Today</b>: one shoot a day with the hook, shot list and caption written for you</li>
+        <li><b style="color:var(--hay)">Ideas</b>: ${IDEAS.length} farm video formats in ${Object.keys(SERIES).length} series</li>
+        <li><b style="color:var(--hay)">Cast</b>: name your animals and they show up in every script</li>
+        <li><b style="color:var(--hay)">Check</b>: a 100-point viral checklist before you post</li>
+        <li><b style="color:var(--hay)">Log</b>: track views and see which series wins</li>
+      </ul>
+      <button class="btn red" data-act="start">Start my 30 days 🚀</button>
+    </div>
+    ${rulesHTML(true)}`;
+    return;
+  }
+  const idea = todaysIdea();
+  const ser = SERIES[idea.s];
+  const ph = phaseFor(d);
+  const doneToday = S.done[idea.id]===todayISO();
+  v.innerHTML = `
+  <div class="panel shoot">
+    <div class="row" style="justify-content:space-between"><p class="eyebrow">Today's shoot · ${ser.e} ${esc(ser.n)}</p>${doneToday?'<span class="pill green">Posted ✓</span>':''}</div>
+    <h2>${esc(idea.t)}</h2>
+    <div class="screen" aria-label="Preview of the on-screen hook">
+      <small>On-screen text, frame one:</small>
+      <span class="hooktxt">${esc(idea.hook)}</span>
+      <div class="rail" aria-hidden="true"><span>♥</span><span>💬</span><span>↗</span></div>
+    </div>
+    <div class="kv"><b>Length</b><span>${esc(idea.len)}</span><b>Star</b><span>${esc((SPECIES[idea.star?.sp]||SPECIES.other).e)} ${esc(label(idea.star))}</span><b>Sound</b><span>${esc(idea.sound)}</span></div>
+    <div><p class="eyebrow" style="margin-bottom:4px">Shot list</p><ol>${idea.shots.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>
+    <div class="copybox"><p class="eyebrow">Caption</p><p>${esc(captionText(idea))}</p><button class="btn ghost sm" data-copy="${esc(captionText(idea))}">Copy caption</button></div>
+    <p style="font-size:.9rem;color:#CFC6BB">💬 ${esc(idea.bait)}</p>
+    <p style="font-size:.85rem;color:#CFC6BB">Why this series: ${esc(ser.why)}</p>
+    <div class="row">
+      <button class="btn red" data-act="posted" data-id="${idea.id}">${doneToday?"Log another":"I posted it ✓"}</button>
+      <button class="btn ghost" data-act="shuffle">🔀 Different idea</button>
+      <button class="btn ghost" data-tabgo="score">🔥 Check it</button>
+    </div>
+  </div>
+
+  ${ph ? `<div class="panel">
+    <p class="eyebrow">The plan</p>
+    <div class="phase">${PHASES.map(p=>`<div class="${p===ph?'on':(d>p.d[1]?'past':'')}"><b>${esc(p.n)}</b>Days ${p.d[0]}–${p.d[1]}</div>`).join("")}</div>
+    <h3>${esc(ph.n)}: this phase's checklist</h3>
+    <ul class="checks">${ph.tasks.map(([id,t,sub])=>`<li><label class="${S.plan[id]?'on':''}"><input type="checkbox" data-plan="${id}" ${S.plan[id]?'checked':''}><span><b>${esc(t)}</b><small>${esc(sub)}</small></span></label></li>`).join("")}</ul>
+  </div>` : `<div class="panel"><p class="eyebrow">30 days done 🎉</p><h3>Keep the rhythm</h3><p class="lede">Keep posting your top 2 series 4–5 times a week, make Part 2s of anything that beats 2× your average, and add one new experiment each week. Check the Log every Sunday.</p></div>`}
+
+  <div class="panel">
+    <p class="eyebrow">This week's rhythm</p>
+    <div class="bars">${[1,2,3,4,5,6,0].map(dw=>{const sk=(seasonalActive()&&dw===4)?"season":WEEK[dw];const on=new Date().getDay()===dw;return `<div class="row" style="justify-content:space-between;${on?'font-weight:700':''}"><span>${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dw]}${on?' · today':''}</span><span>${SERIES[sk].e} ${esc(SERIES[sk].n)}</span></div>`}).join("")}</div>
+  </div>
+  ${rulesHTML(false)}`;
+}
+function rulesHTML(open){
+  return `<details class="panel rules" ${open?"open":""}><summary>📌 The 10 rules for farm TikTok</summary><ul>${RULES.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></details>`;
+}
+
+let ideaFilter = "all", openIdea = null;
+function renderIdeas(){
+  const v = $("#v-ideas");
+  const keys = ["all","saved",...Object.keys(SERIES)];
+  const list = IDEAS.filter(i => ideaFilter==="all" ? true : ideaFilter==="saved" ? S.saved[i.id] : i.s===ideaFilter);
+  v.innerHTML = `
+  <div><p class="eyebrow">Idea lab</p><h2 style="font-size:1.6rem">${IDEAS.length} formats built for this farm</h2></div>
+  ${ideaFilter!=="all"&&ideaFilter!=="saved" ? `<p class="lede">${esc(SERIES[ideaFilter].why)}</p>`:`<p class="lede">Tap one to open the script. Names come from your Cast tab.</p>`}
+  <div class="chips" role="tablist">${keys.map(k=>`<button class="chip ${ideaFilter===k?'on':''}" data-filter="${k}">${k==="all"?"All":k==="saved"?"⭐ Saved":SERIES[k].e+" "+esc(SERIES[k].n)}</button>`).join("")}</div>
+  <div class="view" style="gap:10px">${list.length?list.map((raw,ix)=>{const i=fillIdea(raw,ix);const open=openIdea===raw.id;return `
+    <div class="idea ${S.done[raw.id]?'done':''}">
+      <button data-open="${raw.id}" aria-expanded="${open}"><span class="emo">${SERIES[raw.s].e}</span><span class="t"><b>${esc(i.t)}</b><span>${esc(SERIES[raw.s].n)} · ${esc(i.len)}${S.done[raw.id]?' · posted ✓':''}${S.saved[raw.id]?' · ⭐':''}</span></span></button>
+      ${open?`<div class="body">
+        <p class="hookq">“${esc(i.hook)}”</p>
+        <ol>${i.shots.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>
+        <p><b>Sound:</b> ${esc(i.sound)}</p>
+        <p><b>Engagement:</b> ${esc(i.bait)}</p>
+        <div class="copybox" style="background:var(--sunk)"><p>${esc(captionText(i))}</p></div>
+        <div class="row">
+          <button class="btn sm" data-copy="${esc(captionText(i))}">Copy caption</button>
+          <button class="btn ghost sm" data-save="${raw.id}">${S.saved[raw.id]?"Unsave":"⭐ Save"}</button>
+          <button class="btn ghost sm" data-act="posted" data-id="${raw.id}">Posted ✓</button>
+        </div></div>`:""}
+    </div>`}).join(""):`<p class="lede">Nothing saved yet. Tap ⭐ Save on any idea.</p>`}</div>`;
+}
+
+function renderCast(){
+  const v = $("#v-cast");
+  const named = S.cast.filter(c=>c.name.trim()).length;
+  v.innerHTML = `
+  <div><p class="eyebrow">The cast</p><h2 style="font-size:1.6rem">Characters get followed. Animals get scrolled past.</h2></div>
+  <p class="lede">Give each animal a name, a personality and a running bit. Every script in the app uses these names. ${named<S.cast.length?`<b>${S.cast.length-named} still need a name.</b>`:"Everyone's named. 🎉"}</p>
+  <div class="castgrid">
+    ${S.cast.map(c=>{const sp=SPECIES[c.sp]||SPECIES.other;return `<button class="card" data-cast="${c.id}">
+      <span class="emo">${sp.e}</span>
+      ${c.name.trim()?`<b>${esc(c.name)}</b>`:`<b class="nm">Name me!</b>`}
+      <span>${esc(c.vibe || sp.n)}</span>
+      ${c.bit?`<span>“${esc(c.bit)}”</span>`:""}
+    </button>`}).join("")}
+    <button class="card add" data-cast="new">＋ Add an animal</button>
+  </div>
+  <div class="panel">
+    <h3>How to build a character</h3>
+    <ul style="margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px">
+      <li><b>Name</b>: short and funny beats cute. A human name on a pig ("Gary") is a classic.</li>
+      <li><b>Personality</b>: pick one trait and exaggerate it every time.</li>
+      <li><b>Running bit</b>: a thing they always do. "Escapes every Tuesday." "Screams at the feed bucket."</li>
+      <li>Use the same name in the text, the caption and your voice so viewers learn it.</li>
+    </ul>
+  </div>`;
+}
+function castDialog(id){
+  const c = id==="new" ? {id:uid(),sp:"goat",name:"",vibe:"",bit:"",_new:true} : {...S.cast.find(x=>x.id===id)};
+  const f = $("#dlgform");
+  f.innerHTML = `
+    <h2>${c._new?"New cast member":"Edit "+esc(label(c))}</h2>
+    <div class="grid2">
+      <label class="field">Animal<select name="sp">${Object.entries(SPECIES).map(([k,s])=>`<option value="${k}" ${c.sp===k?"selected":""}>${s.e} ${s.n}</option>`).join("")}</select></label>
+      <label class="field">Name<input name="name" value="${esc(c.name)}" placeholder="e.g. Gary" autocomplete="off"></label>
+    </div>
+    <label class="field">Personality<input name="vibe" value="${esc(c.vibe)}" placeholder="e.g. The Diva" autocomplete="off"></label>
+    <div class="archetypes">${ARCHETYPES.map(a=>`<button type="button" class="chip" data-arch="${esc(a)}">${esc(a)}</button>`).join("")}</div>
+    <label class="field">Running bit<textarea name="bit" placeholder="e.g. Screams at the feed bucket every morning">${esc(c.bit)}</textarea></label>
+    <div class="row" style="justify-content:space-between">
+      ${c._new?"<span></span>":`<button type="button" class="btn ghost" data-del="${c.id}">Remove</button>`}
+      <div class="row"><button value="cancel" class="btn ghost">Cancel</button><button value="ok" class="btn red">Save</button></div>
+    </div>`;
+  f.onclick = e => {
+    const a = e.target.closest("[data-arch]"); if (a){ f.vibe.value = a.dataset.arch; return; }
+    const d = e.target.closest("[data-del]"); if (d && confirm("Remove "+label(c)+" from the cast?")){ S.cast = S.cast.filter(x=>x.id!==d.dataset.del); save(); $("#dlg").close(); renderAll(); }
+  };
+  $("#dlg").onclose = () => {
+    if ($("#dlg").returnValue!=="ok") return;
+    const n = {id:c.id, sp:f.sp.value, name:f.name.value.trim().slice(0,30), vibe:f.vibe.value.trim().slice(0,40), bit:f.bit.value.trim().slice(0,120)};
+    const i = S.cast.findIndex(x=>x.id===c.id);
+    if (i>=0) S.cast[i]=n; else S.cast.push(n);
+    save(); renderAll();
+  };
+  $("#dlg").returnValue=""; $("#dlg").showModal();
+}
+
+function scoreNow(){ return CHECKS.reduce((t,[id,w])=>t+(S.check[id]?w:0),0); }
+function renderScore(){
+  const v = $("#v-score");
+  const sc = scoreNow();
+  const verdict = sc>=75?["Send it 🚀","var(--pasture)"]:sc>=50?["Postable, but fix one thing","var(--haytext)"]:["Rework the hook first","var(--barn)"];
+  const missing = CHECKS.filter(([id])=>!S.check[id]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const r=46, C=2*Math.PI*r;
+  v.innerHTML = `
+  <div><p class="eyebrow">Viral check</p><h2 style="font-size:1.6rem">Run every video through this before you post</h2></div>
+  <div class="panel">
+    <div class="scorehead">
+      <svg class="ring" viewBox="0 0 110 110" role="img" aria-label="Score ${sc} out of 100">
+        <circle cx="55" cy="55" r="${r}" fill="none" stroke="var(--sunk)" stroke-width="12"/>
+        <circle cx="55" cy="55" r="${r}" fill="none" stroke="${verdict[1]}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-sc/100)}" transform="rotate(-90 55 55)"/>
+        <text x="55" y="62" text-anchor="middle" font-size="28" fill="var(--fg)">${sc}</text>
+      </svg>
+      <div><p class="verdict" style="color:${verdict[1]}">${verdict[0]}</p><p class="lede" style="font-size:.88rem">This catches the things that usually sink a video. No score guarantees views.</p></div>
+    </div>
+    ${missing.length?`<div class="tip warn"><b>Biggest fixes:</b><ol class="fixes">${missing.map(m=>`<li>${esc(m[4])} <i>(+${m[1]})</i></li>`).join("")}</ol></div>`:`<div class="tip">Everything's checked. Post it and reply to comments for the first hour.</div>`}
+  </div>
+  <ul class="checks">${CHECKS.map(([id,w,t,sub])=>`<li><label class="${S.check[id]?'on':''}"><input type="checkbox" data-check="${id}" ${S.check[id]?'checked':''}><span class="lab"><b>${esc(t)}</b><small>${esc(sub)}</small></span><span class="pts">+${w}</span></label></li>`).join("")}</ul>
+  <button class="btn ghost" data-act="resetcheck">Start a new video</button>`;
+}
+
+function seriesStats(){
+  const by = {};
+  for (const p of S.posts){ const k = p.series || "other"; (by[k] ||= []).push(p); }
+  return Object.entries(by).map(([k,ps])=>({k, n:ps.length, avg:Math.round(ps.reduce((t,p)=>t+(+p.views||0),0)/ps.length)})).sort((a,b)=>b.avg-a.avg);
+}
+function renderLog(){
+  const v = $("#v-log");
+  const posts = [...S.posts].sort((a,b)=>b.date.localeCompare(a.date));
+  const n = posts.length;
+  const avg = n ? Math.round(posts.reduce((t,p)=>t+(+p.views||0),0)/n) : 0;
+  const best = posts.reduce((m,p)=>(+p.views||0)>(+m?.views||0)?p:m, null);
+  const follows = posts.reduce((t,p)=>t+(+p.follows||0),0);
+  const ss = seriesStats();
+  const maxAvg = Math.max(1,...ss.map(s=>s.avg));
+  const vsBase = S.baseline ? Math.round((avg/S.baseline)*100) : 0;
+  let advice = "";
+  if (n>=5 && ss.length){
+    const top = ss.filter(s=>s.k!=="other").slice(0,2);
+    const weak = ss.filter(s=>s.n>=3 && s.avg < avg*0.6);
+    advice = `<div class="tip"><b>What's working:</b> ${top.map(t=>esc(SERIES[t.k]?.n||t.k)).join(" and ")}. Give ${top.length>1?"them":"it"} 4–5 slots a week.${weak.length?`<br><b>Rest for now:</b> ${weak.map(w=>esc(SERIES[w.k]?.n||w.k)).join(", ")}.`:""}</div>`;
+  } else {
+    advice = `<div class="tip warn">Log at least 5 posts (views 24 hours after posting) and this will tell you which series to double down on.</div>`;
+  }
+  const breakout = best && avg && (+best.views) >= 2*avg ? `<div class="tip">🔥 <b>${esc(best.title)}</b> hit ${(+best.views).toLocaleString()} views, more than 2× your average. Make a Part 2 within 48 hours.</div>` : "";
+  v.innerHTML = `
+  <div class="row" style="justify-content:space-between"><div><p class="eyebrow">Post log</p><h2 style="font-size:1.6rem">What's actually working</h2></div><button class="btn red" data-act="posted">＋ Log a post</button></div>
+  <div class="stats">
+    <div class="stat"><b>${n}</b><span>posts logged</span></div>
+    <div class="stat"><b>${avg.toLocaleString()}</b><span>avg views${n&&S.baseline?` · ${vsBase}% of start`:""}</span></div>
+    <div class="stat"><b>+${follows}</b><span>followers gained</span></div>
+  </div>
+  ${breakout}
+  ${advice}
+  ${ss.length?`<div class="panel"><h3>Average views by series</h3><div class="bars">${ss.map(s=>`<div class="bar"><span>${esc(SERIES[s.k]?.e||"🎞️")} ${esc(SERIES[s.k]?.n||"Other")}</span><div class="track"><div class="fill" style="width:${Math.max(4,s.avg/maxAvg*100)}%"></div></div><span class="val">${s.avg.toLocaleString()}</span></div>`).join("")}</div></div>`:""}
+  <div class="view" style="gap:8px">${posts.map(p=>{const eng=(+p.views)?(((+p.likes||0)+(+p.comments||0)+(+p.shares||0)+(+p.saves||0))/(+p.views)*100).toFixed(1):"–";return `
+    <button class="post" data-post="${p.id}" style="text-align:left">
+      <span class="top"><b>${esc(p.title||"Untitled")}</b><span class="pill ${(+p.views)>=2*avg&&avg?'red':''}">${(+p.views||0).toLocaleString()} views</span></span>
+      <span class="nums">${esc(p.date)} · ${esc(SERIES[p.series]?.n||"Other")} · ♥ ${+p.likes||0} · 💬 ${+p.comments||0} · ↗ ${+p.shares||0} · 🔖 ${+p.saves||0} · ${eng}% engaged</span>
+    </button>`}).join("")}</div>
+  <div class="panel">
+    <h3>Starting point</h3>
+    <label class="field">Average views per video before the 30 days<input type="number" inputmode="numeric" min="0" data-baseline value="${S.baseline||""}"></label>
+    <p class="lede" style="font-size:.86rem">Your videos were averaging roughly 290 views before this. Beating that consistently is the first goal; your first 1,000-view video is the second.</p>
+  </div>
+  <div class="panel">
+    <h3>Back up</h3>
+    <p class="lede" style="font-size:.88rem">Everything lives only on this phone. Save a backup now and then.</p>
+    <div class="row"><button class="btn ghost" data-act="backup">⬇ Back up</button><label class="btn ghost" style="cursor:pointer">⬆ Restore<input type="file" accept="application/json" data-restore hidden></label></div>
+  </div>`;
+}
+function postDialog(ideaId, postId){
+  const existing = postId ? S.posts.find(p=>p.id===postId) : null;
+  const idea = ideaId ? IDEAS.find(i=>i.id===ideaId) : null;
+  const filled = idea ? fillIdea(idea) : null;
+  const p = existing ? {...existing} : {id:uid(), date:todayISO(), title:filled?.t||"", series:idea?.s||"drama", ideaId:ideaId||"", views:"",likes:"",comments:"",shares:"",saves:"",follows:""};
+  const f = $("#dlgform");
+  const num = (k,l) => `<label class="field">${l}<input type="number" inputmode="numeric" min="0" name="${k}" value="${esc(p[k])}"></label>`;
+  f.innerHTML = `
+    <h2>${existing?"Edit post":"Log a post"}</h2>
+    <label class="field">Title<input name="title" value="${esc(p.title)}" required autocomplete="off"></label>
+    <div class="grid2">
+      <label class="field">Date<input type="date" name="date" value="${esc(p.date)}"></label>
+      <label class="field">Series<select name="series">${Object.entries(SERIES).map(([k,s])=>`<option value="${k}" ${p.series===k?"selected":""}>${s.e} ${esc(s.n)}</option>`).join("")}<option value="other" ${p.series==="other"?"selected":""}>🎞️ Other</option></select></label>
+    </div>
+    <p class="lede" style="font-size:.86rem">Fill in the numbers 24 hours after posting. You can come back and edit them.</p>
+    <div class="grid2">${num("views","Views")}${num("likes","Likes")}${num("comments","Comments")}${num("shares","Shares")}${num("saves","Saves")}${num("follows","New followers")}</div>
+    <div class="row" style="justify-content:space-between">
+      ${existing?`<button type="button" class="btn ghost" data-delpost="${p.id}">Delete</button>`:"<span></span>"}
+      <div class="row"><button value="cancel" class="btn ghost">Cancel</button><button value="ok" class="btn red">Save</button></div>
+    </div>`;
+  f.onclick = e => { const d=e.target.closest("[data-delpost]"); if(d && confirm("Delete this post from the log?")){ S.posts=S.posts.filter(x=>x.id!==p.id); save(); $("#dlg").close(); renderAll(); } };
+  $("#dlg").onclose = () => {
+    if ($("#dlg").returnValue!=="ok") return;
+    const n = {...p, title:f.title.value.trim().slice(0,80)||"Untitled", date:f.date.value||todayISO(), series:f.series.value};
+    for (const k of ["views","likes","comments","shares","saves","follows"]) n[k] = f[k].value==="" ? "" : Math.max(0, Math.round(+f[k].value||0));
+    const i = S.posts.findIndex(x=>x.id===p.id);
+    if (i>=0) S.posts[i]=n; else { S.posts.push(n); if (p.ideaId) S.done[p.ideaId]=n.date; S.check={}; }
+    save(); renderAll(); toast(existing?"Saved":"Logged. Reply to your comments! 💬");
+  };
+  $("#dlg").returnValue=""; $("#dlg").showModal();
+}
+
+/* ---------- Wiring ---------- */
+let tab = "today";
+function renderAll(){ renderToday(); renderIdeas(); renderCast(); renderScore(); renderLog(); }
+function go(t){
+  tab=t;
+  for (const s of document.querySelectorAll(".view[id^=v-]")) s.hidden = s.id!=="v-"+t;
+  for (const b of document.querySelectorAll("nav.tabs button")) { if (b.dataset.tab===t) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); }
+  window.scrollTo({top:0});
+}
+document.addEventListener("click", e => {
+  const el = e.target.closest("button,[data-copy]"); if (!el) return;
+  if (el.dataset.tab) return go(el.dataset.tab);
+  if (el.dataset.tabgo) return go(el.dataset.tabgo);
+  if (el.dataset.copy!==undefined) return copy(el.dataset.copy);
+  if (el.dataset.filter){ ideaFilter=el.dataset.filter; openIdea=null; return renderIdeas(); }
+  if (el.dataset.open){ openIdea = openIdea===el.dataset.open ? null : el.dataset.open; return renderIdeas(); }
+  if (el.dataset.save){ S.saved[el.dataset.save] ? delete S.saved[el.dataset.save] : S.saved[el.dataset.save]=1; save(); return renderIdeas(); }
+  if (el.dataset.cast) return castDialog(el.dataset.cast);
+  if (el.dataset.post) return postDialog(null, el.dataset.post);
+  const act = el.dataset.act;
+  if (act==="start"){ S.start = todayISO(); save(); renderAll(); return; }
+  if (act==="shuffle"){ const t=todayISO(); S.shuffle = {[t]:(S.shuffle[t]||0)+1}; save(); renderToday(); return; }
+  if (act==="posted") return postDialog(el.dataset.id||null);
+  if (act==="resetcheck"){ S.check={}; save(); renderScore(); window.scrollTo({top:0}); return; }
+  if (act==="backup"){
+    const blob = new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`barnstorm-backup-${todayISO()}.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); return;
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset.plan!==undefined){ S.plan[t.dataset.plan]=t.checked; save(); t.closest("label").classList.toggle("on",t.checked); return; }
+  if (t.dataset.check!==undefined){ S.check[t.dataset.check]=t.checked; save(); renderScore(); return; }
+  if (t.dataset.baseline!==undefined){ S.baseline = Math.max(0, Math.round(+t.value||0)); save(); renderLog(); return; }
+  if (t.dataset.restore!==undefined && t.files[0]){
+    t.files[0].text().then(txt=>{ const d=JSON.parse(txt); if(!d || !Array.isArray(d.cast) || !Array.isArray(d.posts)) throw 0; if(confirm("Replace everything on this phone with this backup?")){ S=Object.assign(defaultState(),d); save(); renderAll(); toast("Restored ✓"); } }).catch(()=>alert("That file isn't a Barnstorm backup."));
+  }
+});
+
+renderAll();
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>
