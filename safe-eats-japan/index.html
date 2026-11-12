@@ -69,6 +69,12 @@ nav.tabs button[aria-selected="true"] .ic{transform:translateY(-1px)}
 .band .en{color:#fff;opacity:.9}
 .btn.big{min-height:64px;font-size:1.15rem;border-radius:16px;width:100%}
 .btn.ghost{background:transparent;border-color:transparent;color:var(--indigo)}
+.reqgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.req{display:flex;align-items:center;gap:8px;text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:14px;padding:10px;min-height:58px;font-weight:600;font-size:.88rem;line-height:1.25}
+.req:active{transform:scale(.98)}
+.req .em{font-size:1.7rem;flex:none}
+.req b{display:block;font-size:.9rem}
+.req small{display:block;font-size:.78rem;color:var(--muted);font-weight:500;margin-top:1px}
 details.opts{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 12px}
 details.opts summary{min-height:46px;display:flex;align-items:center;font-weight:600;cursor:pointer;list-style:none;color:var(--muted)}
 details.opts summary::-webkit-details-marker{display:none}
@@ -223,6 +229,11 @@ ul.clean li{line-height:1.45}
   <div class="acard" id="acard" role="button" tabindex="0" aria-label="Show card full screen"></div>
   <button class="btn primary big" id="showCard">⤢ Show card full screen</button>
   <button class="btn ghost" id="sayCard">🔊 Hear it in Japanese</button>
+  <div class="panel">
+    <div class="kicker">Ask for a change</div>
+    <p class="small muted" style="margin-top:2px">Polite “if possible… thank you” requests. Tap one to show it big.</p>
+    <div class="reqgrid" id="reqGrid"></div>
+  </div>
 </section>
 
 <!-- ================= PHRASES ================= -->
@@ -320,11 +331,10 @@ ul.clean li{line-height:1.45}
 
 <div id="show" hidden role="dialog" aria-modal="true">
   <div class="sbar">
-    <span class="pill">お願いします</span>
     <button class="btn sm" id="showSay">🔊</button>
     <button class="btn sm" id="showSlow">🐢</button>
     <button class="btn sm" id="showEn">EN</button>
-    <button class="btn sm x" id="showClose">✕ Close</button>
+    <button class="btn sm x" id="showClose" style="white-space:nowrap">✕ Close</button>
   </div>
   <div class="stage"><div class="big" id="showBig"></div><div class="sub" id="showSub"></div></div>
 </div>
@@ -411,7 +421,8 @@ function cardModel() {
     head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have food allergies." },
     items: [
       { ja: "小麦", en: "Wheat" },
-      { ja: "乳製品", en: "Dairy" }
+      { ja: "乳製品", en: "Dairy" },
+      { ja: "大豆", en: "Soy" }
     ],
     note: null,
     ask: { ja: "これらを使わないおすすめの料理を教えていただけますか？", en: "Could you recommend a dish made without these?" },
@@ -472,8 +483,10 @@ function fitSize(len) { return Math.max(24, Math.min(64, Math.round(1500 / Math.
 function openShow(item) {
   showing = item; showEn = false;
   const big = $("#showBig");
-  big.innerHTML = esc(item.ja).replace(/\n/g, "<br>");
-  big.style.fontSize = (item.ja.length > 120 ? 18 : fitSize(item.ja.length)) + "px";
+  const lines = item.ja.split("\n");
+  big.innerHTML = item.ja.length > 120 ? esc(item.ja).replace(/\n/g, "<br>")
+    : esc(lines[0]) + lines.slice(1).map(l => `<span style="display:block;font-size:.7em;margin-top:.5em;white-space:nowrap">${esc(l)}</span>`).join("");
+  big.style.fontSize = item.ja.length > 120 ? "18px" : `min(${fitSize(lines[0].length)}px, 9.5vw)`;
   $("#showSub").textContent = "";
   $("#show").hidden = false; document.body.style.overflow = "hidden"; awake.on();
 }
@@ -492,6 +505,15 @@ document.addEventListener("keydown", e => {
 
 /* ================= PHRASES ================= */
 const PHRASES = [
+  // polite "if possible" requests by dish (also the buttons on the Card screen)
+  { c: "Requests", req: 1, em: "🍣", dish: "Sushi & sashimi", label: "No soy sauce on the fish", en: "If possible, could you not put soy sauce on the fish? Thank you.", ja: "可能でしたら、お魚に醤油をつけないでいただけますか？\nありがとうございます。", ro: "Kanō deshitara, o-sakana ni shōyu o tsukenaide itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, oh-sah-kah-nah nee show-yoo oh tsoo-keh-nai-deh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🍢", dish: "Yakitori & skewers", label: "Salt instead of sauce", en: "If possible, could I have them with salt instead of sauce? Thank you.", ja: "可能でしたら、タレではなく塩でお願いできますか？\nありがとうございます。", ro: "Kanō deshitara, tare de wa naku shio de onegai dekimasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, tah-reh deh wah nah-koo shee-oh deh oh-neh-gai deh-kee-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🥩", dish: "Steak & grill", label: "No butter or soy sauce", en: "If possible, could you grill it with salt, without butter or soy sauce? Thank you.", ja: "可能でしたら、バターと醤油を使わずに、塩で焼いていただけますか？\nありがとうございます。", ro: "Kanō deshitara, batā to shōyu o tsukawazu ni, shio de yaite itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, bah-tah toh show-yoo oh tsoo-kah-wah-zoo nee, shee-oh deh yai-teh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🥗", dish: "Salad", label: "Dressing on the side", en: "If possible, could you put the dressing on the side? Thank you.", ja: "可能でしたら、ドレッシングを別にしていただけますか？\nありがとうございます。", ro: "Kanō deshitara, doresshingu o betsu ni shite itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, doh-res-sheen-goo oh beh-tsoo nee shteh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🍱", dish: "Set meal", label: "No miso soup", en: "If possible, could I have it without the miso soup? Thank you.", ja: "可能でしたら、お味噌汁なしでお願いできますか？\nありがとうございます。", ro: "Kanō deshitara, o-misoshiru nashi de onegai dekimasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, oh-mee-soh-shee-roo nah-shee deh oh-neh-gai deh-kee-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🍳", dish: "Eggs & omelettes", label: "No butter or milk", en: "If possible, could you make the eggs without butter or milk? Thank you.", ja: "可能でしたら、卵料理にバターや牛乳を使わないでいただけますか？\nありがとうございます。", ro: "Kanō deshitara, tamago-ryōri ni batā ya gyūnyū o tsukawanaide itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, tah-mah-goh-ryoh-ree nee bah-tah yah gyoo-nyoo oh tsoo-kah-wah-nai-deh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🍞", dish: "Bread & toast", label: "Rice instead", en: "If possible, could I have rice instead of bread? Thank you.", ja: "可能でしたら、パンの代わりにご飯にしていただけますか？\nありがとうございます。", ro: "Kanō deshitara, pan no kawari ni gohan ni shite itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, pahn noh kah-wah-ree nee goh-hahn nee shteh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  { c: "Requests", req: 1, em: "🍵", dish: "Drinks", label: "Water or tea, not barley tea", en: "Could I have water or green tea instead of barley tea? Thank you.", ja: "麦茶ではなく、お水かお茶をいただけますか？\nありがとうございます。", ro: "Mugicha de wa naku, o-mizu ka o-cha o itadakemasu ka? Arigatō gozaimasu.", say: "moo-ghee-chah deh wah nah-koo, oh-mee-zoo kah oh-chah oh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
   // allergy
   { c: "Allergy", en: "I have food allergies.", ja: "食物アレルギーがあります。", ro: "Shokumotsu arerugī ga arimasu.", say: "show-koo-moh-tsoo ah-reh-roo-ghee gah ah-ree-mahs", q: 1 },
   { c: "Allergy", en: "I can't eat wheat, dairy or soy.", ja: "小麦と乳製品と大豆が食べられません。", ro: "Komugi to nyūseihin to daizu ga taberaremasen.", say: "koh-moo-ghee toh nyoo-say-heen toh dye-zoo gah tah-beh-rah-reh-mah-sen", q: 1 },
@@ -547,7 +569,7 @@ const PHRASES = [
   { c: "Help", en: "Where is the bathroom?", ja: "トイレはどこですか？", ro: "Toire wa doko desu ka?", say: "toy-reh wah doh-koh dess kah" },
   { c: "Help", en: "Please call an ambulance.", ja: "救急車を呼んでください。", ro: "Kyūkyūsha o yonde kudasai.", say: "kyoo-kyoo-shah oh yohn-deh koo-dah-sai" }
 ];
-const PCATS = ["All", "Allergy", "Ordering", "Shopping", "You'll hear", "Help"];
+const PCATS = ["All", "Requests", "Allergy", "Ordering", "Shopping", "You'll hear", "Help"];
 let pCat = "All";
 function renderPhraseCats() {
   $("#pCats").innerHTML = PCATS.map(c => `<button class="chip" aria-pressed="${c === pCat}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
@@ -570,6 +592,10 @@ document.addEventListener("click", e => {
   const a = e.target.closest("[data-say]"); if (a) { speak(PHRASES[+a.dataset.say].ja); return; }
   const w = e.target.closest("[data-slow]"); if (w) { speak(PHRASES[+w.dataset.slow].ja, true); return; }
 });
+
+function renderRequests() {
+  $("#reqGrid").innerHTML = PHRASES.map((p, i) => p.req ? `<button class="req" data-show="${i}"><span class="em">${p.em}</span><span><b>${esc(p.dish)}</b><small>${esc(p.label)}</small></span></button>` : "").join("");
+}
 
 /* ================= FOOD ================= */
 const FOOD = [
@@ -941,7 +967,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 
 /* ================= START ================= */
 renderCard();
-renderPhraseCats(); renderPhrases();
+renderPhraseCats(); renderPhrases(); renderRequests();
 renderFoodCats(); renderFood();
 renderCityChips(); renderPlaces();
 setTab(location.hash.slice(1) || store.get("tab", "card"));
