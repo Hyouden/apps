@@ -1,0 +1,893 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kibun</title>
+<meta name="description" content="Kyoto and Nara temple tracker with crowd estimates, plus a mood-based day planner for Tokyo, Osaka, Kyoto, Nara and Matsumoto.">
+<meta name="theme-color" content="#2C3F73">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kibun">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+:root{
+  --paper:#ECEEEF;--card:#FFFFFF;--ink:#1D2233;--ink2:#4A5268;--ink3:#737B8D;--line:#D6DAE1;--soft:#F4F5F7;
+  --ai:#2C3F73;--ai-soft:#E3E8F4;--shu:#C8372D;--shu-soft:#F7E4E1;
+  --q0:#2F7D4F;--q1:#5E8A2E;--q2:#A8740B;--q3:#A3324A;--closed:#9AA1AE;
+  --kyoto:#3A57A6;--nara:#D9709F;
+  --serif:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --sans:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --navh:64px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#14171D;--card:#1B1F27;--ink:#E7E9EE;--ink2:#B7BDCA;--ink3:#8E96A6;--line:#2E3440;--soft:#222731;
+  --ai:#A9BBEE;--ai-soft:#262F47;--shu:#E35A4C;--shu-soft:#3A2224;
+  --q0:#5DB37E;--q1:#A3C46A;--q2:#E2B04A;--q3:#E77D93;--closed:#6B7280;
+  --kyoto:#7390E6;--nara:#D9558F;color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--sans);-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2.5px solid var(--ai);outline-offset:2px;border-radius:6px}
+a{color:var(--ai)}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:var(--paper);padding-top:env(safe-area-inset-top,0px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:58px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{font:800 1.6rem/1 var(--serif);letter-spacing:.01em}
+.brand .mini{width:30px;height:30px}
+.trip{font-size:.85rem;color:var(--ink2);text-align:right;line-height:1.25}
+.trip strong{display:block;color:var(--ink);font-weight:700}
+
+main{padding-bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 28px)}
+section.view{padding-top:14px}
+
+/* bottom nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(3,1fr);height:var(--navh)}
+nav.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--ink3);font-size:.78rem;font-weight:500}
+nav.tabs button .k{font:800 1.3rem/1.1 var(--serif)}
+nav.tabs button[aria-current="page"]{color:var(--ink)}
+nav.tabs button[aria-current="page"] .k{color:var(--shu)}
+
+/* controls */
+.seg{display:flex;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;min-height:40px;border:0;border-radius:9px;background:none;font-weight:500;font-size:.92rem;color:var(--ink2);padding:0 8px;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(20,25,40,.12)}
+.seg.scroll{overflow-x:auto;scrollbar-width:none}
+.seg.scroll::-webkit-scrollbar{display:none}
+.ctl{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.ctl-row{display:flex;gap:8px;align-items:center}
+.lbl{font-size:.82rem;color:var(--ink3);margin:0 0 4px}
+.search{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:0 12px}
+select.sel{min-height:44px;max-width:44%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:0 10px;font-weight:500}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{min-height:38px;border:1px solid var(--line);background:var(--card);border-radius:19px;padding:0 13px;font-size:.88rem;color:var(--ink2)}
+.chip[aria-pressed="true"]{background:var(--ai);border-color:var(--ai);color:var(--card);font-weight:700}
+.datebox{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--ink2)}
+.datebox input{min-height:40px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 8px}
+.note{font-size:.88rem;color:var(--ink2);background:var(--card);border-left:3px solid var(--ai);border-radius:4px 10px 10px 4px;padding:10px 12px;margin:0 0 12px}
+.note summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.note p{margin:6px 0 0}
+.count{font-size:.85rem;color:var(--ink3);margin:2px 0 8px}
+
+/* temple list */
+.list{background:var(--card);border-radius:14px;border:1px solid var(--line);overflow:hidden}
+.area-h{font:600 .95rem/1.3 var(--serif);color:var(--ink2);padding:14px 14px 6px;background:var(--soft);border-top:1px solid var(--line)}
+.area-h:first-child{border-top:0}
+.row{border-top:1px solid var(--line)}
+.row:first-child,.area-h+.row{border-top:0}
+.row>button.head{width:100%;display:grid;grid-template-columns:50px 1fr auto;gap:10px;align-items:center;text-align:left;background:none;border:0;padding:10px 12px;min-height:68px}
+.nm{font:700 1.04rem/1.25 var(--serif);display:block}
+.sub{font-size:.8rem;color:var(--ink3);display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.sub .jp{font-family:var(--serif)}
+.meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.love{font-size:.85rem;color:var(--ink2);font-weight:700;white-space:nowrap}
+.love i{font-style:normal;color:var(--shu);margin-right:2px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:700;white-space:nowrap;padding:2px 8px 2px 6px;border-radius:10px;background:var(--soft)}
+.pill i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.l0{color:var(--q0)}.l0 i{background:var(--q0)}
+.l1{color:var(--q1)}.l1 i{background:var(--q1)}
+.l2{color:var(--q2)}.l2 i{background:var(--q2)}
+.l3{color:var(--q3)}.l3 i{background:var(--q3)}
+.lc{color:var(--closed)}.lc i{background:none;border:1.5px solid var(--closed)}
+.tags{display:inline-flex;gap:4px}
+.tag{font-size:.72rem;padding:0 6px;border-radius:8px;background:var(--soft);color:var(--ink2);line-height:1.6}
+.tag.warn{background:var(--shu-soft);color:var(--shu);font-weight:700}
+
+.detail{padding:2px 14px 16px 14px}
+.detail p{margin:0 0 10px;color:var(--ink2);font-size:.95rem}
+.detail h4{font:600 .92rem/1.3 var(--serif);margin:14px 0 6px;color:var(--ink)}
+.y26{background:var(--shu-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:0 0 10px}
+.y26 b{color:var(--shu)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.88rem;margin:0 0 4px}
+.facts dt{color:var(--ink3)}.facts dd{margin:0;color:var(--ink2)}
+.hours svg{width:100%;height:70px;display:block}
+.hours .cap{font-size:.82rem;color:var(--ink2);min-height:1.3em}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 13px;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink)}
+.btn.primary{background:var(--shu);border-color:var(--shu);color:#fff}
+.btn.on{background:var(--ai);border-color:var(--ai);color:var(--card)}
+.rate{display:flex;align-items:center;gap:8px;margin:6px 0}
+.rate .who{min-width:64px;font-size:.88rem;color:var(--ink2);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stars{display:flex}
+.stars button{width:40px;height:40px;border:0;background:none;font-size:1.45rem;line-height:1;color:var(--ink3);opacity:.3;padding:0}
+.stars button.on{color:var(--shu);opacity:1}
+textarea.notes{width:100%;min-height:64px;border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:8px 10px;resize:vertical;font-size:.92rem}
+
+/* seals */
+.seal{display:block;overflow:visible}
+.seal .ring{fill:none;stroke:var(--shu)}
+.seal .ch{fill:var(--shu);font-family:var(--serif);font-weight:800}
+.seal.blank .ring{stroke:var(--line);stroke-dasharray:5 4}
+.seal.blank .ch{fill:var(--ink3);opacity:.35}
+.seal.want .ring{stroke:var(--ai);stroke-dasharray:5 4}
+.seal.want .ch{fill:var(--ai);opacity:.55}
+.press{animation:press .55s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes press{0%{transform:scale(1.7) rotate(-14deg);opacity:0}55%{transform:scale(.92) rotate(2deg);opacity:1}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.press{animation:none}}
+
+/* chart */
+.chartbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 10px 10px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--ink2);margin:0 4px 6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .d{width:11px;height:11px;border-radius:50%}
+.chartbox svg{display:block;width:100%;height:auto}
+.chartbox text{font-family:var(--sans)}
+.pick{margin-top:8px;border-top:1px solid var(--line);padding:10px 4px 2px;display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;min-height:70px}
+.pick .hint{grid-column:1/-1;color:var(--ink3);font-size:.88rem}
+
+.hb0{fill:var(--q0)}.hb1{fill:var(--q1)}.hb2{fill:var(--q2)}.hb3{fill:var(--q3)}.hbc{fill:var(--line)}
+.ax{fill:var(--ink3)}.ax2{fill:var(--ink2)}.gridl{stroke:var(--line)}.band{fill:var(--soft)}.noband{fill:transparent}.nowline{stroke:var(--ink)}
+.dot{stroke:var(--card)}.dot.sel{stroke:var(--ink)}.dot-kyoto{fill:var(--kyoto)}.dot-nara{fill:var(--nara)}.ringst{fill:none;stroke:var(--shu)}
+/* mood */
+.moods{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mood{min-height:62px;border:1px solid var(--line);background:var(--card);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 2px;font-size:.74rem;font-weight:500;color:var(--ink2);line-height:1.15;text-align:center}
+.mood .e{font-size:1.35rem;line-height:1}
+.mood[aria-pressed="true"]{border:2px solid var(--shu);background:var(--shu-soft);color:var(--ink);font-weight:700}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-height:56px}
+.switch b{display:block;font-size:.95rem}
+.switch small{color:var(--ink3);font-size:.8rem}
+.tog{width:52px;height:32px;border-radius:16px;border:0;background:var(--line);position:relative;flex:none}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .18s}
+.tog[aria-checked="true"]{background:var(--q0)}
+.tog[aria-checked="true"]::after{transform:translateX(20px)}
+@media (prefers-reduced-motion:reduce){.tog::after{transition:none}}
+.planhead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:22px 0 10px}
+.planhead h2{font:800 1.45rem/1.2 var(--serif);margin:0}
+.day{position:relative;margin:0;padding:0;list-style:none}
+.step{position:relative;padding:0 0 18px 26px}
+.step::before{content:"";position:absolute;left:6px;top:17px;bottom:-2px;width:2px;background:var(--line)}
+.step:last-child::before{display:none}
+.step::after{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;background:var(--card);border:3px solid var(--ai)}
+.step .when{font-size:.8rem;font-weight:700;color:var(--ai);margin-bottom:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.card .nm{font-size:1.12rem}
+.card .top,.idea .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .top .pill{margin-top:3px}
+.card p{margin:6px 0 0;color:var(--ink2);font-size:.93rem}
+.card .tip{color:var(--ink);font-size:.9rem}
+.card .tip b{color:var(--q0)}
+.card .bk{color:var(--shu);font-size:.88rem;font-weight:500}
+.card .swap{font-size:.85rem;color:var(--ink3);font-style:italic}
+.card .acts{margin-top:10px}
+.card .btn{min-height:40px;font-size:.86rem}
+.cont{color:var(--ink3);font-size:.9rem;padding:4px 0}
+.ideas{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.idea{padding:12px 14px;border-top:1px solid var(--line)}
+.idea:first-child{border-top:0}
+.idea .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.idea p{margin:4px 0 0;font-size:.88rem;color:var(--ink2)}
+.idea a{font-size:.85rem;font-weight:700}
+h3.sec{font:800 1.12rem/1.3 var(--serif);margin:26px 0 10px}
+.swaps{background:var(--card);border:1px solid var(--line);border-radius:14px}
+.swaps div{padding:10px 14px;border-top:1px solid var(--line);font-size:.9rem;color:var(--ink2)}
+.swaps div:first-child{border-top:0}
+.swaps s{color:var(--ink3)}
+.swaps b{color:var(--ink)}
+
+/* stamps */
+.bookhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:2px 0 12px}
+.bookhead h2{font:800 1.6rem/1.1 var(--serif);margin:0}
+.bookhead span{color:var(--ink2);font-size:.92rem}
+.book{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px}
+.book button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;min-height:44px}
+.book .bn{font:600 .82rem/1.2 var(--serif);text-align:center}
+.book .bd{font-size:.72rem;color:var(--ink3)}
+.none{grid-column:1/-1;color:var(--ink2);font-size:.92rem;text-align:center;padding:16px 8px}
+.top3{background:var(--card);border:1px solid var(--line);border-radius:14px}
+.top3 button{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;width:100%;background:none;border:0;border-top:1px solid var(--line);padding:8px 12px;text-align:left;min-height:56px}
+.top3 button:first-child{border-top:0}
+.top3 .sc{font-size:.85rem;color:var(--ink2);text-align:right;line-height:1.3}
+.form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.form label{display:block;font-size:.85rem;color:var(--ink2);margin-bottom:10px}
+.form input[type=text],.form input[type=date]{display:block;width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:0 10px;margin-top:4px}
+.fine{font-size:.82rem;color:var(--ink3);margin:18px 2px 0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 14px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:40;max-width:90vw}
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="ink" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feComponentTransfer in="n" result="speck"><feFuncA type="discrete" tableValues="1 1 1 1 1 1 0 1 1 1"/></feComponentTransfer>
+    <feComposite in="d" in2="speck" operator="in"/>
+  </filter>
+</svg>
+<header><div class="wrap">
+  <div class="brand"><svg class="mini seal" viewBox="0 0 100 100" aria-hidden="true"><g filter="url(#ink)"><rect class="ring" x="8" y="8" width="84" height="84" rx="14" stroke-width="7"/><text class="ch" x="50" y="33" text-anchor="middle" dominant-baseline="central" font-size="34">気</text><text class="ch" x="50" y="67" text-anchor="middle" dominant-baseline="central" font-size="34">分</text></g></svg><b>Kibun</b></div>
+  <div class="trip" id="trip"></div>
+</div></header>
+<main class="wrap" id="main"></main>
+<nav class="tabs" aria-label="Sections"><div class="wrap">
+  <button data-act="tab" data-v="temples"><span class="k">寺</span>Temples</button>
+  <button data-act="tab" data-v="mood"><span class="k">気分</span>Mood</button>
+  <button data-act="tab" data-v="stamps"><span class="k">印</span>Stamps</button>
+</div></nav>
+<input type="file" id="restoreFile" accept="application/json,.json" hidden>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+"use strict";
+const STORE_KEY = "kibun-v1"; // unique per app: every app on this site shares one browser storage
+// Trip dates live on the phone (Settings, or a ?trip=YYYY-MM-DD_YYYY-MM-DD link), never in this public file.
+const HOLIDAYS = ["2026-11-23"];
+
+/* ---------- Temples & shrines ----------
+ l = traveler love (1–5), cr = crowd in late November at midday (1 peaceful … 5 shoulder-to-shoulder)
+ o/cl = approx opening hours (24h clock), h24 = grounds always open, nt = 2026 night light-up
+ q = quiet window, d = description, x = 2026 notes (checked Nov 12, 2026) */
+const AREAS = {
+  kyoto: ["Higashiyama","Philosopher’s Path & Okazaki","Kyoto Station area","Fushimi & south","Arashiyama & Sagano","Kinkaku-ji & northwest","Shimogamo & Kamigamo","North: Ohara, Kurama, Ichijoji","Daigo & Yamashina","Uji","West & southwest"],
+  nara: ["Nara Park","Naramachi","Nishinokyo","Ikaruga","Sakurai & the hills","Nara outskirts"]
+};
+const HG="Higashiyama", PP="Philosopher’s Path & Okazaki", ST="Kyoto Station area", FS="Fushimi & south", AR="Arashiyama & Sagano", NW="Kinkaku-ji & northwest", SK="Shimogamo & Kamigamo", NO="North: Ohara, Kurama, Ichijoji", DY="Daigo & Yamashina", UJ="Uji", WS="West & southwest";
+const NP="Nara Park", NM="Naramachi", NK="Nishinokyo", IK="Ikaruga", SA="Sakurai & the hills", NX="Nara outskirts";
+const T = [
+{id:"fushimi-inari",n:"Fushimi Inari Taisha",j:"伏見稲荷大社",s:"伏見",c:"kyoto",a:FS,k:"s",l:5,cr:5,h24:true,q:"Before 7:30 or after dark. Even at noon the crowds thin out past the Yotsutsuji crossroads, about 40 minutes up.",d:"Thousands of vermilion torii tunnel up sacred Mt Inari. The full loop to the summit takes 2–3 hours."},
+{id:"kiyomizu",n:"Kiyomizu-dera",j:"清水寺",s:"清水",c:"kyoto",a:HG,k:"t",l:4.5,cr:5,lv:1,o:6,cl:18,nt:{f:"2026-11-21",t:"2026-11-30",o:18,c:21.5,cr:5},q:"Gates open at 6:00 and the stage stays fairly empty until about 7:30. Walk down Sannenzaka before the shops open.",d:"A wooden stage jutting out over a hillside of maples, with the city spread out below.",x:"Night viewing Nov 21–30: open until 21:30 (last entry 21:00), ¥500, no booking needed, but expect the longest night queue in Kyoto. The Jojuin garden also opens Nov 21–30 for an extra fee."},
+{id:"kinkaku",n:"Kinkaku-ji",j:"金閣寺",s:"金閣",c:"kyoto",a:NW,k:"t",l:4.5,cr:5,o:9,cl:17,q:"Be at the gate at 9:00, or come after 16:00. It’s a one-way 30-minute loop, so it never feels peaceful at midday.",d:"The gold-leaf pavilion mirrored in its pond. Iconic, short, and always busy."},
+{id:"ginkaku",n:"Ginkaku-ji",j:"銀閣寺",s:"銀閣",c:"kyoto",a:PP,k:"t",l:4,cr:4,lv:1,o:8.5,cl:17,q:"Opens at 8:30. Go first thing, then walk south along the Philosopher’s Path while it’s still quiet.",d:"The understated ‘Silver Pavilion’, a sculpted sand cone and a mossy hillside walk."},
+{id:"tenryu",n:"Tenryu-ji",j:"天龍寺",s:"天龍",c:"kyoto",a:AR,k:"t",l:4.5,cr:5,lv:1,o:8.5,cl:17,q:"Arrive at 8:30, see the pond garden first, then leave by the north gate straight into the bamboo grove before the tour buses.",d:"Zen head temple with a 14th-century pond garden that borrows Arashiyama’s hills as its backdrop."},
+{id:"ryoan",n:"Ryoan-ji",j:"龍安寺",s:"龍安",c:"kyoto",a:NW,k:"t",l:4,cr:4,lv:1,o:8,cl:17,q:"Opens at 8:00. The first half hour is the only time the rock garden feels truly meditative.",d:"Fifteen rocks in raked gravel, placed so you can never see all of them at once."},
+{id:"ninna",n:"Ninna-ji",j:"仁和寺",s:"仁和",c:"kyoto",a:NW,k:"t",l:4,cr:2,lv:1,o:9,cl:17,q:"Calm most of the day; the spacious grounds soak up what crowds there are.",d:"Former imperial temple with a five-story pagoda, palace halls and gardens."},
+{id:"tofuku",n:"Tofuku-ji",j:"東福寺",s:"東福",c:"kyoto",a:FS,k:"t",l:5,cr:5,lv:1,o:8.5,cl:16.5,q:"Take a weekday train that reaches Tofukuji Station around 8:05 and be at the Tsutenkyo gate before it opens at 8:30. By 10:00 the bridge queue can run long.",d:"A valley of 2,000 maples seen from the covered Tsutenkyo bridge, plus a checkerboard moss garden.",x:"Autumn period Nov 14–Dec 6: Tsutenkyo bridge ¥1,000 (opens 8:30), Hojo garden ¥600, no combo ticket. Staff may stop photos on the bridges, and tripods are banned."},
+{id:"eikando",n:"Eikan-do",j:"永観堂",s:"永観",c:"kyoto",a:PP,k:"t",l:5,cr:5,lv:1,o:9,cl:17,nt:{f:"2026-11-20",t:"2026-12-06",o:17.5,c:21,cr:5},q:"A weekday at 9:00, or the last hour of the night light-up (after about 19:30) once the first wave has left.",d:"‘Eikan-do of the maples’: hillside halls, a pond, a pagoda view, and a Buddha looking back over his shoulder.",x:"Autumn day ticket ¥1,500 (Nov 11–Dec 6). Night light-up Nov 20–Dec 6, entry 17:30–20:30, ¥1,000, walk-up only. Day visitors must leave by 17:00; the day ticket doesn’t cover the night."},
+{id:"nanzen",n:"Nanzen-ji",j:"南禅寺",s:"南禅",c:"kyoto",a:PP,k:"t",l:4.5,cr:4,lv:1,o:8.67,cl:17,q:"The grounds and brick aqueduct are open before the halls. At 8:00 you’ll have the aqueduct almost to yourselves.",d:"A giant Sanmon gate you can climb, and a Meiji-era brick aqueduct running through the grounds."},
+{id:"konchi",n:"Konchi-in",j:"金地院",s:"金地",c:"kyoto",a:PP,k:"t",l:3.5,cr:1,o:9,cl:17,q:"Rarely busy. A good breather between Nanzen-ji and Eikan-do.",d:"Nanzen-ji subtemple with a crane-and-turtle dry garden by Kobori Enshu."},
+{id:"tenju",n:"Tenju-an",j:"天授庵",s:"天授",c:"kyoto",a:PP,k:"t",l:4,cr:3,lv:1,o:9,cl:17,q:"Small, so even a few groups fill it. Go right at opening.",d:"Tiny Nanzen-ji subtemple whose pond garden glows red in late November."},
+{id:"honen",n:"Honen-in",j:"法然院",s:"法然",c:"kyoto",a:PP,k:"t",l:4,cr:2,lv:1,o:6,cl:16,q:"Free and open from 6:00. Early morning on the mossy gate is the reward.",d:"A thatched gate, moss, and two sand mounds raked with seasonal designs. Hushed and free."},
+{id:"kodai",n:"Kodai-ji",j:"高台寺",s:"高台",c:"kyoto",a:HG,k:"t",l:4,cr:3,lv:1,o:9,cl:17.5,nt:{f:"2026-10-23",t:"2026-12-13",o:17,c:22,cr:4},q:"Daytime is calm. The night light-up is busiest right after dark, so aim for after 20:00.",d:"Garden temple built by Hideyoshi’s widow, with a bamboo grove and projection shows on the dry garden at night.",x:"Night light-up Oct 23–Dec 13 from 17:00, last entry 21:30, ¥800. Leaving the grounds ends your ticket."},
+{id:"chion",n:"Chion-in",j:"知恩院",s:"知恩",c:"kyoto",a:HG,k:"t",l:3.5,cr:2,o:9,cl:16,q:"The grounds and gate are quiet early in the day.",d:"A colossal wooden temple gate and one of Japan’s biggest bells; head temple of Jodo Buddhism."},
+{id:"shoren",n:"Shoren-in",j:"青蓮院",s:"青蓮",c:"kyoto",a:HG,k:"t",l:4,cr:1,lv:1,o:9,cl:17,q:"Almost never crowded. Sit on the tatami and look at the garden as long as you like.",d:"Giant camphor trees and tatami rooms that open onto a moss and pond garden.",x:"Often holds an autumn night light-up. Check dates when you’re there."},
+{id:"yasaka",n:"Yasaka Shrine",j:"八坂神社",s:"八坂",c:"kyoto",a:HG,k:"s",l:4,cr:4,h24:true,q:"Open all night. Late evening, once the Gion restaurants fill up, the lantern hall is lovely and calm.",d:"Gion’s lantern-hung shrine at the top of Shijo-dori."},
+{id:"kennin",n:"Kennin-ji",j:"建仁寺",s:"建仁",c:"kyoto",a:HG,k:"t",l:4.5,cr:3,o:10,cl:16.5,q:"Opens at 10:00. Mid-afternoon on a weekday tends to be calmer than opening.",d:"Kyoto’s oldest Zen temple: twin dragons on the ceiling and a circle-triangle-square garden."},
+{id:"sanjusangen",n:"Sanjusangen-do",j:"三十三間堂",s:"三十三",c:"kyoto",a:HG,k:"t",l:4.5,cr:3,o:9,cl:16,q:"First thing at 9:00, or the last hour before closing. No photos inside.",d:"A 120-metre hall holding 1,001 gilded Kannon statues in rows, guarded by 28 deities. Great on a rainy day."},
+{id:"toji",n:"Toji",j:"東寺",s:"東寺",c:"kyoto",a:ST,k:"t",l:4,cr:2,lv:1,o:8,cl:17,nt:{f:"2026-10-31",t:"2026-12-13",o:18,c:21.5,cr:3},q:"Calm most days. On the 21st a huge flea market fills the grounds; arrive by 8:00 for the best browsing.",d:"Japan’s tallest wooden pagoda and a hall of powerful esoteric Buddhist statues, near the station.",x:"Night light-up Oct 31–Dec 13, 18:00–21:30 (last entry 21:00), ¥1,000, enter by the East Gate. Kobo-san flea market on Sat Nov 21."},
+{id:"nishihongan",n:"Nishi Hongan-ji",j:"西本願寺",s:"西本願",c:"kyoto",a:ST,k:"t",l:3.5,cr:1,o:5.5,cl:17,q:"Free and spacious. Quiet at almost any hour.",d:"Vast gilded halls open to all, and a centuries-old ginkgo that turns gold in late November."},
+{id:"higashihongan",n:"Higashi Hongan-ji",j:"東本願寺",s:"東本願",c:"kyoto",a:ST,k:"t",l:3.5,cr:1,o:6,cl:16.5,q:"Free and quiet. The Shosei-en garden a few blocks east makes a calm add-on.",d:"One of the world’s largest wooden buildings, five minutes from Kyoto Station."},
+{id:"heian",n:"Heian Shrine",j:"平安神宮",s:"平安",c:"kyoto",a:PP,k:"s",l:3.5,cr:2,o:6,cl:17,q:"The forecourt is never too busy. The stroll garden behind is calmest in the morning.",d:"Oversized vermilion halls, a giant torii and a pond garden with stepping stones."},
+{id:"shimogamo",n:"Shimogamo Shrine",j:"下鴨神社",s:"下鴨",c:"kyoto",a:SK,k:"s",l:4,cr:2,lv:1,o:6.5,cl:17,q:"Walk in through the Tadasu no Mori forest from Demachiyanagi in the morning.",d:"Ancient shrine in Tadasu no Mori, a primeval forest whose leaves turn late, into early December."},
+{id:"kamigamo",n:"Kamigamo Shrine",j:"上賀茂神社",s:"上賀茂",c:"kyoto",a:SK,k:"s",l:3.5,cr:1,o:5.5,cl:17,q:"Rarely crowded.",d:"One of Kyoto’s oldest shrines, with two cone-shaped sand mounds and a stream through the grounds."},
+{id:"kitano",n:"Kitano Tenmangu",j:"北野天満宮",s:"北野",c:"kyoto",a:NW,k:"s",l:4,cr:3,lv:1,o:7,cl:17,nt:{f:"2026-11-07",t:"2026-12-06",o:17,c:20,cr:3},q:"Mornings are calm, except on the 25th when the Tenjin-san flea market takes over (busy but fun).",d:"Shrine to the god of learning, with a maple garden along an old earthen rampart.",x:"Maple garden open Oct 31–Dec 6, lit up in the evening from Nov 7 until 20:00 (last entry 19:40), ¥1,500. Tenjin-san flea market on Wed Nov 25."},
+{id:"daitoku",n:"Daitoku-ji",j:"大徳寺",s:"大徳",c:"kyoto",a:NW,k:"t",l:4,cr:2,lv:1,o:9,cl:16.5,q:"The walled complex is peaceful all day. Daisen-in and Ryogen-in have the best gardens; which subtemples are open varies.",d:"A walled village of Zen subtemples holding some of Kyoto’s finest dry gardens."},
+{id:"daigo",n:"Daigo-ji",j:"醍醐寺",s:"醍醐",c:"kyoto",a:DY,k:"t",l:4.5,cr:3,lv:1,o:9,cl:17,q:"Southeast of the center, so it fills slowly. Arrive at 9:00 for reflections on the Bentendo pond.",d:"Hillside temple whose 10th-century pagoda is Kyoto’s oldest building; the red Bentendo hall over its pond is pure postcard in autumn."},
+{id:"byodo",n:"Byodo-in",j:"平等院",s:"平等",c:"kyoto",a:UJ,k:"t",l:4.5,cr:3,o:8.5,cl:17.5,q:"Opens at 8:30. Phoenix Hall interior tours are timed, so grab a slot when you arrive.",d:"The Phoenix Hall from the ¥10 coin, floating on its pond in Uji, the matcha town."},
+{id:"kurama",n:"Kurama-dera",j:"鞍馬寺",s:"鞍馬",c:"kyoto",a:NO,k:"t",l:4.5,cr:2,lv:1,o:9,cl:16.25,q:"Start by 9:30 and hike over the ridge to Kifune for lunch.",d:"Mountain temple up a cedar-root path, the start of the hike over to Kifune."},
+{id:"kifune",n:"Kifune Shrine",j:"貴船神社",s:"貴船",c:"kyoto",a:NO,k:"s",l:4,cr:3,lv:1,o:6,cl:20,q:"Midday fills with day-trippers. Early morning or dusk is calmer, and the lanterns are lit.",d:"Shrine to the god of water, with lantern-lined stone steps in a narrow river valley."},
+{id:"sanzen",n:"Sanzen-in",j:"三千院",s:"三千",c:"kyoto",a:NO,k:"t",l:4.5,cr:3,lv:1,o:8.5,cl:17,q:"Catch an early bus and arrive at opening; tour groups land mid-morning.",d:"Moss gardens dotted with little half-buried jizo statues in the mountain village of Ohara."},
+{id:"hosen",n:"Hosen-in",j:"宝泉院",s:"宝泉",c:"kyoto",a:NO,k:"t",l:4.5,cr:2,lv:1,o:9,cl:17,q:"Usually calm. Entry includes matcha, so take your time.",d:"Sit on tatami with matcha and look at a 700-year-old pine through the framed openings."},
+{id:"jakko",n:"Jakko-in",j:"寂光院",s:"寂光",c:"kyoto",a:NO,k:"t",l:3.5,cr:1,lv:1,o:9,cl:17,q:"Rarely busy. It’s a 15-minute walk across Ohara’s fields from the bus stop.",d:"A small, melancholy nunnery at the quiet end of Ohara."},
+{id:"enko",n:"Enko-ji",j:"圓光寺",s:"圓光",c:"kyoto",a:NO,k:"t",l:4.5,cr:3,lv:1,o:9,cl:17,bk:1,q:"Timed entry caps the numbers, and early slots have the softest light.",d:"Moss, maples and a water-harp garden in Ichijoji.",x:"Timed-entry booking required Nov 10–Dec 10 (bookings opened Oct 20). Book before you go."},
+{id:"shisen",n:"Shisen-do",j:"詩仙堂",s:"詩仙",c:"kyoto",a:NO,k:"t",l:4,cr:2,lv:1,o:9,cl:17,q:"Sit on the veranda. Groups come and go, so wait a few minutes for a lull.",d:"A hermit-poet’s retreat with white sand, clipped azaleas and the clack of a bamboo deer-scarer."},
+{id:"manshu",n:"Manshu-in",j:"曼殊院",s:"曼殊",c:"kyoto",a:NO,k:"t",l:4,cr:1,lv:1,o:9,cl:17,q:"Few visitors at any hour.",d:"Elegant former imperial temple with a dry garden that reads like a river."},
+{id:"ruriko",n:"Rurikoin",j:"瑠璃光院",s:"瑠璃",c:"kyoto",a:NO,k:"t",l:4.5,cr:3,lv:1,o:10,cl:17,bk:2,q:"Reservation only from mid-November to early December.",d:"Maples reflected in a polished black writing desk: the photo you’ve seen online.",x:"Reservation-only Nov 13–Dec 6 through a postcard lottery that closed Aug 20, with no same-day entry, so it’s off the table for late-autumn 2026 unless you already won a slot."},
+{id:"saiho",n:"Saiho-ji (Moss Temple)",j:"西芳寺",s:"西芳",c:"kyoto",a:WS,k:"t",l:5,cr:1,lv:1,o:10,cl:15,bk:1,q:"Visits are capped by reservation, so it’s always calm.",d:"A pond garden carpeted in over a hundred kinds of moss. Visits include sutra copying.",x:"Advance reservation only (online). Check for open dates now."},
+{id:"gio",n:"Gio-ji",j:"祇王寺",s:"祇王",c:"kyoto",a:AR,k:"t",l:4,cr:3,lv:1,o:9,cl:17,q:"Tiny, so groups fill it fast. Come at 9:00 or late afternoon.",d:"A thatched hut in a carpet of moss under maples."},
+{id:"adashino",n:"Adashino Nenbutsu-ji",j:"化野念仏寺",s:"化野",c:"kyoto",a:AR,k:"t",l:4,cr:2,lv:1,o:9,cl:16.5,q:"At the far end of Sagano, so most of the crowds never get this far.",d:"8,000 stone statues for the forgotten dead, and a little bamboo path of its own."},
+{id:"otagi",n:"Otagi Nenbutsu-ji",j:"愛宕念仏寺",s:"愛宕",c:"kyoto",a:AR,k:"t",l:4.5,cr:1,lv:1,o:8,cl:16.5,q:"Almost always peaceful. It’s a 20-minute uphill walk or a short bus ride past Adashino.",d:"1,200 hand-carved stone disciples with goofy faces. One is holding a tennis racket. Pure delight."},
+{id:"jojakko",n:"Jojakko-ji",j:"常寂光寺",s:"常寂",c:"kyoto",a:AR,k:"t",l:4.5,cr:3,lv:1,o:9,cl:17,q:"Arrive at opening and climb to the pagoda for a view over Sagano.",d:"A hillside of mossy steps and maples climbing to a small pagoda."},
+{id:"hogon",n:"Hogon-in",j:"宝厳院",s:"宝厳",c:"kyoto",a:AR,k:"t",l:4,cr:3,lv:1,o:9,cl:17,q:"Opens in autumn only. Mornings are calmest.",d:"Tenryu-ji subtemple with a ‘lion’s roar’ garden of rocks and maples.",x:"Autumn special opening. Some evening viewing dates need online booking."},
+{id:"daikaku",n:"Daikaku-ji",j:"大覚寺",s:"大覚",c:"kyoto",a:AR,k:"t",l:4,cr:1,lv:1,o:9,cl:17,q:"Quiet at all hours. The walk around Osawa Pond is the highlight.",d:"Former imperial villa turned temple beside the big Osawa Pond, with long, quiet corridors."},
+{id:"taizo",n:"Taizo-in",j:"退蔵院",s:"退蔵",c:"kyoto",a:NW,k:"t",l:3.5,cr:1,o:9,cl:17,q:"Myoshin-ji’s lanes are hushed all day.",d:"Subtemple of the vast Myoshin-ji, with a sweeping garden and a famous ink painting of a man trying to catch a catfish with a gourd."},
+{id:"shinnyo",n:"Shinnyo-do",j:"真如堂",s:"真如",c:"kyoto",a:PP,k:"t",l:4.5,cr:2,lv:1,o:9,cl:16,q:"A local favorite that stays calm even at peak color.",d:"A three-story pagoda framed by maples, with room to breathe. Kyoto’s answer to Eikan-do without the queue."},
+{id:"kurodani",n:"Konkai Komyo-ji",j:"金戒光明寺",s:"金戒",c:"kyoto",a:PP,k:"t",l:4,cr:1,lv:1,o:9,cl:16,q:"Rarely busy. Pair it with Shinnyo-do next door.",d:"Hilltop temple with samurai history, a city view, and the curly-haired ‘afro Buddha’."},
+{id:"jingo",n:"Jingo-ji",j:"神護寺",s:"神護",c:"kyoto",a:WS,k:"t",l:4.5,cr:2,lv:1,o:9,cl:16,q:"Takao’s leaves peak earlier than the city’s. Weekday mornings are calmest.",d:"Mountain temple up about 400 stone steps in Takao, where you fling clay disks off a cliff for luck."},
+{id:"sennyu",n:"Sennyu-ji",j:"泉涌寺",s:"泉涌",c:"kyoto",a:FS,k:"t",l:4,cr:1,lv:1,o:9,cl:16.5,q:"Hushed all day. Imakumano Kannon-ji’s little red bridge is on the way up.",d:"The imperial family’s temple, dignified and nearly empty, a 15-minute walk from Tofuku-ji."},
+{id:"enryaku",n:"Enryaku-ji (Mt Hiei)",j:"延暦寺",s:"延暦",c:"kyoto",a:NO,k:"t",l:4,cr:2,lv:1,o:9,cl:16,q:"Spread across a mountain, so it never feels crowded.",d:"The vast Tendai monastery on Mt Hiei, spread over forested ridges above Kyoto and Lake Biwa.",x:"The main hall (Konpon Chudo) is under scaffolding, and its interior is closed for most of 2026–27."},
+{id:"komyo",n:"Komyo-ji (Nagaokakyo)",j:"光明寺",s:"光明",c:"kyoto",a:WS,k:"t",l:4.5,cr:3,lv:1,o:9,cl:16,q:"Southwest of the city, so it fills later. Weekday mornings are best.",d:"A long tunnel of maples up the approach, famous for its carpet of red leaves in late autumn."},
+{id:"bishamon",n:"Bishamon-do",j:"毘沙門堂",s:"毘沙門",c:"kyoto",a:DY,k:"t",l:4,cr:2,lv:1,o:8.5,cl:17,q:"Early December is its moment, when the steps disappear under fallen red leaves.",d:"Yamashina temple whose stone steps vanish under a carpet of fallen maple leaves in early December."},
+{id:"nonomiya",n:"Nonomiya Shrine",j:"野宮神社",s:"野宮",c:"kyoto",a:AR,k:"s",l:3.5,cr:4,o:9,cl:17,q:"It sits on the busiest stretch of the bamboo grove. Pass through before 8:30.",d:"Tiny matchmaking shrine with a black bark-covered torii, tucked into the bamboo grove."},
+{id:"yasui",n:"Yasui Konpira-gu",j:"安井金比羅宮",s:"安井",c:"kyoto",a:HG,k:"s",l:3.5,cr:2,h24:true,q:"Open all hours. A short line for the stone can form on weekend afternoons.",d:"Crawl through a paper-covered stone to cut bad ties, then back through to bind good ones."},
+{id:"chishaku",n:"Chishaku-in",j:"智積院",s:"智積",c:"kyoto",a:HG,k:"t",l:4,cr:1,lv:1,o:9,cl:16,q:"Steps from Sanjusangen-do and nearly always empty.",d:"Glowing gold-leaf screen paintings and a hillside garden."},
+{id:"rokuhara",n:"Rokuharamitsu-ji",j:"六波羅蜜寺",s:"六波羅",c:"kyoto",a:HG,k:"t",l:4,cr:1,o:8,cl:17,q:"Small and quiet. Head straight to the treasure hall.",d:"Home of the statue of the monk Kuya, with six tiny Buddhas walking out of his mouth."},
+{id:"todai",n:"Todai-ji",j:"東大寺",s:"東大",c:"nara",a:NP,k:"t",l:5,cr:5,o:8,cl:17,q:"Be at the Great Buddha Hall for 8:00. School groups and tour buses arrive from about 9:30.",d:"The world’s largest bronze Buddha in a colossal wooden hall. Squeeze through the pillar hole for luck."},
+{id:"nigatsu",n:"Nigatsu-do",j:"二月堂",s:"二月",c:"nara",a:NP,k:"t",l:4.5,cr:1,lv:1,h24:true,q:"Free and open around the clock. Sunset from the veranda is the best view in Nara.",d:"Todai-ji’s hillside hall, with a wide wooden veranda looking out over the city."},
+{id:"hokke",n:"Hokke-do (Sangatsu-do)",j:"法華堂",s:"法華",c:"nara",a:NP,k:"t",l:4,cr:1,o:8.5,cl:16,q:"Rarely busy, and right next to Nigatsu-do.",d:"Todai-ji’s oldest building, a dim hall of 8th-century statues."},
+{id:"kasuga",n:"Kasuga Taisha",j:"春日大社",s:"春日",c:"nara",a:NP,k:"s",l:4.5,cr:3,lv:1,o:7,cl:17,q:"Early morning on the lantern-lined forest approach is magic, and deer outnumber people.",d:"Vermilion shrine in the forest, lined with 3,000 stone and bronze lanterns."},
+{id:"kofuku",n:"Kofuku-ji",j:"興福寺",s:"興福",c:"nara",a:NP,k:"t",l:3.5,cr:3,h24:true,q:"The grounds are open and free all day. Visit the museum early.",d:"Historic temple at the edge of Nara Park. The three-faced Ashura statue in its treasure museum is the highlight.",x:"The famous five-story pagoda is fully enclosed for restoration (until around 2034), so you won’t see it. The museum and other halls are open."},
+{id:"yakushi",n:"Yakushi-ji",j:"薬師寺",s:"薬師",c:"nara",a:NK,k:"t",l:4,cr:1,o:8.5,cl:17,q:"Quiet at most hours.",d:"Twin pagodas and gleaming red halls, a short train ride west of central Nara."},
+{id:"toshodai",n:"Toshodai-ji",j:"唐招提寺",s:"唐招提",c:"nara",a:NK,k:"t",l:4,cr:1,lv:1,o:8.5,cl:17,q:"Calm all day. A 10-minute walk from Yakushi-ji.",d:"Serene 8th-century temple founded by Ganjin, the Chinese monk who went blind on his journey to Japan."},
+{id:"horyu",n:"Horyu-ji",j:"法隆寺",s:"法隆",c:"nara",a:IK,k:"t",l:4.5,cr:2,o:8,cl:16.5,q:"About 30 minutes from Nara. Arrive at 8:00, before the school groups.",d:"The world’s oldest surviving wooden buildings, in the town of Ikaruga."},
+{id:"gango",n:"Gango-ji",j:"元興寺",s:"元興",c:"nara",a:NM,k:"t",l:3.5,cr:1,o:9,cl:17,q:"Quiet any time.",d:"World Heritage temple in Naramachi with roof tiles laid 1,400 years ago."},
+{id:"shinyakushi",n:"Shin-Yakushi-ji",j:"新薬師寺",s:"新薬師",c:"nara",a:NM,k:"t",l:4,cr:1,o:9,cl:17,q:"Usually empty.",d:"A Healing Buddha ringed by twelve fierce guardian generals in a dim hall."},
+{id:"hase",n:"Hase-dera",j:"長谷寺",s:"長谷",c:"nara",a:SA,k:"t",l:4.5,cr:2,lv:1,o:9,cl:17,q:"About an hour from Nara. Weekday mornings are calm.",d:"399 covered steps up a mountainside to a 10-metre Kannon, with maples all around."},
+{id:"muro",n:"Muro-ji",j:"室生寺",s:"室生",c:"nara",a:SA,k:"t",l:4.5,cr:1,lv:1,o:8.5,cl:17,q:"Remote, so always calm.",d:"Forest temple with Japan’s smallest outdoor five-story pagoda. It welcomed women when Mt Koya didn’t."},
+{id:"omiwa",n:"Omiwa Shrine",j:"大神神社",s:"大神",c:"nara",a:SA,k:"s",l:4,cr:1,h24:true,q:"Quiet. Hiking the sacred mountain needs a permit, and photos aren’t allowed on it.",d:"One of Japan’s oldest shrines, where the mountain itself is the god."},
+{id:"tamukeyama",n:"Tamukeyama Hachimangu",j:"手向山八幡宮",s:"手向山",c:"nara",a:NP,k:"s",l:3.5,cr:1,lv:1,h24:true,q:"On the path between Todai-ji and Nigatsu-do, and few people stop.",d:"Small shrine among maples between Todai-ji and Nigatsu-do."},
+{id:"akishino",n:"Akishino-dera",j:"秋篠寺",s:"秋篠",c:"nara",a:NX,k:"t",l:4,cr:1,lv:1,o:9.5,cl:16.5,q:"Quiet at all times.",d:"Moss garden and a graceful Gigeiten statue in a residential corner of Nara."},
+{id:"isonokami",n:"Isonokami Jingu",j:"石上神宮",s:"石上",c:"nara",a:NX,k:"s",l:3.5,cr:1,o:6,cl:17,q:"Quiet. The chickens are most active in the morning.",d:"Ancient shrine in Tenri where long-tailed chickens strut around the grounds."}
+];
+const TI = Object.fromEntries(T.map(t=>[t.id,t]));
+
+/* ---------- Mood companion ----------
+ m = moods, s = slots (am, lunch, pm, eve), cr = typical crowd 1–5, in = mostly indoors,
+ full = takes most of the day, alt = quieter swap, bk = booking note */
+const MOODS = [
+  {k:"chill",e:"😌",l:"Chill",adj:"Chill"},
+  {k:"romance",e:"💞",l:"Romantic",adj:"Romantic"},
+  {k:"adventure",e:"🥾",l:"Adventure",adj:"Adventurous"},
+  {k:"foodie",e:"🍡",l:"Hungry",adj:"Food-first"},
+  {k:"play",e:"🎮",l:"Nerdy fun",adj:"Nerdy"},
+  {k:"culture",e:"⛩️",l:"Culture",adj:"Culture"},
+  {k:"quirky",e:"🤪",l:"Weird & funny",adj:"Weird & funny"},
+  {k:"animals",e:"🦌",l:"Animals",adj:"Animal"},
+  {k:"night",e:"🏮",l:"Night out",adj:"Night-owl"},
+  {k:"rainy",e:"☔",l:"Rainy day",adj:"Rainy"}
+];
+const CITIES = [
+  {k:"tokyo",l:"Tokyo"},{k:"osaka",l:"Osaka"},{k:"kyoto",l:"Kyoto"},{k:"nara",l:"Nara"},{k:"matsumoto",l:"Matsumoto"}
+];
+const CITY_NOTE = {
+  tokyo:"Tokyo’s leaves are forecast to peak around Nov 26–29. There’s no sumo tournament in Tokyo in late November; November’s is in Fukuoka (Nov 8–22).",
+  osaka:"Osaka’s maples are forecast to peak around Dec 4.",
+  kyoto:"Peak leaf season means peak crowds. Do the famous spots at opening and save midday for quiet corners. Nov 21–23 is a three-day holiday weekend.",
+  nara:"Nara winds down early. Most sights close by 17:00, so plan evenings back in Kyoto or Osaka.",
+  matsumoto:"Kamikochi closes for winter after Nov 15. Expect cold mornings and maybe the first snow."
+};
+const A = [
+// Tokyo
+{id:"t-sensoji-early",c:"tokyo",n:"Senso-ji before the crowds",a:"Asakusa",m:["culture","romance","chill"],s:["am","eve"],cr:2,t:"1 hr",d:"Tokyo’s oldest temple. The grounds never close, and early morning or after dark it’s calm and glowing.",tip:"Come before 8:00 or after 19:00, when the Nakamise stalls are shuttered.",q:"Senso-ji Asakusa"},
+{id:"t-sensoji-noon",c:"tokyo",n:"Senso-ji & Nakamise at midday",a:"Asakusa",m:["culture","foodie"],s:["pm"],cr:5,t:"1–2 hrs",d:"Snack stalls and the big red lantern gate, shoulder to shoulder.",alt:"t-yanaka",q:"Nakamise Asakusa"},
+{id:"t-yanaka",c:"tokyo",n:"Yanaka old town",a:"Yanaka",m:["chill","quirky","animals","culture"],s:["am","pm"],cr:2,t:"2–3 hrs",d:"Old-Tokyo lanes, tiny temples, a leafy cemetery with resident street cats, and croquette stands on Yanaka Ginza.",tip:"Walk from Nippori Station through Yanaka Cemetery to Yanaka Ginza. The cats like the afternoon sun.",q:"Yanaka Ginza"},
+{id:"t-gyoen",c:"tokyo",n:"Shinjuku Gyoen",a:"Shinjuku",m:["chill","romance"],s:["am","pm"],cr:3,t:"2 hrs",d:"Huge garden with Japanese, English and French sections. Maples and ginkgo turn in late November.",tip:"Weekday mornings are calmest; the Japanese garden corner has the best color.",bk:"Closed Mondays. ¥500 entry.",q:"Shinjuku Gyoen"},
+{id:"t-meiji",c:"tokyo",n:"Meiji Jingu forest walk",a:"Harajuku",m:["culture","chill"],s:["am"],cr:3,t:"1 hr",d:"A wide gravel path through a planted forest to a calm cypress shrine, right next to Harajuku.",tip:"Go at opening (around sunrise) when it’s just joggers and priests.",q:"Meiji Jingu"},
+{id:"t-shibuyasky",c:"tokyo",n:"Shibuya Sky at sunset",a:"Shibuya",m:["romance","night"],s:["eve"],cr:4,t:"1 hr",d:"Open-air rooftop over the scramble crossing, with Fuji on clear days.",bk:"Book the sunset slot online in advance; it sells out.",q:"Shibuya Sky"},
+{id:"t-crossing",c:"tokyo",n:"Shibuya Crossing & Center Gai",a:"Shibuya",m:["night","quirky"],s:["eve"],cr:5,t:"1 hr",d:"The famous scramble, neon and crowds.",alt:"t-shimokita",q:"Shibuya Crossing"},
+{id:"t-shimokita",c:"tokyo",n:"Shimokitazawa",a:"Setagaya",m:["chill","quirky","night"],s:["pm","eve"],cr:3,t:"3 hrs",d:"Thrift shops, record stores, tiny cafés and live-music bars, plus the Reload and Bonus Track walkways.",tip:"Shops open late morning; the bars get going after 19:00.",q:"Shimokitazawa"},
+{id:"t-omoide",c:"tokyo",n:"Omoide Yokocho & Golden Gai",a:"Shinjuku",m:["night","foodie"],s:["eve"],cr:5,t:"2–3 hrs",d:"Smoky yakitori alleys and 200 tiny bars stacked six seats deep.",tip:"Many Golden Gai bars charge a seat fee; look for ones with English ‘welcome’ signs.",alt:"t-nonbei",q:"Omoide Yokocho"},
+{id:"t-nonbei",c:"tokyo",n:"Nonbei Yokocho",a:"Shibuya",m:["night","foodie","romance"],s:["eve"],cr:3,t:"2 hrs",d:"A lantern-lit drinkers’ alley by Shibuya Station. Same tiny bars, a fraction of the crowd.",q:"Nonbei Yokocho Shibuya"},
+{id:"t-akiba",c:"tokyo",n:"Akihabara retro games & arcades",a:"Akihabara",m:["play","night"],s:["pm","eve"],cr:4,t:"3 hrs",d:"Super Potato’s retro floors, Mandarake, card shops and multi-story arcades.",alt:"t-nakano",q:"Super Potato Akihabara"},
+{id:"t-nakano",c:"tokyo",n:"Nakano Broadway",a:"Nakano",m:["play","quirky"],s:["pm"],cr:2,t:"2–3 hrs",d:"A 1960s mall packed with Mandarake branches, retro toys, figures and trading-card shops.",tip:"Most shops open around noon. Weekdays are quietest.",q:"Nakano Broadway"},
+{id:"t-nintendo",c:"tokyo",n:"Nintendo Tokyo & Pokémon Center",a:"Shibuya Parco",m:["play","rainy"],s:["pm"],cr:4,in:1,t:"1–2 hrs",d:"Both official stores on one floor of Shibuya Parco.",tip:"Weekday mornings right at opening are calmest.",q:"Nintendo Tokyo Shibuya Parco"},
+{id:"t-borderless",c:"tokyo",n:"teamLab Borderless",a:"Azabudai Hills",m:["romance","play","rainy"],s:["pm","eve"],cr:4,in:1,t:"2–3 hrs",d:"Wander through rooms of moving digital art that drift from room to room.",bk:"Book a timed ticket ahead.",q:"teamLab Borderless Azabudai"},
+{id:"t-planets",c:"tokyo",n:"teamLab Planets",a:"Toyosu",m:["romance","quirky","rainy"],s:["pm","eve"],cr:4,in:1,t:"2 hrs",d:"Barefoot, knee-deep in water and floating flowers of light.",bk:"Book a timed ticket ahead.",q:"teamLab Planets Toyosu"},
+{id:"t-ryogoku",c:"tokyo",n:"Ryogoku sumo town",a:"Ryogoku",m:["culture","foodie"],s:["am","lunch"],cr:2,t:"2–3 hrs",d:"Sumo’s home turf: the Kokugikan arena, the small Sumo Museum and chanko-nabe, the wrestlers’ hotpot.",tip:"Most wrestlers are in Fukuoka for the November tournament and its regional tour, so watching practice is unlikely.",bk:"The Sumo Museum usually opens weekdays only.",q:"Ryogoku Kokugikan"},
+{id:"t-gotokuji",c:"tokyo",n:"Gotoku-ji lucky-cat temple",a:"Setagaya",m:["quirky","chill","culture"],s:["am","pm"],cr:2,t:"1–2 hrs",d:"Hundreds of white beckoning-cat figurines stacked by the hall. Ride the little Setagaya Line tram there.",q:"Gotokuji Temple"},
+{id:"t-takao",c:"tokyo",n:"Mt Takao hike",a:"Hachioji",m:["adventure","chill"],s:["am"],full:1,cr:4,t:"Most of the day",d:"An hour from Shinjuku: forest trails, a mountain temple and autumn leaves. Cable car down.",tip:"Take Trail 6 (the stream path) up to dodge the main-path crowds. Weekdays are far calmer.",q:"Mount Takao"},
+{id:"t-tsukiji",c:"tokyo",n:"Tsukiji Outer Market",a:"Tsukiji",m:["foodie"],s:["am","lunch"],cr:4,t:"1–2 hrs",d:"Grazing stalls of tamagoyaki, seafood and knives.",tip:"Go by 8:00. Some stalls close Sundays and Wednesdays.",alt:"t-depachika",q:"Tsukiji Outer Market"},
+{id:"t-depachika",c:"tokyo",n:"Department-store food halls",a:"Shinjuku or Ginza",m:["foodie","rainy"],s:["lunch"],cr:3,in:1,t:"1 hr",d:"Basement food floors at Isetan Shinjuku or Mitsukoshi Ginza: bento, sweets and fruit like jewelry.",q:"Isetan Shinjuku"},
+{id:"t-sento",c:"tokyo",n:"Neighborhood sento soak",a:"Anywhere",m:["chill","quirky"],s:["eve"],cr:1,in:1,t:"1 hr",d:"A local public bathhouse: cheap, steamy and very Tokyo.",tip:"Neighborhood sento tend to be more relaxed about tattoos than big spa resorts. Check the sign at the door.",q:"sento"},
+{id:"t-kichijoji",c:"tokyo",n:"Kichijoji & Inokashira Park",a:"Kichijoji",m:["romance","chill","play"],s:["am","pm"],cr:3,t:"3 hrs",d:"Swan boats on the pond, leafy paths, cafés, and the Ghibli Museum on the edge of the park.",bk:"Ghibli Museum tickets are sold monthly in advance and usually gone by now.",q:"Inokashira Park"},
+{id:"t-takeshita",c:"tokyo",n:"Takeshita Street",a:"Harajuku",m:["quirky"],s:["pm"],cr:5,t:"1 hr",d:"Crepes, cosplay shops and a solid wall of people.",alt:"t-catstreet",q:"Takeshita Street"},
+{id:"t-catstreet",c:"tokyo",n:"Cat Street & Ura-Harajuku",a:"Harajuku",m:["quirky","chill"],s:["pm"],cr:3,t:"2 hrs",d:"The calmer back streets: vintage, sneaker shops and good coffee.",q:"Cat Street Harajuku"},
+{id:"t-tower",c:"tokyo",n:"Tokyo Tower from Shiba Park",a:"Minato",m:["romance","night"],s:["eve"],cr:2,t:"1 hr",d:"Free views of the glowing tower over Zojo-ji’s rows of little jizo statues.",q:"Zojoji"},
+{id:"t-ebisu",c:"tokyo",n:"Ebisu Yokocho",a:"Ebisu",m:["foodie","night"],s:["eve"],cr:4,t:"2 hrs",d:"A covered alley of small food stalls where strangers share tables.",q:"Ebisu Yokocho"},
+{id:"t-tnm",c:"tokyo",n:"Tokyo National Museum",a:"Ueno",m:["culture","rainy"],s:["am","pm"],cr:2,in:1,t:"2–3 hrs",d:"Samurai armor, swords, screens and Buddhist sculpture in Japan’s biggest museum.",q:"Tokyo National Museum"},
+{id:"t-boardgame",c:"tokyo",n:"Board-game café",a:"Shibuya or Akihabara",m:["play","rainy","chill"],s:["pm","eve"],cr:2,in:1,t:"2–3 hrs",d:"Hundreds of games and staff who’ll teach you the rules. Jelly Jelly Café has several branches.",q:"Jelly Jelly Cafe"},
+{id:"t-ameyoko",c:"tokyo",n:"Ameyoko market street",a:"Ueno",m:["foodie","quirky"],s:["lunch","pm"],cr:4,t:"1 hr",d:"A loud, cheap street market under the train tracks: skewers, fruit sticks and bargains.",q:"Ameyoko"},
+{id:"t-zoo",c:"tokyo",n:"Ueno Zoo",a:"Ueno",m:["animals"],s:["am","pm"],cr:3,t:"2–3 hrs",d:"Japan’s oldest zoo, in Ueno Park with its autumn leaves.",bk:"Closed Mondays.",q:"Ueno Zoo"},
+{id:"t-kappabashi",c:"tokyo",n:"Kappabashi kitchen street",a:"Asakusa",m:["quirky","foodie"],s:["pm"],cr:2,t:"1–2 hrs",d:"Shops of plastic food samples, knives and ceramics. Some offer make-your-own fake-food workshops.",q:"Kappabashi"},
+{id:"t-ramen",c:"tokyo",n:"Ramen counter lunch",a:"Shinjuku or Ikebukuro",m:["foodie"],s:["lunch"],cr:3,t:"45 min",d:"Buy a ticket from the machine, slurp, leave. Lines move fast.",q:"ramen Shinjuku"},
+// Osaka
+{id:"o-dotonbori",c:"osaka",n:"Dotonbori neon",a:"Namba",m:["night","foodie"],s:["eve"],cr:5,t:"2 hrs",d:"The Glico runner, giant crabs and canal-side street food.",alt:"o-hozenji",q:"Dotonbori"},
+{id:"o-hozenji",c:"osaka",n:"Hozen-ji Yokocho",a:"Namba",m:["romance","culture","night"],s:["pm","eve"],cr:2,t:"1 hr",d:"A moss-furred Fudo statue you splash with water, in a lantern-lit stone alley steps from Dotonbori.",q:"Hozenji Yokocho"},
+{id:"o-uranamba",c:"osaka",n:"Ura-Namba izakaya alleys",a:"Namba",m:["foodie","night"],s:["eve"],cr:3,t:"2–3 hrs",d:"Back-street izakaya and standing bars where locals actually drink.",q:"Ura Namba"},
+{id:"o-shinsekai",c:"osaka",n:"Shinsekai & kushikatsu",a:"Shinsekai",m:["quirky","foodie","play"],s:["lunch","pm","eve"],cr:3,t:"2 hrs",d:"Retro Showa streets under Tsutenkaku tower, fried skewers and old-school shooting galleries.",tip:"No double-dipping in the shared sauce.",q:"Shinsekai Osaka"},
+{id:"o-denden",c:"osaka",n:"Den Den Town",a:"Nipponbashi",m:["play"],s:["pm"],cr:3,t:"2–3 hrs",d:"Osaka’s otaku strip: retro games, trading cards, figures and arcades.",q:"Den Den Town"},
+{id:"o-kuromon",c:"osaka",n:"Kuromon Market",a:"Namba",m:["foodie"],s:["lunch"],cr:5,t:"1 hr",d:"Seafood skewers and wagyu bites at tourist prices.",alt:"o-tenjinbashi",q:"Kuromon Market"},
+{id:"o-tenjinbashi",c:"osaka",n:"Tenjinbashisuji arcade",a:"Kita",m:["foodie","chill","rainy"],s:["lunch","pm"],cr:2,in:1,t:"2 hrs",d:"Japan’s longest covered shopping street, about 2.6 km of croquettes, old cafés and locals.",q:"Tenjinbashisuji"},
+{id:"o-castle",c:"osaka",n:"Osaka Castle grounds",a:"Chuo",m:["culture","chill"],s:["am"],cr:4,t:"2 hrs",d:"Huge stone walls and moats. The park is the best part; the keep is a modern museum inside.",tip:"Walk the moats around 8:00. The Nishinomaru garden has ginkgo color.",q:"Osaka Castle"},
+{id:"o-usj",c:"osaka",n:"Universal Studios & Super Nintendo World",a:"Bay area",m:["play","adventure"],s:["am"],full:1,cr:5,t:"All day",d:"Mario Kart, Donkey Kong Country and power-up bands.",bk:"Super Nintendo World needs a timed-entry ticket or Express Pass. Buy ahead.",q:"Universal Studios Japan"},
+{id:"o-umeda",c:"osaka",n:"Umeda Sky Building at sunset",a:"Umeda",m:["romance","night"],s:["eve"],cr:3,t:"1 hr",d:"Open-air ring walkway 170 m up, between twin towers.",q:"Umeda Sky Building"},
+{id:"o-nakazaki",c:"osaka",n:"Nakazakicho cafés",a:"Umeda",m:["chill","quirky"],s:["pm"],cr:2,t:"2 hrs",d:"Pre-war wooden houses turned into tiny cafés, vintage shops and galleries.",q:"Nakazakicho"},
+{id:"o-minoo",c:"osaka",n:"Minoo Park waterfall walk",a:"Minoh",m:["adventure","chill","foodie"],s:["am","pm"],cr:3,t:"3 hrs",d:"A forest path to a 33 m waterfall, with peak maples in late November and momiji tempura (fried maple leaves) on the way.",tip:"Weekdays are much calmer.",q:"Minoo Waterfall"},
+{id:"o-kaiyukan",c:"osaka",n:"Kaiyukan aquarium",a:"Bay area",m:["animals","rainy"],s:["pm","eve"],cr:4,in:1,t:"2–3 hrs",d:"Whale shark in a giant central tank, spiraled by ramps.",tip:"Go after 16:00, when the tour groups have left.",q:"Kaiyukan"},
+{id:"o-tempozan",c:"osaka",n:"Tempozan Ferris wheel",a:"Bay area",m:["romance"],s:["eve"],cr:2,t:"30 min",d:"Glass-floored gondola over the bay lights.",q:"Tempozan Ferris Wheel"},
+{id:"o-sumiyoshi",c:"osaka",n:"Sumiyoshi Taisha",a:"Sumiyoshi",m:["culture","chill"],s:["am","pm"],cr:2,t:"1 hr",d:"One of Japan’s oldest shrines, with a steep red arched bridge and a distinctive ancient style.",q:"Sumiyoshi Taisha"},
+{id:"o-shitennoji",c:"osaka",n:"Shitenno-ji",a:"Tennoji",m:["culture","quirky"],s:["am"],cr:2,t:"1 hr",d:"Japan’s oldest official temple, rebuilt in its original layout.",bk:"Flea market on the 21st and 22nd of each month.",q:"Shitennoji"},
+{id:"o-amemura",c:"osaka",n:"Amerikamura",a:"Shinsaibashi",m:["quirky","chill"],s:["pm"],cr:3,t:"2 hrs",d:"Osaka’s youth and skate district: Triangle Park, skate and vintage shops.",q:"Amerikamura"},
+{id:"o-pokemon",c:"osaka",n:"Pokémon Center Osaka DX",a:"Shinsaibashi",m:["play","rainy"],s:["pm"],cr:4,in:1,t:"1 hr",d:"The big Pokémon store, with the Pokémon Café in the same building.",bk:"The Pokémon Café needs a reservation.",q:"Pokemon Center Osaka DX"},
+{id:"o-nintendo",c:"osaka",n:"Nintendo Osaka",a:"Umeda",m:["play","rainy"],s:["pm"],cr:4,in:1,t:"1 hr",d:"Official Nintendo store in Daimaru Umeda.",q:"Nintendo Osaka"},
+{id:"o-expo70",c:"osaka",n:"Tower of the Sun, Expo ’70 Park",a:"Suita",m:["quirky","chill"],s:["am","pm"],cr:2,t:"2–3 hrs",d:"Taro Okamoto’s giant three-faced tower in a huge leafy park.",q:"Tower of the Sun"},
+{id:"o-okonomiyaki",c:"osaka",n:"Okonomiyaki dinner",a:"Namba",m:["foodie"],s:["lunch","eve"],cr:3,t:"1 hr",d:"Osaka’s comfort food, grilled at your table.",q:"okonomiyaki Namba"},
+// Kyoto
+{id:"k-inari-dawn",c:"kyoto",n:"Fushimi Inari at dawn",a:"Fushimi",m:["adventure","culture","romance"],s:["am"],cr:2,t:"2–3 hrs",d:"The torii tunnels in soft early light, all the way to the summit.",tip:"Be on the trail by 7:00. Past Yotsutsuji (about 40 min up) it’s quiet at any hour.",q:"Fushimi Inari Taisha"},
+{id:"k-bamboo",c:"kyoto",n:"Arashiyama bamboo grove",a:"Arashiyama",m:["romance","chill"],s:["am","pm"],cr:5,t:"1 hr",d:"The famous green corridor, usually a slow-moving queue by mid-morning.",alt:"k-sagano",q:"Arashiyama Bamboo Grove"},
+{id:"k-sagano",c:"kyoto",n:"Adashino & Otagi Nenbutsu-ji",a:"Sagano",m:["quirky","chill","culture"],s:["am","pm"],cr:1,t:"2–3 hrs",d:"North of the main grove: a quiet bamboo path, 8,000 stone memorials, then 1,200 goofy hand-carved stone disciples.",q:"Otagi Nenbutsuji"},
+{id:"k-okochi",c:"kyoto",n:"Okochi Sanso garden",a:"Arashiyama",m:["chill","romance","culture"],s:["am","pm"],cr:2,t:"1 hr",d:"A film star’s hillside villa garden with mountain views. Entry includes matcha and a sweet.",q:"Okochi Sanso"},
+{id:"k-monkeys",c:"kyoto",n:"Monkey Park Iwatayama",a:"Arashiyama",m:["animals","adventure"],s:["am","pm"],cr:3,t:"1.5 hrs",d:"A 20-minute uphill hike to 100+ free-roaming macaques and a view over the city.",q:"Monkey Park Iwatayama"},
+{id:"k-hozugawa",c:"kyoto",n:"Sagano train & Hozugawa boat",a:"Arashiyama",m:["romance","adventure"],s:["am"],cr:4,t:"Half day",d:"Ride the old open-air train up the gorge, then float back down by wooden boat.",bk:"The boat runs its regular schedule through Dec 13. Book both ahead and check which days the train runs.",q:"Hozugawa River Boat Ride"},
+{id:"k-philo",c:"kyoto",n:"Philosopher’s Path walk",a:"Higashiyama north",m:["chill","romance","culture"],s:["am","pm"],cr:3,t:"2–3 hrs",d:"A canal-side stroll from Ginkaku-ji past Honen-in to the Nanzen-ji aqueduct.",tip:"Start at the Ginkaku-ji end at 8:30 and walk south.",q:"Philosopher's Path Kyoto"},
+{id:"k-gion",c:"kyoto",n:"Gion & Shirakawa at dusk",a:"Gion",m:["romance","night","culture"],s:["eve"],cr:4,t:"1–2 hrs",d:"Willow-lined canal, teahouses and lanterns coming on.",tip:"Shirakawa is calmer than Hanamikoji. Gion’s private lanes are off-limits to tourists, so stick to public streets.",q:"Shirakawa Gion"},
+{id:"k-pontocho",c:"kyoto",n:"Pontocho dinner",a:"Kawaramachi",m:["foodie","night","romance"],s:["eve"],cr:4,t:"2 hrs",d:"A lantern-lit alley of restaurants along the Kamo River.",q:"Pontocho"},
+{id:"k-nishiki",c:"kyoto",n:"Nishiki Market",a:"Downtown",m:["foodie"],s:["lunch"],cr:5,t:"1 hr",d:"‘Kyoto’s kitchen’: pickles, tamagoyaki and skewers in a narrow covered lane.",tip:"Eating while walking is discouraged; eat at the stall.",alt:"k-demachi",q:"Nishiki Market"},
+{id:"k-demachi",c:"kyoto",n:"Demachi arcade & Kamo Delta",a:"Demachiyanagi",m:["chill","foodie","quirky"],s:["lunch","pm"],cr:1,t:"2 hrs",d:"A local covered market, then hop the turtle-shaped stepping stones across the river.",q:"Demachi Masugata Shopping Street"},
+{id:"k-dawnkiyomizu",c:"kyoto",n:"Kiyomizu & Sannenzaka at 6am",a:"Higashiyama",m:["adventure","romance","culture"],s:["am"],cr:2,t:"2 hrs",d:"The temple stage and the stone lanes below it before the shops open.",q:"Kiyomizu-dera"},
+{id:"k-kurama",c:"kyoto",n:"Kurama to Kifune hike",a:"North Kyoto",m:["adventure","culture"],s:["am","pm"],cr:3,t:"Half day",d:"Climb from Kurama-dera over a cedar-root ridge and down to Kifune’s lantern stairs, about 2 hours of walking.",q:"Kurama-dera"},
+{id:"k-ohara",c:"kyoto",n:"Ohara village",a:"North Kyoto",m:["chill","culture"],s:["am","pm"],cr:2,t:"Half day",d:"An hour north: moss gardens, little jizo statues and matcha framed by a 700-year-old pine.",q:"Sanzen-in"},
+{id:"k-nintendo",c:"kyoto",n:"Nintendo Museum",a:"Uji",m:["play"],s:["am","pm"],cr:3,t:"3 hrs",d:"Nintendo’s history from hanafuda cards to Switch, in its old Uji factory, with giant playable controllers.",bk:"Tickets are lottery-only and booked far ahead. Check the official site for released tickets; no door sales.",q:"Nintendo Museum Uji"},
+{id:"k-uji",c:"kyoto",n:"Uji matcha & Byodo-in",a:"Uji",m:["foodie","chill","culture"],s:["am","pm"],cr:3,t:"Half day",d:"Tea shops, matcha everything and the Phoenix Hall, 20 minutes from Kyoto.",q:"Byodo-in"},
+{id:"k-manga",c:"kyoto",n:"Kyoto International Manga Museum",a:"Downtown",m:["play","rainy"],s:["pm"],cr:2,in:1,t:"2 hrs",d:"A wall of manga you can pull down and read anywhere in the building.",q:"Kyoto International Manga Museum"},
+{id:"k-kamo",c:"kyoto",n:"Kamo River at golden hour",a:"Sanjo",m:["romance","chill"],s:["pm","eve"],cr:2,t:"1 hr",d:"Sit on the riverbank like the locals do, couples spaced out along the water.",q:"Kamo River Sanjo"},
+{id:"k-funaoka",c:"kyoto",n:"Funaoka Onsen",a:"Kitaoji",m:["chill","quirky"],s:["eve"],cr:2,in:1,t:"1 hr",d:"A century-old bathhouse with carved wooden panels and an electric bath if you dare.",q:"Funaoka Onsen"},
+{id:"k-kiyonight",c:"kyoto",n:"Kiyomizu-dera night viewing",a:"Higashiyama",m:["romance","night"],s:["eve"],cr:5,t:"1.5 hrs",d:"A blue beam rises from the lit stage over glowing maples.",bk:"Nov 21–30 only, to 21:30 (last entry 21:00), ¥500.",alt:"k-tojinight",q:"Kiyomizu-dera"},
+{id:"k-eikannight",c:"kyoto",n:"Eikan-do night light-up",a:"Higashiyama north",m:["romance","night"],s:["eve"],cr:5,t:"1.5 hrs",d:"Lit maples doubled in the pond.",bk:"Nov 20–Dec 6, entry 17:30–20:30, ¥1,000, walk-up only.",alt:"k-kodainight",q:"Eikando"},
+{id:"k-tojinight",c:"kyoto",n:"Toji night light-up",a:"Kyoto Station area",m:["romance","night","culture"],s:["eve"],cr:3,t:"1 hr",d:"The tallest wooden pagoda in Japan reflected in a pond of lit maples.",bk:"Oct 31–Dec 13, 18:00–21:30, ¥1,000. Enter by the East Gate.",q:"Toji"},
+{id:"k-kodainight",c:"kyoto",n:"Kodai-ji night & Ishibe-koji",a:"Higashiyama",m:["romance","night"],s:["eve"],cr:3,t:"1.5 hrs",d:"Projections on the dry garden and a lit bamboo grove, then the stone lane of Ishibe-koji.",bk:"Through Dec 13, from 17:00, ¥800.",q:"Kodaiji"},
+{id:"k-rokuhara",c:"kyoto",n:"Odd-statue crawl",a:"Higashiyama",m:["quirky","culture"],s:["pm"],cr:2,t:"1.5 hrs",d:"Rokuharamitsu-ji’s monk with six tiny Buddhas walking out of his mouth, then crawl through Yasui Konpira-gu’s bad-ties stone.",q:"Rokuharamitsuji"},
+{id:"k-railway",c:"kyoto",n:"Kyoto Railway Museum",a:"Umekoji",m:["play","rainy"],s:["pm"],cr:3,in:1,t:"2–3 hrs",d:"Steam locomotives in a roundhouse, bullet trains and a driving simulator.",q:"Kyoto Railway Museum"},
+{id:"k-pokemon",c:"kyoto",n:"Pokémon Center & Teramachi arcades",a:"Downtown",m:["play","rainy"],s:["pm","eve"],cr:3,in:1,t:"2 hrs",d:"The Pokémon Center near Shijo-Kawaramachi, then the covered Teramachi and Shinkyogoku arcades with game centers.",q:"Pokemon Center Kyoto"},
+{id:"k-tea",c:"kyoto",n:"Tea ceremony",a:"Various",m:["culture","chill","rainy"],s:["am","pm"],cr:1,in:1,t:"1 hr",d:"A small-group ceremony in a tatami room, with someone to explain each step.",bk:"Book a day or two ahead.",q:"tea ceremony Kyoto"},
+{id:"k-gosho",c:"kyoto",n:"Imperial Palace park ginkgos",a:"Central",m:["chill","romance"],s:["am","pm"],cr:1,t:"1–2 hrs",d:"Huge free park with gravel avenues. The ginkgo are forecast to peak around Nov 27.",q:"Kyoto Gyoen"},
+{id:"k-fushimisake",c:"kyoto",n:"Fushimi sake district",a:"Fushimi",m:["foodie","chill"],s:["pm"],cr:2,t:"2–3 hrs",d:"Willow-lined canals, the Gekkeikan sake museum and tasting rooms.",q:"Gekkeikan Okura Sake Museum"},
+{id:"k-tofuku",c:"kyoto",n:"Tofuku-ji at 8:30",a:"Higashiyama south",m:["culture","romance"],s:["am"],cr:4,t:"1.5 hrs",d:"The Tsutenkyo bridge over a valley of 2,000 maples.",bk:"Autumn tickets ¥1,000 (bridge) + ¥600 (garden). Photos on the bridge may be stopped.",alt:"k-sennyu",q:"Tofukuji"},
+{id:"k-sennyu",c:"kyoto",n:"Sennyu-ji & Imakumano Kannon-ji",a:"Higashiyama south",m:["chill","culture"],s:["am","pm"],cr:1,t:"1.5 hrs",d:"Next door to Tofuku-ji: an imperial temple and a little red bridge over a maple valley, with a fraction of the people.",q:"Sennyuji"},
+{id:"k-kitano",c:"kyoto",n:"Kitano Tenmangu maple garden",a:"Northwest",m:["romance","quirky","foodie"],s:["pm","eve"],cr:3,t:"1.5 hrs",d:"Maples along an old earthen rampart, lit in the evening. The 25th brings a sprawling flea market.",bk:"Maple garden ¥1,500, lit until 20:00.",q:"Kitano Tenmangu"},
+{id:"k-shinnyo",c:"kyoto",n:"Shinnyo-do & the afro Buddha",a:"Higashiyama north",m:["chill","culture","quirky"],s:["am","pm"],cr:2,t:"1.5 hrs",d:"A locals’ leaf spot with a pagoda, then the curly-haired ‘afro Buddha’ at Konkai Komyo-ji.",q:"Shinnyodo"},
+{id:"k-jingo",c:"kyoto",n:"Jingo-ji disk throwing",a:"Takao",m:["adventure","quirky"],s:["am","pm"],cr:2,t:"Half day",d:"Climb about 400 stone steps in the Takao hills, then fling clay disks off a cliff for luck.",q:"Jingoji"},
+{id:"k-kennin",c:"kyoto",n:"Kennin-ji twin dragons",a:"Gion",m:["culture","rainy"],s:["am","pm"],cr:3,in:1,t:"1 hr",d:"Twin dragons painted across the ceiling and calm tatami rooms around small gardens.",q:"Kenninji"},
+{id:"k-sanjusangen",c:"kyoto",n:"Sanjusangen-do",a:"Higashiyama",m:["culture","rainy"],s:["am","pm"],cr:3,in:1,t:"1 hr",d:"1,001 gilded Kannon statues in a 120-metre hall.",q:"Sanjusangendo"},
+{id:"k-aquarium",c:"kyoto",n:"Kyoto Aquarium",a:"Umekoji",m:["animals","rainy"],s:["pm"],cr:3,in:1,t:"2 hrs",d:"Giant salamanders, penguins and seals, next to the Railway Museum.",q:"Kyoto Aquarium"},
+{id:"k-yudofu",c:"kyoto",n:"Yudofu lunch by Nanzen-ji",a:"Higashiyama north",m:["foodie","culture","chill"],s:["lunch"],cr:3,t:"1 hr",d:"Simmered tofu hotpot in old garden restaurants, a Kyoto temple-town classic.",q:"yudofu Nanzenji"},
+{id:"k-obanzai",c:"kyoto",n:"Obanzai home-style lunch",a:"Downtown",m:["foodie","chill"],s:["lunch"],cr:2,t:"1 hr",d:"A spread of small seasonal Kyoto dishes, usually as a set lunch.",q:"obanzai Kyoto"},
+// Nara
+{id:"n-deer",c:"nara",n:"Nara Park deer at Todai-ji",a:"Nara Park",m:["animals"],s:["am","pm"],cr:5,t:"1–2 hrs",d:"Bowing deer and cracker vendors outside the Great South Gate.",tip:"Bow and they bow back. Hide paper maps; they eat them.",alt:"n-kasugadeer",q:"Nara Park"},
+{id:"n-kasugadeer",c:"nara",n:"Kasuga forest & lantern paths",a:"Nara Park",m:["animals","chill","culture"],s:["am","pm"],cr:2,t:"1.5 hrs",d:"Deer wander the cedar woods around Kasuga Taisha’s 3,000 lanterns, far calmer than the park entrance.",q:"Kasuga Taisha"},
+{id:"n-todai",c:"nara",n:"Todai-ji at 8:00",a:"Nara Park",m:["culture"],s:["am"],cr:3,t:"1 hr",d:"The Great Buddha before the school groups arrive.",q:"Todaiji"},
+{id:"n-nigatsu",c:"nara",n:"Sunset at Nigatsu-do",a:"Nara Park",m:["romance","chill"],s:["pm","eve"],cr:1,t:"1 hr",d:"Free hillside veranda with the whole city glowing below.",q:"Nigatsudo"},
+{id:"n-forest",c:"nara",n:"Kasugayama Primeval Forest",a:"Nara Park",m:["adventure","chill"],s:["am","pm"],cr:1,t:"2–3 hrs",d:"An old-growth forest loop behind Kasuga, with Buddhas carved into the rock.",q:"Kasugayama Primeval Forest"},
+{id:"n-wakakusa",c:"nara",n:"Wakakusayama climb",a:"Nara Park",m:["adventure","romance","animals"],s:["pm"],cr:2,t:"1.5 hrs",d:"A grassy hill with deer on top and a view over Nara.",bk:"Seasonal, daytime-only opening with a small fee.",q:"Mount Wakakusa"},
+{id:"n-isuien",c:"nara",n:"Isuien garden",a:"Nara Park",m:["chill","culture"],s:["am","pm"],cr:1,t:"1 hr",d:"A strolling garden that borrows Todai-ji’s roof and the hills as its scenery.",q:"Isuien Garden"},
+{id:"n-naramachi",c:"nara",n:"Naramachi lanes",a:"Naramachi",m:["chill","foodie"],s:["lunch","pm"],cr:2,t:"2 hrs",d:"Old merchant townhouses, persimmon-leaf sushi and sake shops.",q:"Naramachi"},
+{id:"n-mochi",c:"nara",n:"Nakatanidou mochi pounding",a:"Downtown",m:["foodie","quirky"],s:["lunch","pm"],cr:4,t:"30 min",d:"Lightning-fast mochi pounding, then warm mugwort mochi.",q:"Nakatanidou"},
+{id:"n-kofukumuseum",c:"nara",n:"Kofuku-ji treasure museum",a:"Nara Park",m:["culture","rainy"],s:["am","pm"],cr:2,in:1,t:"1 hr",d:"The three-faced Ashura statue and a room of national treasures.",q:"Kohfukuji National Treasure Museum"},
+{id:"n-museum",c:"nara",n:"Nara National Museum",a:"Nara Park",m:["culture","rainy"],s:["am","pm"],cr:2,in:1,t:"1.5 hrs",d:"A hall of Buddhist sculpture spanning 1,300 years.",q:"Nara National Museum"},
+{id:"n-nishinokyo",c:"nara",n:"Yakushi-ji & Toshodai-ji",a:"Nishinokyo",m:["chill","culture"],s:["am","pm"],cr:1,t:"Half day",d:"Two serene World Heritage temples a 10-minute walk apart.",q:"Yakushiji"},
+{id:"n-horyu",c:"nara",n:"Horyu-ji",a:"Ikaruga",m:["culture"],s:["am"],cr:2,t:"Half day",d:"The world’s oldest wooden buildings, 30 minutes from Nara.",q:"Horyuji"},
+{id:"n-hase",c:"nara",n:"Hase-dera",a:"Sakurai",m:["adventure","romance","culture"],s:["am","pm"],cr:2,t:"Half day",d:"399 covered steps up a mountainside, maples and a 10-metre Kannon.",q:"Hasedera"},
+{id:"n-ukimido",c:"nara",n:"Ukimido pavilion at night",a:"Nara Park",m:["romance","night"],s:["eve"],cr:1,t:"30 min",d:"A lit wooden pavilion on Sagi-ike pond. Free and quiet.",q:"Ukimido"},
+{id:"n-arcades",c:"nara",n:"Higashimuki & Mochiidono arcades",a:"Downtown",m:["foodie","rainy"],s:["lunch","eve"],cr:3,in:1,t:"1 hr",d:"Covered shopping streets with snacks, cafés and souvenir shops.",q:"Higashimuki Shopping Street"},
+{id:"n-dinner",c:"nara",n:"Kamameshi dinner in Naramachi",a:"Naramachi",m:["foodie","romance"],s:["eve"],cr:2,t:"1.5 hrs",d:"Rice cooked in an iron pot, Nara’s comfort food.",q:"kamameshi Nara"},
+{id:"n-isonokami",c:"nara",n:"Isonokami Jingu chickens",a:"Tenri",m:["animals","quirky","culture"],s:["am","pm"],cr:1,t:"Half day",d:"An ancient shrine where long-tailed chickens roam the grounds.",q:"Isonokami Jingu"},
+// Matsumoto
+{id:"m-castle",c:"matsumoto",n:"Matsumoto Castle at opening",a:"Central",m:["culture","adventure"],s:["am"],cr:3,t:"1.5 hrs",d:"An original black keep, a National Treasure, with steep ladder stairs inside.",tip:"Buy a timed e-ticket. Shoes come off inside.",q:"Matsumoto Castle"},
+{id:"m-castlenight",c:"matsumoto",n:"Castle lit up at night",a:"Central",m:["romance","night"],s:["eve"],cr:1,t:"30 min",d:"The floodlit keep reflected in the moat. Free, from the park.",q:"Matsumoto Castle"},
+{id:"m-nakamachi",c:"matsumoto",n:"Nakamachi Street",a:"Central",m:["chill","foodie"],s:["lunch","pm"],cr:2,t:"2 hrs",d:"White-and-black storehouses turned into craft shops and cafés.",q:"Nakamachi Street Matsumoto"},
+{id:"m-nawate",c:"matsumoto",n:"Nawate frog street & Yohashira Shrine",a:"Central",m:["quirky","chill"],s:["pm"],cr:2,t:"1 hr",d:"A riverside lane of stalls with a frog theme, beside a small shrine.",q:"Nawate Street"},
+{id:"m-kusama",c:"matsumoto",n:"Matsumoto City Museum of Art",a:"Central",m:["quirky","rainy","culture"],s:["pm"],cr:2,in:1,t:"1.5 hrs",d:"Polka-dot heaven: hometown hero Yayoi Kusama’s permanent collection.",bk:"Closed Mondays.",q:"Matsumoto City Museum of Art"},
+{id:"m-kaichi",c:"matsumoto",n:"Former Kaichi School",a:"Central",m:["culture","rainy"],s:["am","pm"],cr:1,in:1,t:"1 hr",d:"A charming 1876 Western-style school, a National Treasure.",q:"Former Kaichi School"},
+{id:"m-wasabi",c:"matsumoto",n:"Daio Wasabi Farm & Azumino",a:"Azumino",m:["chill","adventure","foodie"],s:["am","pm"],cr:2,t:"Half day",d:"Clear spring-fed wasabi fields and water wheels. Rent bikes at Hotaka Station, then try wasabi ice cream.",q:"Daio Wasabi Farm"},
+{id:"m-onsen",c:"matsumoto",n:"Utsukushigahara or Asama Onsen soak",a:"Outskirts",m:["chill","romance"],s:["pm","eve"],cr:1,in:1,t:"2 hrs",d:"Hot-spring towns 20 minutes from the center, with day baths at ryokan.",tip:"Ask about the tattoo policy, or book a private (kashikiri) bath.",q:"Utsukushigahara Onsen"},
+{id:"m-clock",c:"matsumoto",n:"Matsumoto Timepiece Museum",a:"Central",m:["quirky","rainy"],s:["pm"],cr:1,in:1,t:"45 min",d:"Hundreds of old clocks, many still ticking, plus a giant pendulum outside.",q:"Matsumoto Timepiece Museum"},
+{id:"m-ukiyoe",c:"matsumoto",n:"Japan Ukiyo-e Museum",a:"Outskirts",m:["culture","rainy"],s:["am","pm"],cr:1,in:1,t:"1 hr",d:"A big private collection of woodblock prints, shown in rotation.",q:"Japan Ukiyo-e Museum"},
+{id:"m-coffee",c:"matsumoto",n:"Coffee & craft crawl",a:"Central",m:["chill"],s:["pm"],cr:2,t:"2 hrs",d:"Matsumoto is a crafts town: cafés, woodwork and pottery shops along Nakamachi and Kurassic-kan.",q:"Matsumoto craft shops"},
+{id:"m-soba",c:"matsumoto",n:"Shinshu soba lunch",a:"Central",m:["foodie"],s:["lunch"],cr:2,t:"1 hr",d:"Nagano is buckwheat country. Cold soba with mountain vegetables.",q:"soba Matsumoto"},
+{id:"m-izakaya",c:"matsumoto",n:"Local sake izakaya",a:"Central",m:["foodie","night"],s:["eve"],cr:2,t:"2 hrs",d:"Nagano sake, oyaki dumplings and mountain dishes.",q:"izakaya Matsumoto"},
+{id:"m-alps",c:"matsumoto",n:"Alps Park",a:"Hills west of town",m:["adventure","animals","chill"],s:["am","pm"],cr:1,t:"2–3 hrs",d:"Hilltop park with views of the Northern Alps, forest trails and a small animal corner.",q:"Alps Park Matsumoto"},
+{id:"m-monkeys",c:"matsumoto",n:"Jigokudani snow monkeys",a:"Day trip via Nagano",m:["animals","adventure"],s:["am"],full:1,cr:3,t:"All day",d:"About 2.5 hrs each way: a 30-minute forest walk to wild macaques soaking in a hot spring.",q:"Jigokudani Monkey Park"},
+{id:"m-narai",c:"matsumoto",n:"Narai-juku post town",a:"Day trip south",m:["romance","culture","adventure"],s:["am","pm"],cr:2,t:"Half day",d:"An Edo-era post town of wooden inns, about an hour south by JR train.",q:"Narai-juku"}
+];
+const AI = Object.fromEntries(A.map(a=>[a.id,a]));
+const SLOTS = [{k:"am",l:"Morning"},{k:"lunch",l:"Lunch"},{k:"pm",l:"Afternoon"},{k:"eve",l:"Evening"}];
+const LVL = ["Quiet","Light","Busy","Packed"];
+const BASE_WORD = ["","Usually quiet","Some visitors","Steady crowds","Busy","Packed"];
+
+/* ---------- state ---------- */
+const DEF = {st:{},names:["Me","Sydney"],trip:{start:"",end:""},ui:{tab:"temples",tcity:"kyoto",q:"",when:"now",date:"",sort:"best",view:"list",f:{leaves:false,night:false,want:false,unst:false},open:null,city:"kyoto",moods:["chill"],avoid:true,plan:null}};
+let S;
+function load(){
+  try{const raw=localStorage.getItem(STORE_KEY); if(raw){const p=JSON.parse(raw); return {...DEF,...p,ui:{...DEF.ui,...(p.ui||{}),f:{...DEF.ui.f,...((p.ui||{}).f||{})}}};}}catch(e){}
+  return JSON.parse(JSON.stringify(DEF));
+}
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}}
+S = load();
+(function readTripParam(){
+  const m=/[?&]trip=(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})/.exec(location.search);
+  if(m && m[1]<=m[2]){S.trip={start:m[1],end:m[2]}; save();}
+  if(location.search) history.replaceState(null,"",location.pathname);
+})();
+const trip = () => (S.trip && S.trip.start && S.trip.end && S.trip.start<=S.trip.end) ? S.trip : null;
+const rec = id => S.st[id] || (S.st[id]={v:null,w:false,r:[0,0],n:""});
+const peek = id => S.st[id] || {v:null,w:false,r:[0,0],n:""};
+
+/* ---------- time (always Japan time) ---------- */
+function jst(){
+  const p=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,weekday:"short"}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+  const h=(+p.hour)%24;
+  return {date:`${p.year}-${p.month}-${p.day}`,h,mi:+p.minute,wd:p.weekday};
+}
+const dow = d => new Date(d+"T12:00:00Z").getUTCDay();
+const dayDiff = (a,b) => Math.round((new Date(b+"T12:00:00Z")-new Date(a+"T12:00:00Z"))/864e5);
+const fmtDate = d => new Date(d+"T12:00:00Z").toLocaleDateString("en-US",{timeZone:"UTC",weekday:"short",month:"short",day:"numeric"});
+const fmtH = h => { const hh=Math.floor(h), mm=Math.round((h-hh)*60); return `${hh}:${String(mm).padStart(2,"0")}`; };
+function defaultDate(){const n=jst(), tr=trip(); if(tr && n.date<tr.start) return tr.start; return n.date;}
+function spec(){
+  const n=jst();
+  if(S.ui.when==="now") return {h:n.h+n.mi/60,date:n.date,now:true,n};
+  const date=S.ui.date||defaultDate();
+  return {h:+S.ui.when,date,now:false,n};
+}
+const isBusyDay = d => [0,6].includes(dow(d)) || HOLIDAYS.includes(d);
+const CURVE = [[0,.12],[5,.15],[6,.3],[7,.4],[8,.55],[9,.75],[10,.95],[11,1.05],[12,1.05],[13,1.05],[14,1],[15,.9],[16,.75],[17,.6],[18,.45],[19,.4],[20,.35],[21,.3],[22,.2],[24,.12]];
+function curve(h){for(let i=1;i<CURVE.length;i++){const [h1,v1]=CURVE[i-1],[h2,v2]=CURVE[i]; if(h<=h2) return v1+(v2-v1)*(h-h1)/(h2-h1);} return .12;}
+function crowdAt(t,sp){
+  const wk = isBusyDay(sp.date) ? 1.25 : 1;
+  const nt = t.nt && sp.date>=t.nt.f && sp.date<=t.nt.t && sp.h>=t.nt.o && sp.h<t.nt.c;
+  const day = t.h24 || (sp.h>=t.o && sp.h<t.cl);
+  if(!day && !nt) return {open:false,lvl:-1,label:"Closed",v:0};
+  let v = day ? t.cr*curve(sp.h) : 0;
+  if(nt) v = Math.max(v, t.nt.cr*.9);
+  v *= wk;
+  const lvl = v<1.6?0:v<2.6?1:v<3.6?2:3;
+  return {open:true,lvl,label:LVL[lvl]+(nt?" (lit)":""),v,night:nt};
+}
+function nightActive(t,date){return t.nt && date>=t.nt.f && date<=t.nt.t;}
+
+/* ---------- helpers ---------- */
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const hash = s => {let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))|0; return Math.abs(h);};
+const maps = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+const tMaps = t => maps(`${t.j} ${t.c==="kyoto"?(t.a===UJ?"宇治":"京都"):"奈良"}`);
+function pill(c){return c.lvl<0?`<span class="pill lc"><i></i>Closed</span>`:`<span class="pill l${c.lvl}"><i></i>${esc(c.label)}</span>`;}
+function seal(t,size,cls){
+  const r=peek(t.id), stamped=!!r.v, want=!stamped&&r.w;
+  const ch=[...t.s], n=ch.length, fs=n===1?44:n===2?30:22;
+  const rot = stamped ? ((hash(t.id)%15)-7) : 0;
+  const txt = ch.map((c,i)=>`<text class="ch" x="50" y="${50-(n-1)*fs*0.52+i*fs*1.04}" text-anchor="middle" dominant-baseline="central" font-size="${fs}">${c}</text>`).join("");
+  const k = stamped?"":want?" want":" blank";
+  return `<svg class="seal${k} ${cls||""}" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true"><g ${stamped?'filter="url(#ink)"':""} transform="rotate(${rot} 50 50)"><circle class="ring" cx="50" cy="50" r="44" stroke-width="${stamped?6:2}"/>${stamped?'<circle class="ring" cx="50" cy="50" r="36.5" stroke-width="1.6"/>':""}${txt}</g></svg>`;
+}
+function toast(msg){const el=document.getElementById("toast"); el.textContent=msg; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2400);}
+
+/* ---------- header ---------- */
+function renderTrip(){
+  const n=jst(), el=document.getElementById("trip"), tr=trip();
+  const clock=`${n.wd} ${fmtH(n.h+n.mi/60)} in Japan`;
+  if(!tr){el.innerHTML=`<strong>Japan time</strong>${clock}`; return;}
+  const total=dayDiff(tr.start,tr.end)+1, short=d=>fmtDate(d).replace(/^\w+, /,"");
+  if(n.date<tr.start){const d=dayDiff(n.date,tr.start); el.innerHTML=`<strong>${d} day${d===1?"":"s"} to Japan</strong>${short(tr.start)} – ${short(tr.end)}`;}
+  else if(n.date<=tr.end){el.innerHTML=`<strong>Day ${dayDiff(tr.start,n.date)+1} of ${total}</strong>${clock}`;}
+  else el.innerHTML=`<strong>Trip complete</strong>Your stamps are saved`;
+}
+
+/* ---------- temples view ---------- */
+function filtered(sp){
+  const u=S.ui, q=u.q.trim().toLowerCase();
+  return T.filter(t=>{
+    if(u.tcity!=="both" && t.c!==u.tcity) return false;
+    if(q && !(t.n.toLowerCase().includes(q)||t.j.includes(q)||t.a.toLowerCase().includes(q))) return false;
+    const r=peek(t.id);
+    if(u.f.leaves && !t.lv) return false;
+    if(u.f.night && !nightActive(t,sp.date)) return false;
+    if(u.f.want && !r.w) return false;
+    if(u.f.unst && r.v) return false;
+    return true;
+  });
+}
+function avgRating(id){const r=peek(id).r.filter(x=>x>0); return r.length? r.reduce((a,b)=>a+b,0)/r.length : 0;}
+function sorted(list,sp){
+  const s=S.ui.sort, cw=new Map(list.map(t=>[t.id,crowdAt(t,sp)]));
+  const L=[...list];
+  if(s==="best") L.sort((a,b)=>{const ca=cw.get(a.id),cb=cw.get(b.id); const sa=ca.open? a.l*1.2-ca.v*.55 : -99, sb=cb.open? b.l*1.2-cb.v*.55 : -99; return sb-sa;});
+  if(s==="gems") L.sort((a,b)=>(b.l-b.cr*.7)-(a.l-a.cr*.7) || b.l-a.l);
+  if(s==="loved") L.sort((a,b)=>b.l-a.l || a.cr-b.cr);
+  if(s==="quiet") L.sort((a,b)=>{const ca=cw.get(a.id),cb=cw.get(b.id); return (ca.open?ca.v:99)-(cb.open?cb.v:99) || b.l-a.l;});
+  if(s==="ours") L.sort((a,b)=>avgRating(b.id)-avgRating(a.id) || b.l-a.l);
+  if(s==="area") {const order=[...AREAS.kyoto,...AREAS.nara]; L.sort((a,b)=>order.indexOf(a.a)-order.indexOf(b.a) || b.l-a.l);}
+  return {L,cw};
+}
+const WHENS=[["now","Now"],["7","7am"],["10","10am"],["13","1pm"],["16","4pm"],["19","7pm"]];
+function renderTemples(){
+  const u=S.ui, sp=spec();
+  const list=filtered(sp), {L,cw}=sorted(list,sp);
+  const nStamped=T.filter(t=>peek(t.id).v && (u.tcity==="both"||t.c===u.tcity)).length;
+  const scope=T.filter(t=>u.tcity==="both"||t.c===u.tcity).length;
+  const seasonK = `<details class="note"><summary>Late-November crowds</summary><p>Crowd levels assume late November, Kyoto’s peak leaf season. Forecasts put Tofuku-ji, Eikan-do, Kiyomizu-dera and Arashiyama at peak color from about Nov 23–25, with ginkgo around Nov 27. Nov 21–23 is a three-day holiday weekend, so expect the worst of it then.</p><p>Love scores reflect how much travelers rave about each place; crowd levels and hours are estimates, not live data. Seasonal details were checked Nov 12, 2026.</p></details>`;
+  const seasonN = `<details class="note"><summary>Nara in late November</summary><p>Calmer than Kyoto, but Todai-ji and the park entrance pack out from mid-morning. Most temples close by 17:00. Crowd levels and hours are estimates, not live data.</p></details>`;
+  let h=`<div class="ctl">
+    <div class="seg" role="group" aria-label="City">${[["kyoto","Kyoto"],["nara","Nara"],["both","Both"]].map(([k,l])=>`<button data-act="tcity" data-v="${k}" aria-pressed="${u.tcity===k}">${l}</button>`).join("")}</div>
+    <div class="ctl-row"><input class="search" type="search" id="q" placeholder="Search temples" value="${esc(u.q)}" aria-label="Search temples"><select class="sel" id="sort" aria-label="Sort">${[["best","Best right now"],["gems","Hidden gems"],["loved","Most loved"],["quiet","Quietest"],["area","By area"],["ours","Our ratings"]].map(([k,l])=>`<option value="${k}" ${u.sort===k?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div><p class="lbl">Crowds at ${sp.now?`<b>${fmtH(sp.h)}</b>, ${esc(sp.n.wd)} in Japan`:`<b>${fmtH(sp.h)}</b> on ${fmtDate(sp.date)}`}${isBusyDay(sp.date)?" (weekend or holiday)":""}</p>
+    <div class="seg scroll" role="group" aria-label="Time of day">${WHENS.map(([k,l])=>`<button data-act="when" data-v="${k}" aria-pressed="${u.when===k}">${l}</button>`).join("")}</div></div>
+    ${sp.now?"":`<label class="datebox">Day <input type="date" id="date" ${trip()?`min="${trip().start}" max="${trip().end}"`:""} value="${sp.date}"></label>`}
+    <div class="chips" role="group" aria-label="Filters">
+      <button class="chip" data-act="f" data-v="leaves" aria-pressed="${u.f.leaves}">🍁 Autumn leaves</button>
+      <button class="chip" data-act="f" data-v="night" aria-pressed="${u.f.night}">🏮 Lit at night</button>
+      <button class="chip" data-act="f" data-v="want" aria-pressed="${u.f.want}">Want to go</button>
+      <button class="chip" data-act="f" data-v="unst" aria-pressed="${u.f.unst}">Not stamped</button>
+    </div>
+    <div class="seg" role="group" aria-label="View">${[["list","List"],["chart","Love vs crowds"]].map(([k,l])=>`<button data-act="view" data-v="${k}" aria-pressed="${u.view===k}">${l}</button>`).join("")}</div>
+  </div>`;
+  h += u.tcity==="nara"?seasonN:seasonK;
+  h += `<p class="count">${L.length} shown. ${nStamped} of ${scope} stamped.</p>`;
+  if(u.view==="chart") h+=renderChart(L,cw,sp);
+  else {
+    if(!L.length) h+=`<div class="list"><p class="none">Nothing matches. Clear a filter or the search.</p></div>`;
+    else {
+      h+=`<div class="list">`; let last=null;
+      for(const t of L){
+        if(u.sort==="area" && t.a!==last){h+=`<div class="area-h">${esc(t.a)}</div>`; last=t.a;}
+        h+=rowHTML(t,cw.get(t.id),sp);
+      }
+      h+=`</div>`;
+    }
+  }
+  return h;
+}
+function rowHTML(t,c,sp){
+  const open=S.ui.open===t.id, r=peek(t.id);
+  const tags=[]; if(t.lv) tags.push(`<span class="tag">🍁</span>`); if(nightActive(t,sp.date)) tags.push(`<span class="tag">🏮 lit</span>`); if(t.bk) tags.push(`<span class="tag warn">${t.bk===2?"No entry":"Book"}</span>`);
+  let h=`<div class="row" id="row-${t.id}"><button class="head" data-act="open" data-v="${t.id}" aria-expanded="${open}">
+    ${seal(t,46)}
+    <span><span class="nm">${esc(t.n)}</span><span class="sub"><span class="jp">${t.j}</span><span>${esc(t.a)}</span>${tags.length?`<span class="tags">${tags.join("")}</span>`:""}</span></span>
+    <span class="meta"><span class="love"><i>♥</i>${t.l.toFixed(1)}</span>${pill(c)}</span></button>`;
+  if(open) h+=detailHTML(t,c,sp,r);
+  return h+`</div>`;
+}
+function hoursSVG(t,sp){
+  const W=340,H=58,x0=14,hrs=[];for(let h=5;h<=22;h++)hrs.push(h);
+  const bw=(W-x0*2)/hrs.length;
+  let s=`<svg viewBox="0 0 ${W} ${H+14}" role="img" aria-label="Estimated crowds through the day">`;
+  hrs.forEach((h,i)=>{
+    const c=crowdAt(t,{...sp,h:h+.5}); const x=x0+i*bw;
+    if(!c.open){s+=`<rect class="hbc" x="${x+2}" y="${H-3}" width="${bw-4}" height="3" rx="1.5"/>`;}
+    else{const bh=Math.max(6,Math.min(1,c.v/6)*(H-6)); s+=`<rect class="hb${c.lvl}" x="${x+2}" y="${H-bh}" width="${bw-4}" height="${bh}" rx="3"/>`;}
+    s+=`<rect x="${x}" y="0" width="${bw}" height="${H+14}" fill="transparent" data-act="hr" data-v="${t.id}" data-h="${h}"><title>${h}:00 ${c.label}</title></rect>`;
+    if(h%3===0) s+=`<text class="ax" x="${x+bw/2}" y="${H+12}" text-anchor="middle" font-size="10">${h}</text>`;
+  });
+  if(sp.now){const x=x0+(sp.h-5)*bw; if(x>x0&&x<W-x0) s+=`<line class="nowline" x1="${x}" x2="${x}" y1="0" y2="${H}" stroke-width="1.5" stroke-dasharray="3 3"/>`;}
+  return s+`</svg>`;
+}
+function detailHTML(t,c,sp,r){
+  const hrs = t.h24 ? "Grounds open 24 hours" : `${fmtH(t.o)}–${fmtH(t.cl)} (approx.)`;
+  const nt = t.nt ? `<dt>Night</dt><dd>${fmtDate(t.nt.f).replace(/^\w+, /,"")} – ${fmtDate(t.nt.t).replace(/^\w+, /,"")}, ${fmtH(t.nt.o)}–${fmtH(t.nt.c)}</dd>`:"";
+  const names=S.names;
+  const stars=(w)=>`<div class="rate"><span class="who">${esc(names[w])}</span><div class="stars" role="group" aria-label="${esc(names[w])}’s rating">${[1,2,3,4,5].map(i=>`<button data-act="rate" data-v="${t.id}" data-w="${w}" data-s="${i}" class="${r.r[w]>=i?"on":""}" aria-label="${i} star${i>1?"s":""}">★</button>`).join("")}</div></div>`;
+  return `<div class="detail">
+    <p>${esc(t.d)}</p>
+    ${t.x?`<div class="y26"><b>This season:</b> ${esc(t.x)}</div>`:""}
+    <h4>When it’s calm</h4><p>${esc(t.q)}</p>
+    <h4>Crowds through ${sp.now?"today":fmtDate(sp.date)}</h4>
+    <div class="hours">${hoursSVG(t,sp)}<div class="cap" id="cap-${t.id}">Tap a bar for the estimate at that hour.</div></div>
+    <dl class="facts"><dt>Type</dt><dd>${t.k==="s"?"Shrine":"Temple"}</dd><dt>Hours</dt><dd>${hrs}</dd>${nt}<dt>Love</dt><dd>${t.l.toFixed(1)} of 5</dd><dt>Typical</dt><dd>${BASE_WORD[t.cr]} at midday</dd></dl>
+    <div class="acts">
+      <button class="btn ${r.v?"":"primary"}" data-act="stamp" data-v="${t.id}">${r.v?"Unstamp":"Stamp it"}</button>
+      <button class="btn ${r.w?"on":""}" data-act="want" data-v="${t.id}" aria-pressed="${!!r.w}">${r.w?"On our list":"Want to go"}</button>
+      <a class="btn" href="${tMaps(t)}" target="_blank" rel="noopener">Maps</a>
+    </div>
+    ${r.v?`<p style="margin:10px 0 0;font-size:.85rem;color:var(--ink3)">Stamped ${fmtDate(r.v)}</p>`:""}
+    <h4>Our ratings</h4>${stars(0)}${stars(1)}
+    <textarea class="notes" data-note="${t.id}" placeholder="Notes: what we loved, what to skip">${esc(r.n||"")}</textarea>
+  </div>`;
+}
+let chartPick=null;
+function renderChart(L,cw,sp){
+  const pts=L.map(t=>({t,c:cw.get(t.id)})).filter(p=>p.c.open);
+  const closed=L.length-pts.length;
+  const W=360,H=330,ml=38,mr=10,mt=24,mb=40,pw=W-ml-mr,ph=H-mt-mb;
+  const X=v=>ml+(Math.min(6,Math.max(.4,v))-.4)/(6-.4)*pw, Y=l=>mt+(5.25-l)/(5.25-3.2)*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Scatter of traveler love against estimated crowd level">`;
+  const bands=[[.4,1.6,"Quiet"],[1.6,2.6,"Light"],[2.6,3.6,"Busy"],[3.6,6,"Packed"]];
+  bands.forEach(([a,b,l],i)=>{s+=`<rect class="${i%2?"band":"noband"}" x="${X(a)}" y="${mt}" width="${X(b)-X(a)}" height="${ph}"/><text class="ax2" x="${(X(a)+X(b))/2}" y="${H-mb+16}" text-anchor="middle" font-size="11">${l}</text>`;});
+  [3.5,4,4.5,5].forEach(v=>{s+=`<line class="gridl" x1="${ml}" x2="${W-mr}" y1="${Y(v)}" y2="${Y(v)}" stroke-width="1"/><text class="ax" x="${ml-6}" y="${Y(v)}" text-anchor="end" dominant-baseline="central" font-size="11">${v}</text>`;});
+  s+=`<text class="ax" x="${ml+6}" y="${mt-8}" font-size="11">Hidden gems</text><text class="ax" x="${W-mr-4}" y="${mt-8}" text-anchor="end" font-size="11">Worth the crowds?</text>`;
+  s+=`<text class="ax" x="${ml+pw/2}" y="${H-6}" text-anchor="middle" font-size="11">Estimated crowd at ${fmtH(sp.h)}</text>`;
+  s+=`<text class="ax" transform="translate(11 ${mt+ph/2}) rotate(-90)" text-anchor="middle" font-size="11">Traveler love</text>`;
+  for(const {t,c} of pts){
+    const jx=((hash(t.id)%100)/100-.5)*.6, jy=((hash(t.id+"y")%100)/100-.5)*.22;
+    const cx=X(c.v+jx), cy=Y(t.l+jy), st=!!peek(t.id).v, sel=chartPick===t.id;
+    if(st) s+=`<circle class="ringst" cx="${cx}" cy="${cy}" r="9.5" stroke-width="2"/>`;
+    s+=`<circle class="dot dot-${t.c}${sel?" sel":""}" cx="${cx}" cy="${cy}" r="${sel?7.5:6}" stroke-width="2"/>`;
+    s+=`<circle cx="${cx}" cy="${cy}" r="15" fill="transparent" data-act="dot" data-v="${t.id}" style="cursor:pointer"><title>${esc(t.n)}: love ${t.l}, ${c.label}</title></circle>`;
+  }
+  s+=`</svg>`;
+  const showK=L.some(t=>t.c==="kyoto"), showN=L.some(t=>t.c==="nara");
+  const legend=`<div class="legend">${showK?`<span><i class="d" style="background:var(--kyoto)"></i>Kyoto</span>`:""}${showN?`<span><i class="d" style="background:var(--nara)"></i>Nara</span>`:""}<span><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle class="ringst" cx="7" cy="7" r="5.5" stroke-width="2"/></svg>Stamped</span></div>`;
+  let pick;
+  const pt=chartPick && TI[chartPick] && pts.find(p=>p.t.id===chartPick);
+  if(pt){const t=pt.t; pick=`<div class="pick">${seal(t,46)}<div><span class="nm">${esc(t.n)}</span><span class="sub"><span>♥ ${t.l.toFixed(1)}</span>${pill(pt.c)}</span></div><button class="btn" data-act="goto" data-v="${t.id}">Details</button></div>`;}
+  else pick=`<div class="pick"><span class="hint">Tap a dot to see the place. Switch the time above to watch the dots slide as crowds come and go.${closed?` ${closed} closed at this time and not shown.`:""}</span></div>`;
+  return `<div class="chartbox">${legend}${s}${pick}</div>`;
+}
+
+/* ---------- mood view ---------- */
+function planKey(){const u=S.ui; return `${u.city}|${[...u.moods].sort().join(",")}|${u.avoid?1:0}`;}
+function scoreAct(a,slot,moods,avoid){
+  let sc=0; for(const m of moods) if(a.m.includes(m)) sc+=3;
+  if(moods.includes("rainy")) sc+= a.in?2:-5;
+  sc -= avoid ? (a.cr-1)*1.3 : (a.cr-1)*.15;
+  return sc;
+}
+function pickFor(slot,used,moods,avoid,city,exclude){
+  const c=A.filter(a=>a.c===city && a.s.includes(slot) && !used.has(a.id) && a.id!==exclude);
+  if(!c.length) return null;
+  const sc=c.map(a=>({a,s:scoreAct(a,slot,moods,avoid)+Math.random()*1.8})).sort((x,y)=>y.s-x.s);
+  for(const {a} of sc){
+    if(avoid && a.cr>=4){
+      const alt=a.alt && AI[a.alt];
+      if(alt && alt.s.includes(slot) && !used.has(alt.id) && alt.id!==exclude) return {id:alt.id,from:a.id};
+      if(a.cr>=5) continue;
+    }
+    return {id:a.id,from:null};
+  }
+  return {id:sc[0].a.id,from:null};
+}
+function buildPlan(){
+  const u=S.ui, used=new Set(), slots={};
+  for(const sl of SLOTS){
+    if(sl.k==="pm" && slots.am && AI[slots.am.id]?.full){slots.pm={cont:true}; continue;}
+    if(sl.k==="lunch" && slots.am && AI[slots.am.id]?.full){slots.lunch={cont:true}; continue;}
+    const p=pickFor(sl.k,used,u.moods,u.avoid,u.city);
+    if(p){slots[sl.k]=p; used.add(p.id); if(p.from) used.add(p.from);}
+  }
+  u.plan={key:planKey(),slots}; save();
+}
+function reslot(k){
+  const u=S.ui, cur=u.plan.slots[k], used=new Set();
+  for(const [kk,v] of Object.entries(u.plan.slots)) if(v && v.id){used.add(v.id); if(v.from) used.add(v.from);}
+  const p=pickFor(k,used,u.moods,u.avoid,u.city,cur&&cur.id);
+  if(p){
+    u.plan.slots[k]=p;
+    if(k==="am"){
+      const wasFull=cur&&AI[cur.id]?.full, isFull=AI[p.id]?.full;
+      if(isFull){u.plan.slots.pm={cont:true};u.plan.slots.lunch={cont:true};}
+      else if(wasFull){used.add(p.id); for(const kk of ["lunch","pm"]){const q=pickFor(kk,used,u.moods,u.avoid,u.city); if(q){u.plan.slots[kk]=q; used.add(q.id);}}}
+    }
+  } else toast("No other ideas for that slot. Try another mood.");
+  save();
+}
+function stepCard(a,from,slotK){
+  const moodsOn=a.m.filter(m=>S.ui.moods.includes(m)).map(m=>MOODS.find(x=>x.k===m).e).join(" ");
+  return `<div class="card">
+    <div class="top"><span class="nm">${esc(a.n)}</span>${pill({lvl:a.cr<=2?0:a.cr===3?1:a.cr===4?2:3,label:BASE_WORD[a.cr]})}</div>
+    <span class="sub"><span>${esc(a.a)}</span><span>${esc(a.t)}</span>${moodsOn?`<span>${moodsOn}</span>`:""}</span>
+    <p>${esc(a.d)}</p>
+    ${a.tip?`<p class="tip"><b>Tip:</b> ${esc(a.tip)}</p>`:""}
+    ${a.bk?`<p class="bk">${esc(a.bk)}</p>`:""}
+    ${from?`<p class="swap">Swapped in for ${esc(AI[from].n)}, which is packed.</p>`:""}
+    <div class="acts">
+      <a class="btn" href="${maps(a.q+" "+CITIES.find(c=>c.k===a.c).l)}" target="_blank" rel="noopener">Maps</a>
+      ${slotK?`<button class="btn" data-act="reslot" data-v="${slotK}">Something else</button>`:""}</div>
+  </div>`;
+}
+function renderMood(){
+  const u=S.ui;
+  if(!u.plan || u.plan.key!==planKey() || Object.values(u.plan.slots||{}).some(v=>v&&v.id&&!AI[v.id])) buildPlan();
+  const city=CITIES.find(c=>c.k===u.city).l;
+  const title = u.moods.length ? u.moods.map((k,i)=>{const a=MOODS.find(m=>m.k===k).adj; return i?a.toLowerCase():a;}).join(" + ")+` day in ${city}` : `A day in ${city}`;
+  let h=`<div class="ctl">
+    <div class="seg scroll" role="group" aria-label="City">${CITIES.map(c=>`<button data-act="city" data-v="${c.k}" aria-pressed="${u.city===c.k}">${c.l}</button>`).join("")}</div>
+    <div><p class="lbl">How are we feeling? Pick one or two.</p>
+    <div class="moods" role="group" aria-label="Mood">${MOODS.map(m=>`<button class="mood" data-act="mood" data-v="${m.k}" aria-pressed="${u.moods.includes(m.k)}"><span class="e" aria-hidden="true">${m.e}</span>${m.l}</button>`).join("")}</div></div>
+    <div class="switch"><span><b>Dodge crowds</b><small>Skip packed places and suggest calmer swaps</small></span><button class="tog" role="switch" aria-checked="${u.avoid}" data-act="avoid" aria-label="Dodge crowds"></button></div>
+  </div>
+  <div class="planhead"><h2>${esc(title)}</h2><button class="btn" data-act="shuffle">Shuffle</button></div>
+  <ol class="day">`;
+  for(const sl of SLOTS){
+    const v=u.plan.slots[sl.k];
+    if(!v) continue;
+    h+=`<li class="step"><div class="when">${sl.l}</div>`;
+    if(v.cont) h+=`<div class="cont">Still out on the morning trip.</div>`;
+    else h+=stepCard(AI[v.id],v.from,sl.k);
+    h+=`</li>`;
+  }
+  h+=`</ol><div class="note">${esc(CITY_NOTE[u.city])} For safe places to eat, open <a href="../safe-eats-japan/">Sydney Eats Japan</a>.</div>`;
+  const inPlan=new Set(Object.values(u.plan.slots).filter(v=>v&&v.id).map(v=>v.id));
+  const more=A.filter(a=>a.c===u.city && !inPlan.has(a.id) && a.m.some(m=>u.moods.includes(m)) && !(u.avoid && a.cr>=4) && !(u.moods.includes("rainy") && !a.in))
+    .sort((x,y)=>scoreAct(y,"",u.moods,u.avoid)-scoreAct(x,"",u.moods,u.avoid));
+  if(more.length){
+    h+=`<h3 class="sec">More ideas in ${city}</h3><div class="ideas">`+more.map(a=>`<div class="idea"><div class="top"><span class="nm">${esc(a.n)}</span>${pill({lvl:a.cr<=2?0:a.cr===3?1:a.cr===4?2:3,label:BASE_WORD[a.cr]})}</div><p>${esc(a.d)}</p>${a.bk?`<p style="color:var(--shu)">${esc(a.bk)}</p>`:""}<a href="${maps(a.q+" "+city)}" target="_blank" rel="noopener">Maps</a></div>`).join("")+`</div>`;
+  }
+  const sw=A.filter(a=>a.c===u.city && a.alt && AI[a.alt]);
+  if(u.avoid && sw.length){
+    h+=`<h3 class="sec">Crowd swaps</h3><div class="swaps">`+sw.map(a=>`<div>Instead of <s>${esc(a.n)}</s>, try <b>${esc(AI[a.alt].n)}</b>. ${esc(AI[a.alt].d)}</div>`).join("")+`</div>`;
+  }
+  return h;
+}
+
+/* ---------- stamps view ---------- */
+function renderStamps(){
+  const st=T.filter(t=>peek(t.id).v).sort((a,b)=>peek(a.id).v.localeCompare(peek(b.id).v));
+  const want=T.filter(t=>!peek(t.id).v && peek(t.id).w);
+  let h=`<div class="bookhead"><h2>Stamp book</h2><span>${st.length} of ${T.length}</span></div><div class="book">`;
+  h+= st.length ? st.map(t=>`<button data-act="goto" data-v="${t.id}">${seal(t,74)}<span class="bn">${esc(t.n)}</span><span class="bd">${fmtDate(peek(t.id).v)}</span></button>`).join("")
+       : `<p class="none">No stamps yet. Open a temple and tap Stamp it after you visit.</p>`;
+  h+=`</div>`;
+  if(want.length){h+=`<h3 class="sec">On our list</h3><div class="book">`+want.map(t=>`<button data-act="goto" data-v="${t.id}">${seal(t,60)}<span class="bn">${esc(t.n)}</span></button>`).join("")+`</div>`;}
+  const rated=T.filter(t=>avgRating(t.id)>0).sort((a,b)=>avgRating(b.id)-avgRating(a.id)).slice(0,8);
+  if(rated.length){
+    h+=`<h3 class="sec">Our favorites</h3><div class="top3">`+rated.map(t=>{const r=peek(t.id).r; return `<button data-act="goto" data-v="${t.id}">${seal(t,38)}<span class="nm">${esc(t.n)}</span><span class="sc">${S.names.map((n,i)=>r[i]?`${esc(n)} ${"★".repeat(r[i])}`:"").filter(Boolean).join("<br>")}</span></button>`;}).join("")+`</div>`;
+  }
+  h+=`<h3 class="sec">Settings</h3><div class="form">
+    <label>First rater<input type="text" data-name="0" value="${esc(S.names[0])}" maxlength="16"></label>
+    <label>Second rater<input type="text" data-name="1" value="${esc(S.names[1])}" maxlength="16"></label>
+    <label>Trip starts<input type="date" data-trip="start" value="${esc(S.trip.start||"")}"></label>
+    <label>Trip ends<input type="date" data-trip="end" value="${esc(S.trip.end||"")}"></label>
+    <div class="acts"><button class="btn" data-act="backup">Back up</button><button class="btn" data-act="restore">Restore</button></div>
+  </div>
+  <p class="fine">Stamps, ratings and notes live only on this phone, so back up now and then. Love scores and crowd levels are curated estimates for late November, not live data; hours are approximate. 2026 seasonal details were checked Nov 12, 2026, so confirm on official sites before you go.</p>`;
+  return h;
+}
+
+/* ---------- render & events ---------- */
+const main=document.getElementById("main");
+function render(keepScroll){
+  const y=window.scrollY;
+  renderTrip();
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===S.ui.tab?"page":"false"));
+  main.innerHTML=`<section class="view">${S.ui.tab==="temples"?renderTemples():S.ui.tab==="mood"?renderMood():renderStamps()}</section>`;
+  if(keepScroll) window.scrollTo(0,y);
+}
+function setTab(t){S.ui.tab=t; save(); render(); window.scrollTo(0,0);}
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-act]"); if(!el) return;
+  const act=el.dataset.act, v=el.dataset.v, u=S.ui;
+  switch(act){
+    case "tab": setTab(v); break;
+    case "tcity": u.tcity=v; u.open=null; save(); render(true); break;
+    case "when": u.when=v; if(v!=="now"&&!u.date) u.date=defaultDate(); save(); render(true); break;
+    case "f": u.f[v]=!u.f[v]; save(); render(true); break;
+    case "view": u.view=v; save(); render(true); break;
+    case "open": u.open = u.open===v?null:v; save(); render(true); break;
+    case "stamp": {const r=rec(v); r.v = r.v?null:jst().date; save(); render(true); if(r.v){const s=document.querySelector(`#row-${v} .seal`); if(s) s.classList.add("press"); toast(`Stamped ${TI[v].n}`);} break;}
+    case "want": {const r=rec(v); r.w=!r.w; save(); render(true); break;}
+    case "rate": {const r=rec(v), w=+el.dataset.w, s=+el.dataset.s; r.r[w] = r.r[w]===s?0:s; save(); render(true); break;}
+    case "hr": {const t=TI[v], h=+el.dataset.h, c=crowdAt(t,{...spec(),h:h+.5}); const cap=document.getElementById("cap-"+v); if(cap) cap.textContent=`${h}:00–${h+1}:00: ${c.open?c.label:"Closed"}`; break;}
+    case "dot": chartPick=v; render(true); break;
+    case "goto": u.tab="temples"; u.view="list"; u.open=v; if(u.tcity!=="both"&&u.tcity!==TI[v].c) u.tcity=TI[v].c; u.q=""; u.f={leaves:false,night:false,want:false,unst:false}; save(); render(); requestAnimationFrame(()=>{const r=document.getElementById("row-"+v); if(r) r.scrollIntoView({block:"start"}); window.scrollBy(0,-70);}); break;
+    case "city": u.city=v; save(); render(true); break;
+    case "mood": {const i=u.moods.indexOf(v); if(i>=0) u.moods.splice(i,1); else {u.moods.push(v); if(u.moods.length>2) u.moods.shift();} save(); render(true); break;}
+    case "avoid": u.avoid=!u.avoid; save(); render(true); break;
+    case "shuffle": buildPlan(); render(true); break;
+    case "reslot": reslot(v); render(true); break;
+    case "backup": backup(); break;
+    case "restore": document.getElementById("restoreFile").click(); break;
+  }
+});
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.id==="q"){S.ui.q=t.value; save(); clearTimeout(render.qt); render.qt=setTimeout(()=>{const pos=t.selectionStart; render(true); const q=document.getElementById("q"); if(q){q.focus(); try{q.setSelectionRange(pos,pos);}catch(_){}}},250);}
+  if(t.dataset.note){rec(t.dataset.note).n=t.value; save();}
+  if(t.dataset.name){S.names[+t.dataset.name]=t.value.trim()||(t.dataset.name==="0"?"Me":"Sydney"); save();}
+});
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.id==="sort"){S.ui.sort=t.value; save(); render(true);}
+  if(t.id==="date"){if(t.value){S.ui.date=t.value; save(); render(true);}}
+  if(t.dataset.trip){S.trip={...S.trip,[t.dataset.trip]:t.value}; save(); renderTrip();}
+});
+function backup(){
+  const data=JSON.stringify({app:"kibun",v:1,saved:new Date().toISOString(),st:S.st,names:S.names,trip:S.trip},null,1);
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+  a.download=`kibun-backup-${jst().date}.json`; document.body.append(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000); toast("Backup saved");
+}
+document.getElementById("restoreFile").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{const d=JSON.parse(await f.text()); if(d.app!=="kibun"||typeof d.st!=="object") throw 0;
+    S.st=d.st; if(Array.isArray(d.names)) S.names=d.names.slice(0,2); if(d.trip&&typeof d.trip==="object") S.trip=d.trip; save(); render(); toast("Restored from backup");}
+  catch(_){toast("That file isn’t a Kibun backup.");}
+  e.target.value="";
+});
+render();
+setInterval(()=>{ if(S.ui.when==="now" && S.ui.tab==="temples" && !document.activeElement?.matches("textarea,input")) render(true); else renderTrip(); },60000);
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>

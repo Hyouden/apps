@@ -1,0 +1,32 @@
+{
+  "name": "Kibun: Temples & Moods",
+  "short_name": "Kibun",
+  "description": "Kyoto & Nara temple tracker with crowd estimates and stamps, plus a mood-based day planner for Tokyo, Osaka, Kyoto, Nara and Matsumoto",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ECEEEF",
+  "theme_color": "#2C3F73",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
