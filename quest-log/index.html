@@ -1,0 +1,537 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Quest Log</title>
+<meta name="theme-color" content="#11151a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quest Log">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: hero banner (level, XP, gold) on top; tabs Quests / Hero / Loot; quests grouped Dailies, Bosses, Main, Side; bottom sheet for add/edit. Single dark "dungeon" theme by choice. */
+:root {
+  --bg: #11151a;
+  --panel: #1a2028;
+  --panel2: #212934;
+  --ink: #edf0e8;
+  --muted: #95a0ad;
+  --line: #2d3744;
+  --xp: #7ee07a;
+  --gold: #f4c542;
+  --boss: #ff5a5f;
+  --main: #8c7cff;
+  --daily: #48c6ef;
+  --side: #c9d1d9;
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--font-body); -webkit-tap-highlight-color: transparent; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 14px;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) max(14px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 96px) max(14px, env(safe-area-inset-left, 0px)); }
+button { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.hero { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; background: linear-gradient(135deg, #1f2833, #161c23); border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.crest { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 14px; background: radial-gradient(circle at 50% 35%, #33404f, #1a2028); border: 2px solid var(--gold); font: 700 1.7rem var(--font-display); color: var(--gold); position: relative; }
+.crest small { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #241a00; font: 700 .7rem var(--font-display); padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
+.hname { font: 700 1.25rem var(--font-display); margin: 0; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.htitle { color: var(--muted); font-size: .85rem; }
+.bar { height: 12px; border-radius: 6px; background: #0d1116; border: 1px solid var(--line); overflow: hidden; margin: 6px 0 4px; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, #4fbf4b, var(--xp)); transition: width .5s; }
+.stats { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.gold { color: var(--gold); font-weight: 700; }
+
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--panel); border: 2px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; }
+.tab { font: 700 1rem var(--font-display); min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+
+h2 { font: 700 1rem var(--font-display); margin: 8px 0 6px; display: flex; justify-content: space-between; align-items: baseline; letter-spacing: .03em; }
+h2 span { font: 400 .8rem var(--font-body); color: var(--muted); }
+.group { display: grid; gap: 8px; }
+.quest { --q: var(--side); display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--q); border-radius: 12px; padding: 8px 10px 8px 6px; }
+.quest.daily { --q: var(--daily); } .quest.main { --q: var(--main); } .quest.boss { --q: var(--boss); }
+.quest.done { opacity: .55; }
+.quest.done .qt { text-decoration: line-through; }
+.check { width: 44px; height: 44px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.check span { width: 26px; height: 26px; border: 2px solid var(--q); border-radius: 7px; display: grid; place-items: center; font-size: 1rem; color: var(--bg); }
+.done .check span { background: var(--q); }
+.qbody { min-width: 0; cursor: pointer; background: none; border: 0; text-align: left; padding: 4px 0; }
+.qt { display: block; font-weight: 700; overflow-wrap: anywhere; }
+.qm { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; font-size: .75rem; color: var(--muted); }
+.pill { border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; }
+.xp { font: 700 .85rem var(--font-display); color: var(--xp); text-align: right; white-space: nowrap; }
+.hp { height: 8px; border-radius: 4px; background: #0d1116; overflow: hidden; margin-top: 6px; border: 1px solid #3b2224; }
+.hp i { display: block; height: 100%; background: var(--boss); }
+.empty { color: var(--muted); font-size: .9rem; margin: 0; padding: 4px 2px; }
+
+.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); min-height: 56px; padding: 0 22px; border-radius: 16px; border: 0; background: var(--gold); color: #241a00; font: 700 1.05rem var(--font-display); box-shadow: 0 10px 30px rgba(0,0,0,.45); cursor: pointer; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 10px; }
+.skill { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: .9rem; }
+.skill .bar { grid-column: 1 / -1; height: 8px; margin: 2px 0 0; }
+.skill b { font-family: var(--font-display); }
+.ach { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.badge { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: .82rem; color: var(--muted); }
+.badge b { display: block; font-family: var(--font-display); color: var(--ink); font-size: .95rem; }
+.badge.locked { opacity: .45; filter: grayscale(1); }
+.logrow { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; padding: 6px 0; border-top: 1px solid var(--line); }
+.logrow:first-child { border-top: 0; }
+.logrow span:last-child { color: var(--xp); white-space: nowrap; font-family: var(--font-display); }
+.loot { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.loot b { display: block; }
+.loot small { color: var(--muted); }
+.btn { min-height: 44px; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); font: 700 .95rem var(--font-display); cursor: pointer; }
+.btn.gold { background: var(--gold); color: #241a00; border-color: transparent; }
+.btn.danger { color: var(--boss); }
+.btn:disabled { opacity: .45; cursor: default; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.note { color: var(--muted); font-size: .85rem; margin: 0; }
+
+.scrim { position: fixed; inset: 0; background: rgba(5,8,12,.7); display: grid; align-items: end; z-index: 10; }
+.sheet { background: var(--panel); border-top: 2px solid var(--line); border-radius: 20px 20px 0 0; max-height: 92vh; overflow: auto; padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 18px) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 12px; width: 100%; max-width: 560px; margin: 0 auto; }
+.sheet h3 { font: 700 1.2rem var(--font-display); margin: 0; }
+.field { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); }
+.field input, .field select { min-height: 46px; border-radius: 10px; border: 1px solid var(--line); background: #0f1318; color: var(--ink); font: 1rem var(--font-body); padding: 8px 12px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { min-height: 40px; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--line); background: #0f1318; color: var(--muted); cursor: pointer; font-size: .9rem; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: transparent; font-weight: 700; }
+.steps { display: grid; gap: 6px; }
+.steprow { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 4px; background: #0f1318; border-radius: 10px; }
+.steprow.done span.t { text-decoration: line-through; color: var(--muted); }
+.steprow button { width: 44px; height: 44px; border: 0; background: none; cursor: pointer; color: var(--muted); }
+.addstep { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.addstep input { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: #0f1318; color: var(--ink); font: 1rem var(--font-body); padding: 8px 12px; }
+
+.toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translateX(-50%); background: #263140; border: 2px solid var(--gold); color: var(--ink); padding: 10px 16px; border-radius: 12px; font: 700 .95rem var(--font-display); z-index: 20; display: flex; gap: 12px; align-items: center; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.toast button { background: none; border: 0; color: var(--gold); cursor: pointer; font: 700 .9rem var(--font-display); padding: 4px 0; }
+.levelup { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(5,8,12,.8); z-index: 30; text-align: center; }
+.levelup div { background: var(--panel); border: 3px solid var(--gold); border-radius: 20px; padding: 28px 30px; display: grid; gap: 8px; }
+.levelup b { font: 700 2.2rem var(--font-display); color: var(--gold); }
+.levelup p { margin: 0; color: var(--muted); }
+.float { position: fixed; font: 700 1rem var(--font-display); color: var(--xp); pointer-events: none; z-index: 25; }
+@media (prefers-reduced-motion: no-preference) {
+  .float { animation: rise .9s ease-out forwards; }
+  @keyframes rise { to { transform: translateY(-46px); opacity: 0; } }
+  .levelup div { animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes pop { from { transform: scale(.7); } }
+}
+@media (prefers-reduced-motion: reduce) { .float { display: none; } }
+</style>
+</head><body>
+<div class="wrap">
+  <section class="hero" aria-label="Your hero">
+    <div class="crest" id="crest">?<small id="lvl">LV 1</small></div>
+    <div>
+      <p class="hname"><span id="hname">Adventurer</span><span class="htitle" id="htitle"></span></p>
+      <div class="bar" role="progressbar" aria-label="XP to next level" id="xpbar"><i id="xpfill"></i></div>
+      <div class="stats"><span id="xptext"></span><span class="gold" id="goldtext"></span></div>
+    </div>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="quests" type="button">Quests</button>
+    <button class="tab" role="tab" data-tab="hero" type="button">Hero</button>
+    <button class="tab" role="tab" data-tab="loot" type="button">Loot</button>
+  </div>
+
+  <section id="v-quests">
+    <h2>Dailies <span id="dailynote"></span></h2>
+    <div class="group" id="g-daily"></div>
+    <h2>Bosses <span>big dreaded jobs, one hit at a time</span></h2>
+    <div class="group" id="g-boss"></div>
+    <h2>Main quests <span>bigger goals with steps</span></h2>
+    <div class="group" id="g-main"></div>
+    <h2>Side quests</h2>
+    <div class="group" id="g-side"></div>
+    <h2 id="donehead" hidden>Completed today</h2>
+    <div class="group" id="g-done"></div>
+  </section>
+
+  <section id="v-hero" hidden>
+    <div class="card">
+      <h2 style="margin:0">Skills</h2>
+      <div id="skills" class="group"></div>
+    </div>
+    <h2>Achievements <span id="achcount"></span></h2>
+    <div class="ach" id="ach"></div>
+    <h2>Adventure log</h2>
+    <div class="card" id="log"></div>
+    <h2>Settings</h2>
+    <div class="card">
+      <label class="field" for="nameinput">Hero name<input id="nameinput" maxlength="24" autocomplete="off"></label>
+      <p class="note">Your quests live on this phone. Back up now and then so a new phone doesn't wipe your hero.</p>
+      <div class="row2"><button class="btn" id="backup" type="button">Back up</button><button class="btn" id="restore" type="button">Restore</button></div>
+      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <section id="v-loot" hidden>
+    <p class="note">Spend gold from finished quests on real rewards you set for yourself.</p>
+    <div class="group" id="loot"></div>
+    <div class="card">
+      <label class="field" for="lootname">New reward<input id="lootname" maxlength="60" placeholder="e.g. Buy that new game"></label>
+      <div class="row2">
+        <label class="field" for="lootcost">Cost in gold<input id="lootcost" type="number" inputmode="numeric" min="1" value="50"></label>
+        <button class="btn gold" id="lootadd" type="button" style="align-self:end">Add reward</button>
+      </div>
+    </div>
+    <h2>Claimed</h2>
+    <div class="card" id="claimed"></div>
+  </section>
+</div>
+
+<button class="fab" id="fab" type="button">+ New quest</button>
+<div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" hidden><span id="tmsg"></span><button id="tundo" type="button" hidden>Undo</button></div>
+<div class="levelup" id="levelup" hidden><div><b id="lvtext">LEVEL 2</b><p id="lvsub"></p><button class="btn gold" id="lvok" type="button">Onward</button></div></div>
+
+<script>
+const KEY = "quest-log-v1"; // every app on this site shares one browser storage
+const $ = id => document.getElementById(id);
+const DIFF = { easy: { label: "Easy", xp: 10 }, med: { label: "Medium", xp: 25 }, hard: { label: "Hard", xp: 50 }, epic: { label: "Epic", xp: 100 } };
+const TYPES = { daily: "Daily", side: "Side quest", main: "Main quest", boss: "Boss" };
+const SKILLS = {
+  body:   { label: "Body",   hint: "workouts, mobility, sleep" },
+  shred:  { label: "Shred",  hint: "skate, snow, bike, disc golf" },
+  mind:   { label: "Mind",   hint: "reading, learning, philosophy" },
+  craft:  { label: "Craft",  hint: "work, code, building things" },
+  home:   { label: "Home",   hint: "chores, pets, errands, money" },
+  social: { label: "Social", hint: "friends, family, partner" }
+};
+const TITLES = ["Peasant", "Squire", "Adventurer", "Ranger", "Knight", "Champion", "Hero", "Warlord", "Archmage", "Legend", "Mythic"];
+const today = () => new Date().toLocaleDateString("en-CA");
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+function starter() {
+  const t = today();
+  return {
+    hero: { name: "Adventurer", xp: 0, gold: 0 },
+    skills: {},
+    quests: [
+      { id: uid(), type: "daily", title: "Feed and play with the crew", diff: "easy", skill: "home", steps: [], doneDates: [], created: t },
+      { id: uid(), type: "daily", title: "10-minute mobility flow", diff: "easy", skill: "body", steps: [], doneDates: [], created: t },
+      { id: uid(), type: "daily", title: "Read 10 pages", diff: "easy", skill: "mind", steps: [], doneDates: [], created: t },
+      { id: uid(), type: "boss", title: "The Garage of Doom", diff: "epic", skill: "home", steps: [{ t: "Pull everything out", done: false }, { t: "Sort keep / sell / toss", done: false }, { t: "Haul the junk", done: false }, { t: "Put it all back neat", done: false }], created: t },
+      { id: uid(), type: "main", title: "Learn a new trick", diff: "hard", skill: "shred", steps: [{ t: "Watch a breakdown", done: false }, { t: "Practice 3 sessions", done: false }, { t: "Land it clean", done: false }], created: t },
+      { id: uid(), type: "side", title: "Answer that email you've been avoiding", diff: "med", skill: "craft", steps: [], created: t }
+    ],
+    rewards: [
+      { id: uid(), title: "Guilt-free gaming night", cost: 60 },
+      { id: uid(), title: "Takeout of my choice", cost: 120 },
+      { id: uid(), title: "New board, game or gear", cost: 600 }
+    ],
+    claimed: [], log: [], ach: {}, best: 0
+  };
+}
+let S;
+function load() { try { S = JSON.parse(localStorage.getItem(KEY)); } catch {} if (!S || !S.hero) S = starter(); S.skills = S.skills || {}; S.ach = S.ach || {}; S.log = S.log || []; S.claimed = S.claimed || []; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
+
+// Level L needs 60*L*(L+1)/2 total XP to pass: 60, 180, 360, 600...
+const needFor = L => 30 * L * (L + 1);
+function levelOf(xp) { let L = 1; while (xp >= needFor(L)) L++; return L; }
+function skillLevel(xp) { let L = 1; while (xp >= 15 * L * (L + 1)) L++; return L; }
+
+function streak() {
+  const dailies = S.quests.filter(q => q.type === "daily");
+  if (!dailies.length) return 0;
+  const allDone = d => dailies.every(q => (q.doneDates || []).includes(d) || q.created > d);
+  let n = 0; const d = new Date(); d.setHours(12);
+  if (!allDone(today())) d.setDate(d.getDate() - 1);
+  while (n < 3650) { const k = d.toLocaleDateString("en-CA"); if (!allDone(k) || dailies.every(q => q.created > k)) break; n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+
+let toastT;
+function toast(msg, undo) {
+  const t = $("toast"); $("tmsg").textContent = msg; t.hidden = false;
+  $("tundo").hidden = !undo; $("tundo").onclick = () => { t.hidden = true; undo && undo(); };
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, undo ? 5000 : 2200);
+}
+function floatXP(el, txt) {
+  const r = el.getBoundingClientRect(); const f = document.createElement("div");
+  f.className = "float"; f.textContent = txt; f.style.left = (r.left + r.width / 2 - 20) + "px"; f.style.top = (r.top - 6) + "px";
+  document.body.append(f); setTimeout(() => f.remove(), 950);
+}
+
+function grant(xp, gold, quest, label, el) {
+  const before = levelOf(S.hero.xp);
+  S.hero.xp += xp; S.hero.gold += gold;
+  if (quest && quest.skill) S.skills[quest.skill] = (S.skills[quest.skill] || 0) + xp;
+  S.log.unshift({ t: label, xp, gold, d: today() }); S.log = S.log.slice(0, 200);
+  if (el) floatXP(el, "+" + xp + " XP");
+  const after = levelOf(S.hero.xp);
+  checkAch();
+  save();
+  if (after > before) setTimeout(() => {
+    $("lvtext").textContent = "LEVEL " + after;
+    $("lvsub").textContent = "You are now a " + TITLES[Math.min(TITLES.length - 1, Math.floor((after - 1) / 3))] + ".";
+    $("levelup").hidden = false; $("lvok").focus();
+  }, 350);
+}
+function ungrant(xp, gold, quest) {
+  S.hero.xp = Math.max(0, S.hero.xp - xp); S.hero.gold = Math.max(0, S.hero.gold - gold);
+  if (quest && quest.skill) S.skills[quest.skill] = Math.max(0, (S.skills[quest.skill] || 0) - xp);
+  S.log.shift(); save();
+}
+$("lvok").onclick = () => $("levelup").hidden = true;
+
+const ACH = [
+  ["first", "First blood", "Finish your first quest", () => S.log.length >= 1],
+  ["ten", "Getting busy", "Finish 10 quests", () => S.log.filter(l => l.xp > 0).length >= 10],
+  ["fifty", "Quest machine", "Finish 50 quests", () => S.log.filter(l => l.xp > 0).length >= 50],
+  ["boss", "Boss slayer", "Defeat a boss", () => S.log.some(l => l.boss)],
+  ["streak3", "Warming up", "3-day daily streak", () => S.best >= 3],
+  ["streak7", "On a roll", "7-day daily streak", () => S.best >= 7],
+  ["streak30", "Unbreakable", "30-day daily streak", () => S.best >= 30],
+  ["lv5", "Seasoned", "Reach level 5", () => levelOf(S.hero.xp) >= 5],
+  ["lv10", "Veteran", "Reach level 10", () => levelOf(S.hero.xp) >= 10],
+  ["loot", "Treat yo self", "Claim a reward", () => S.claimed.length >= 1],
+  ["rich", "Dragon hoard", "Hold 500 gold", () => S.hero.gold >= 500],
+  ["wide", "Well rounded", "Level 3 in every skill", () => Object.keys(SKILLS).every(k => skillLevel(S.skills[k] || 0) >= 3)]
+];
+function checkAch() {
+  S.best = Math.max(S.best || 0, streak());
+  for (const [id, name] of ACH) if (!S.ach[id] && ACH.find(a => a[0] === id)[3]()) { S.ach[id] = today(); setTimeout(() => toast("Achievement: " + name), 900); }
+}
+
+function renderHero() {
+  const L = levelOf(S.hero.xp), lo = L > 1 ? needFor(L - 1) : 0, hi = needFor(L);
+  $("crest").firstChild.textContent = (S.hero.name || "A").trim().charAt(0).toUpperCase() || "A";
+  $("lvl").textContent = "LV " + L;
+  $("hname").textContent = S.hero.name || "Adventurer";
+  $("htitle").textContent = TITLES[Math.min(TITLES.length - 1, Math.floor((L - 1) / 3))];
+  const pct = Math.round(((S.hero.xp - lo) / (hi - lo)) * 100);
+  $("xpfill").style.width = pct + "%"; $("xpbar").setAttribute("aria-valuenow", pct);
+  $("xptext").textContent = (S.hero.xp - lo) + " / " + (hi - lo) + " XP to level " + (L + 1);
+  $("goldtext").textContent = S.hero.gold + " gold";
+}
+
+function questRow(q) {
+  const isDaily = q.type === "daily";
+  const done = isDaily ? (q.doneDates || []).includes(today()) : !!q.done;
+  const el = document.createElement("div"); el.className = "quest " + q.type + (done ? " done" : "");
+  const chk = document.createElement("button"); chk.className = "check"; chk.type = "button";
+  chk.setAttribute("aria-label", (done ? "Undo " : "Complete ") + q.title);
+  chk.innerHTML = "<span>" + (done ? "✓" : "") + "</span>";
+  const steps = q.steps || [], left = steps.filter(s => !s.done).length;
+  if ((q.type === "boss" || q.type === "main") && steps.length && left > 0 && !done) chk.setAttribute("aria-label", "Open " + q.title + " to hit its next step");
+  chk.onclick = () => complete(q, chk);
+  const body = document.createElement("button"); body.className = "qbody"; body.type = "button";
+  const t = document.createElement("span"); t.className = "qt"; t.textContent = q.title;
+  const m = document.createElement("span"); m.className = "qm";
+  const pills = [DIFF[q.diff].label, SKILLS[q.skill] ? SKILLS[q.skill].label : null];
+  if (steps.length) pills.push((steps.length - left) + "/" + steps.length + " steps");
+  if (isDaily) { const n = (q.doneDates || []).length; if (n) pills.push("done " + n + "×"); }
+  for (const p of pills.filter(Boolean)) { const s = document.createElement("span"); s.className = "pill"; s.textContent = p; m.append(s); }
+  body.append(t, m);
+  if (q.type === "boss" && steps.length) { const hp = document.createElement("div"); hp.className = "hp"; hp.innerHTML = "<i></i>"; hp.firstChild.style.width = (left / steps.length * 100) + "%"; hp.setAttribute("aria-label", "Boss HP " + left + " of " + steps.length); body.append(hp); }
+  body.onclick = () => openQuest(q);
+  const xp = document.createElement("span"); xp.className = "xp"; xp.textContent = rewardFor(q).xp + " XP";
+  el.append(chk, body, xp);
+  return el;
+}
+function rewardFor(q) { const base = DIFF[q.diff].xp; const xp = q.type === "boss" ? base * 2 : base; return { xp, gold: Math.round(xp / 2) }; }
+
+function complete(q, el) {
+  const r = rewardFor(q);
+  if (q.type === "daily") {
+    q.doneDates = q.doneDates || [];
+    if (q.doneDates.includes(today())) { q.doneDates = q.doneDates.filter(d => d !== today()); ungrant(r.xp, r.gold, q); render(); return; }
+    q.doneDates.push(today()); grant(r.xp, r.gold, q, q.title, el);
+    const s = streak(); render();
+    if (S.quests.filter(x => x.type === "daily").every(x => (x.doneDates || []).includes(today()))) toast("All dailies done · streak " + s + " 🔥");
+    return;
+  }
+  if (q.done) { q.done = false; ungrant(r.xp, r.gold, q); render(); return; }
+  const left = (q.steps || []).filter(s => !s.done);
+  if ((q.type === "boss" || q.type === "main") && left.length) { openQuest(q); return; }
+  finish(q, el);
+}
+function finish(q, el) {
+  const r = rewardFor(q);
+  q.done = true; q.doneOn = today();
+  grant(r.xp, r.gold, q, q.title, el);
+  if (q.type === "boss") { S.log[0].boss = true; checkAch(); save(); }
+  render();
+  toast((q.type === "boss" ? "Boss defeated! " : "Quest complete! ") + "+" + r.gold + " gold", () => { q.done = false; ungrant(r.xp, r.gold, q); render(); });
+}
+
+function render() {
+  renderHero();
+  const groups = { daily: [], boss: [], main: [], side: [] }, doneToday = [];
+  for (const q of S.quests) {
+    if (q.type !== "daily" && q.done) { if (q.doneOn === today()) doneToday.push(q); continue; }
+    groups[q.type].push(q);
+  }
+  for (const [k, list] of Object.entries(groups)) {
+    const g = $("g-" + k); g.innerHTML = "";
+    if (!list.length) { g.innerHTML = '<p class="empty">' + { daily: "No dailies yet. Add a habit you want to keep.", boss: "No bosses. Got a dreaded job? Make it a boss.", main: "No main quests right now.", side: "No side quests. Nice." }[k] + "</p>"; continue; }
+    list.forEach(q => g.append(questRow(q)));
+  }
+  $("donehead").hidden = !doneToday.length;
+  const gd = $("g-done"); gd.innerHTML = ""; doneToday.forEach(q => gd.append(questRow(q)));
+  const s = streak(); $("dailynote").textContent = s ? "🔥 " + s + "-day streak" : "resets each day";
+}
+
+function renderHeroTab() {
+  const sk = $("skills"); sk.innerHTML = "";
+  for (const [k, v] of Object.entries(SKILLS)) {
+    const xp = S.skills[k] || 0, L = skillLevel(xp), lo = L > 1 ? 15 * (L - 1) * L : 0, hi = 15 * L * (L + 1);
+    const el = document.createElement("div"); el.className = "skill";
+    el.innerHTML = '<b></b><span class="htitle"></span><div class="bar"><i></i></div>';
+    el.querySelector("b").textContent = v.label + " · LV " + L;
+    el.querySelector("span").textContent = v.hint;
+    el.querySelector("i").style.width = Math.round((xp - lo) / (hi - lo) * 100) + "%";
+    sk.append(el);
+  }
+  const a = $("ach"); a.innerHTML = ""; let got = 0;
+  for (const [id, name, desc] of ACH) {
+    const on = !!S.ach[id]; if (on) got++;
+    const b = document.createElement("div"); b.className = "badge" + (on ? "" : " locked");
+    b.innerHTML = "<b></b><span></span>"; b.querySelector("b").textContent = (on ? "🏆 " : "🔒 ") + name; b.querySelector("span").textContent = desc;
+    a.append(b);
+  }
+  $("achcount").textContent = got + " / " + ACH.length;
+  const lg = $("log"); lg.innerHTML = "";
+  if (!S.log.length) lg.innerHTML = '<p class="empty">Finished quests show up here.</p>';
+  for (const l of S.log.slice(0, 25)) {
+    const r = document.createElement("div"); r.className = "logrow";
+    const a1 = document.createElement("span"); a1.textContent = l.t; const a2 = document.createElement("span");
+    a2.textContent = l.xp ? "+" + l.xp + " XP" : "−" + l.gold + " gold"; if (!l.xp) a2.style.color = "var(--gold)";
+    r.append(a1, a2); lg.append(r);
+  }
+  $("nameinput").value = S.hero.name || "";
+}
+$("nameinput").oninput = () => { S.hero.name = $("nameinput").value.trim() || "Adventurer"; save(); renderHero(); };
+
+function renderLoot() {
+  const box = $("loot"); box.innerHTML = "";
+  if (!S.rewards.length) box.innerHTML = '<p class="empty">Add a reward below.</p>';
+  for (const r of S.rewards) {
+    const el = document.createElement("div"); el.className = "loot";
+    el.innerHTML = '<div><b></b><small></small></div><div style="display:flex;gap:6px"><button class="btn" type="button" aria-label="Delete reward">✕</button><button class="btn gold" type="button">Claim</button></div>';
+    el.querySelector("b").textContent = r.title; el.querySelector("small").textContent = r.cost + " gold";
+    const [del, buy] = el.querySelectorAll("button");
+    buy.disabled = S.hero.gold < r.cost; if (buy.disabled) buy.textContent = (r.cost - S.hero.gold) + " to go";
+    buy.onclick = () => {
+      S.hero.gold -= r.cost; S.claimed.unshift({ t: r.title, d: today(), cost: r.cost });
+      S.log.unshift({ t: "Claimed: " + r.title, xp: 0, gold: r.cost, d: today() }); checkAch(); save(); renderHero(); renderLoot();
+      toast("Enjoy it. You earned it.", () => { S.hero.gold += r.cost; S.claimed.shift(); S.log.shift(); save(); renderHero(); renderLoot(); });
+    };
+    del.onclick = () => { const i = S.rewards.indexOf(r); S.rewards.splice(i, 1); save(); renderLoot(); toast("Reward deleted", () => { S.rewards.splice(i, 0, r); save(); renderLoot(); }); };
+    box.append(el);
+  }
+  const c = $("claimed"); c.innerHTML = "";
+  if (!S.claimed.length) c.innerHTML = '<p class="empty">Nothing claimed yet.</p>';
+  for (const x of S.claimed.slice(0, 20)) { const r = document.createElement("div"); r.className = "logrow"; const a = document.createElement("span"); a.textContent = x.t; const b = document.createElement("span"); b.textContent = new Date(x.d + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }); b.style.color = "var(--muted)"; r.append(a, b); c.append(r); }
+}
+$("lootadd").onclick = () => {
+  const t = $("lootname").value.trim(), c = Math.max(1, parseInt($("lootcost").value, 10) || 0);
+  if (!t) { $("lootname").focus(); return; }
+  S.rewards.push({ id: uid(), title: t, cost: c }); $("lootname").value = ""; save(); renderLoot();
+};
+
+// ---------- Sheet: add / edit quest ----------
+function closeSheet() { $("scrim").hidden = true; }
+$("scrim").onclick = e => { if (e.target === $("scrim")) closeSheet(); };
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeSheet(); $("levelup").hidden = true; } });
+
+function seg(name, opts, val) {
+  return '<div class="seg" role="group" aria-label="' + name + '" data-seg="' + name + '">' +
+    Object.entries(opts).map(([k, v]) => '<button type="button" data-v="' + k + '" aria-pressed="' + (k === val) + '">' + (v.label || v) + "</button>").join("") + "</div>";
+}
+function openQuest(q) {
+  const isNew = !q;
+  const d = q ? JSON.parse(JSON.stringify(q)) : { id: uid(), type: "side", title: "", diff: "med", skill: "craft", steps: [], doneDates: [], created: today() };
+  const sh = $("sheet");
+  sh.innerHTML = '<h3>' + (isNew ? "New quest" : "Edit quest") + '</h3>' +
+    '<label class="field" for="qtitle">Quest<input id="qtitle" maxlength="80" autocomplete="off" placeholder="What needs doing?"></label>' +
+    '<div class="field">Type' + seg("type", TYPES, d.type) + '</div>' +
+    '<div class="field">Difficulty' + seg("diff", DIFF, d.diff) + '</div>' +
+    '<div class="field">Skill' + seg("skill", SKILLS, d.skill) + '</div>' +
+    '<div class="field" id="stepsfield">Steps <span id="stephint"></span><div class="steps" id="steps"></div>' +
+    '<div class="addstep"><input id="newstep" maxlength="80" placeholder="Add a step" aria-label="New step"><button class="btn" id="addstep" type="button">Add</button></div></div>' +
+    '<p class="note" id="rewardnote"></p>' +
+    '<div class="row2">' + (isNew ? '<button class="btn" id="cancel" type="button">Cancel</button>' : '<button class="btn danger" id="delq" type="button">Delete</button>') +
+    '<button class="btn gold" id="saveq" type="button">' + (isNew ? "Add quest" : "Save") + '</button></div>';
+  $("qtitle").value = d.title;
+  const live = isNew ? null : S.quests.find(x => x.id === q.id);
+  function paint() {
+    sh.querySelectorAll("[data-seg]").forEach(g => g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === d[g.dataset.seg]))));
+    $("stepsfield").hidden = d.type === "daily";
+    $("stephint").textContent = d.type === "boss" ? "(each step is a hit on its HP)" : d.type === "main" ? "(each step earns a little XP)" : "(optional)";
+    const r = rewardFor(d); $("rewardnote").textContent = "Reward: " + r.xp + " XP and " + r.gold + " gold" + (d.type === "daily" ? " each day." : d.type === "boss" ? " when it falls (bosses pay double)." : ".");
+    const st = $("steps"); st.innerHTML = "";
+    d.steps.forEach((s, i) => {
+      const row = document.createElement("div"); row.className = "steprow" + (s.done ? " done" : "");
+      row.innerHTML = '<button type="button"></button><span class="t"></span><button type="button" aria-label="Remove step">✕</button>';
+      const [tick, , rm] = row.children; row.children[1].textContent = s.t;
+      tick.textContent = s.done ? "☑" : "☐"; tick.setAttribute("aria-label", (s.done ? "Undo " : "Do ") + s.t);
+      tick.onclick = () => {
+        s.done = !s.done;
+        if (!isNew && live) {
+          live.steps = JSON.parse(JSON.stringify(d.steps));
+          const stepXP = d.type === "boss" ? 5 : 5;
+          if (s.done) grant(stepXP, 0, live, (d.type === "boss" ? "Hit " : "Step: ") + s.t, tick); else ungrant(stepXP, 0, live);
+          if (live.steps.every(x => x.done)) { closeSheet(); finish(live, tick); return; }
+          render();
+        }
+        paint();
+      };
+      rm.onclick = () => { d.steps.splice(i, 1); paint(); };
+      st.append(row);
+    });
+  }
+  sh.querySelectorAll("[data-seg]").forEach(g => g.onclick = e => { const b = e.target.closest("button"); if (!b) return; d[g.dataset.seg] = b.dataset.v; paint(); });
+  const addStep = () => { const v = $("newstep").value.trim(); if (!v) return; d.steps.push({ t: v, done: false }); $("newstep").value = ""; paint(); $("newstep").focus(); };
+  $("addstep").onclick = addStep; $("newstep").onkeydown = e => { if (e.key === "Enter") addStep(); };
+  $("saveq").onclick = () => {
+    d.title = $("qtitle").value.trim(); if (!d.title) { $("qtitle").focus(); return; }
+    if (d.type === "daily") d.steps = [];
+    if (isNew) S.quests.push(d); else Object.assign(live, d, { doneDates: live.doneDates, done: live.done, doneOn: live.doneOn });
+    save(); closeSheet(); render(); toast(isNew ? "Quest accepted" : "Quest updated");
+  };
+  if (isNew) $("cancel").onclick = closeSheet;
+  else $("delq").onclick = () => { const i = S.quests.indexOf(live); S.quests.splice(i, 1); save(); closeSheet(); render(); toast("Quest abandoned", () => { S.quests.splice(i, 0, live); save(); render(); }); };
+  paint(); $("scrim").hidden = false; if (isNew) setTimeout(() => $("qtitle").focus(), 50);
+}
+$("fab").onclick = () => openQuest(null);
+
+// ---------- Backup ----------
+$("backup").onclick = () => {
+  const name = "quest-log-backup-" + today() + ".json";
+  const blob = new Blob([JSON.stringify({ app: "quest-log", S }, null, 1)], { type: "application/json" });
+  const file = new File([blob], name, { type: "application/json" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Quest Log backup" }).catch(() => {}); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("Backup saved");
+};
+$("restore").onclick = () => { $("restoreFile").value = ""; $("restoreFile").click(); };
+$("restoreFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const d = JSON.parse(await f.text()); if (!d || d.app !== "quest-log" || !d.S || !d.S.hero) throw 0; S = d.S; save(); load(); render(); renderHeroTab(); toast("Hero restored"); }
+  catch { toast("That isn't a Quest Log backup"); }
+};
+
+function setTab(t) {
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  $("v-quests").hidden = t !== "quests"; $("v-hero").hidden = t !== "hero"; $("v-loot").hidden = t !== "loot";
+  $("fab").hidden = t !== "quests";
+  if (t === "hero") renderHeroTab(); if (t === "loot") renderLoot(); if (t === "quests") render();
+}
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+
+load(); setTab("quests");
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>
