@@ -143,6 +143,8 @@ select{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;border
 .switch input:checked+span{background:var(--mob)}
 .switch input:checked+span::after{transform:translateX(22px);background:var(--ink)}
 .switch input:focus-visible+span{outline:3px solid var(--chalk);outline-offset:2px}
+.voicebox{display:flex;flex-direction:column;gap:10px;padding:14px 0 4px}
+.voicebox label{font-weight:700}
 
 /* Strength logger */
 .ex{display:flex;flex-direction:column;gap:10px;padding-top:18px;border-top:2px solid var(--rule)}
@@ -466,7 +468,7 @@ const ICON = {
 /* ---------- Storage ---------- */
 function freshDB() {
   return { v:1, onboarded:false, installHidden:false,
-    settings:{ week:["strA","hips","spine","strB","flow","deep","reset"], len:"std", beeps:true, voice:true, vibrate:true, rest:90, unit:"lb", swaps:{} },
+    settings:{ week:["strA","hips","spine","strB","flow","deep","reset"], len:"std", beeps:true, voice:true, voiceURI:"", vibrate:true, rest:90, unit:"lb", swaps:{} },
     log:[], tests:[], draft:null };
 }
 function load() {
@@ -889,6 +891,22 @@ function spark(series, t) {
   return `<svg viewBox="0 0 110 36" aria-hidden="true">${paths}</svg>`;
 }
 
+function voiceBox() {
+  if (!("speechSynthesis" in window) || !db.settings.voice) return "";
+  if (!VOICES.length) loadVoices();
+  const best = VOICES[0], cur = db.settings.voiceURI || "";
+  const ua = navigator.userAgent, ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1), android = /android/i.test(ua);
+  const tip = ios ? (hasGoodVoice()
+      ? "Want more choices? Download extra voices in your iPhone's Settings > Accessibility > Spoken Content > Voices > English."
+      : "Your iPhone only has its basic voices right now. For a much more human voice, open Settings > Accessibility > Spoken Content > Voices > English and download one marked Premium or Enhanced. Ava, Zoe and Evan sound the most natural. Then pick it here.")
+    : android ? "For a more natural voice, open your phone's Settings, search for Text-to-speech, and install a higher-quality English voice. Then pick it here."
+    : "Voices come from your device. Ones marked Premium, Enhanced or Natural sound the most human.";
+  const opts = [["", `Automatic${best ? `: ${voiceLabel(best)}` : ""}`], ...VOICES.slice(0, 40).map(v => [v.voiceURI, voiceLabel(v)])];
+  return `<div class="voicebox"><label for="s-voiceURI">Voice</label>
+    <select id="s-voiceURI" data-set="voiceURI">${opts.map(([v, l]) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>
+    <button class="btn ghost" data-act="voice-test">Play a sample</button>
+    <p class="mist small">${esc(tip)}</p></div>`;
+}
 function viewSettings() {
   const sw = (key, label, sub) => `<div class="setrow"><span class="lbl"><span>${label}</span>${sub ? `<small>${sub}</small>` : ""}</span>
     <label class="switch"><input type="checkbox" role="switch" data-set="${key}" ${db.settings[key] ? "checked" : ""} aria-label="${label}"><span></span></label></div>`;
@@ -904,7 +922,7 @@ function viewSettings() {
     ${sw("beeps", "Beeps", "Countdown ticks before each change")}
     ${sw("voice", "Voice cues", "Says the next move and when to switch sides")}
     ${"vibrate" in navigator ? sw("vibrate", "Vibrate", "Buzz along with the beeps") : ""}
-  </div><p class="mist small">On iPhone, beeps follow the ring/silent switch. Voice cues play either way.</p></section>
+  </div>${voiceBox()}<p class="mist small">On iPhone, beeps follow the ring/silent switch. Voice cues play either way.</p></section>
   <section class="sec"><h2 class="h2">Your data</h2>
     <p class="mist">Everything stays on this phone. Back up now and then so a new phone or a cleared browser doesn't wipe your history.</p>
     <div class="stack-s"><button class="btn ghost" data-act="backup">Back up</button><button class="btn ghost" data-act="restore">Restore from a backup</button>
@@ -952,9 +970,50 @@ function tone(kind) {
   }
   if (db.settings.vibrate && navigator.vibrate) navigator.vibrate(kind === "tick" ? 35 : kind === "done" ? [120, 80, 120] : 160);
 }
-function speak(text) {
-  if (!db.settings.voice || !("speechSynthesis" in window)) return;
-  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate = 1.02; speechSynthesis.speak(u); } catch (e) {}
+/* Voices come from the phone. Rank them so the most natural one is used unless the person picks another. */
+let VOICES = [];
+const ROBOTIC = /eloquence|albert|bad ?news|bahh|bells|boing|bubbles|cellos|good ?news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|deranged|hysterical|\bfred\b|junior|ralph|kathy|grandma|grandpa|\beddy\b|\bflo\b|\breed\b|rocko|sandy|shelley/i;
+function voiceScore(v) {
+  const id = `${v.name} ${v.voiceURI}`;
+  let s = 0;
+  if (/premium/i.test(id)) s += 100; else if (/enhanced/i.test(id)) s += 80;
+  if (/natural|neural/i.test(id)) s += 70;
+  if (/online|network/i.test(id)) s += 40;
+  if (/^google/i.test(v.name)) s += 45;
+  if (/compact/i.test(id)) s -= 10;
+  if (ROBOTIC.test(id)) s -= 200;
+  if (/^en[-_]US/i.test(v.lang)) s += 12; else if (/^en[-_](GB|AU|IE|CA|NZ)/i.test(v.lang)) s += 8;
+  if (/\b(ava|zoe|evan|nathan|noelle|joelle|samantha|aria|jenny)\b/i.test(v.name)) s += 5;
+  return s;
+}
+function loadVoices() {
+  try { VOICES = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)); }
+  catch (e) { VOICES = []; }
+  return VOICES;
+}
+function pickVoice() {
+  if (!VOICES.length) loadVoices();
+  const want = db.settings.voiceURI;
+  return (want && VOICES.find(v => v.voiceURI === want)) || VOICES[0] || null;
+}
+const hasGoodVoice = () => VOICES.some(v => voiceScore(v) >= 75);
+const ACCENT = { GB:"British", AU:"Australian", IE:"Irish", IN:"Indian", ZA:"South African", NZ:"New Zealand", CA:"Canadian", SG:"Singapore" };
+function voiceLabel(v) { const reg = (v.lang.split(/[-_]/)[1] || "").toUpperCase(); return v.name + (ACCENT[reg] ? `, ${ACCENT[reg]}` : ""); }
+if ("speechSynthesis" in window) {
+  loadVoices();
+  const onVoices = () => { loadVoices(); if (ui.tab === "settings" && !ui.view && !P.on) render(); };
+  try { speechSynthesis.addEventListener("voiceschanged", onVoices); } catch (e) { speechSynthesis.onvoiceschanged = onVoices; }
+}
+function speak(text, force) {
+  if ((!db.settings.voice && !force) || !("speechSynthesis" in window)) return;
+  try {
+    const u = new SpeechSynthesisUtterance(text), v = pickVoice();
+    if (v) { u.voice = v; u.lang = v.lang; }
+    u.rate = 0.96; u.pitch = 1;
+    // Safari can drop an utterance queued in the same instant as cancel(), so give it a beat.
+    if (speechSynthesis.speaking || speechSynthesis.pending) { speechSynthesis.cancel(); setTimeout(() => speechSynthesis.speak(u), 80); }
+    else speechSynthesis.speak(u);
+  } catch (e) {}
 }
 let wake = null;
 async function keepAwake(on) {
@@ -989,8 +1048,8 @@ function beginPhase(ph) {
   P.phase = ph; P.dur = ph === "prep" ? st.prep : st.secs; P.end = Date.now() + P.dur * 1000; P.left = P.dur * 1000;
   P.beeped = new Set(); P.half = false;
   if (ph === "prep") {
-    if (st.side === "Right" && P.i > 0 && P.steps[P.i - 1].m === st.m) speak("Switch sides");
-    else speak(`${P.i === 0 ? "First" : "Next"}: ${mv.n}${st.side ? ", left side" : ""}`);
+    if (st.side === "Right" && P.i > 0 && P.steps[P.i - 1].m === st.m) speak("Switch sides.");
+    else speak(`${P.i === 0 ? "First up" : "Next up"}: ${mv.n}.${st.side ? " Left side." : ""}`);
   } else tone("go");
   renderPlayer();
 }
@@ -1003,7 +1062,7 @@ function tick() {
   const left = (P.end - now) / 1000, sec = Math.ceil(left);
   if (sec >= 1 && sec <= 3 && !P.beeped.has(sec)) { P.beeped.add(sec); tone("tick"); }
   const mv = MOVES[P.steps[P.i].m];
-  if (P.phase === "work" && mv.half && !P.half && left <= P.dur / 2) { P.half = true; speak(mv.half); }
+  if (P.phase === "work" && mv.half && !P.half && left <= P.dur / 2) { P.half = true; speak(mv.half + "."); }
   if (left <= 0) { advance(); return; }
   paintTime(left);
 }
@@ -1132,7 +1191,7 @@ function restTick() {
   if (!rest.on) return;
   const left = (rest.end - Date.now()) / 1000, sec = Math.ceil(left);
   if (sec >= 1 && sec <= 3 && !rest.beeped.has(sec)) { rest.beeped.add(sec); tone("tick"); }
-  if (left <= 0) { tone("go"); speak("Next set"); stopRest(); return; }
+  if (left <= 0) { tone("go"); speak("Next set."); stopRest(); return; }
   const t = $("#rT"); if (t) t.textContent = fmtClock(Math.max(0, sec));
   const b = $("#rB"); if (b) b.style.width = `${Math.min(100, (1 - left / rest.total) * 100)}%`;
 }
@@ -1259,6 +1318,7 @@ const ACT = {
       : `<p>In Chrome, tap the ⋮ menu at the top right, then <b>Add to home screen</b> or <b>Install app</b>.</p>`}
       <p>After that, open Method from its icon. Your data stays on this phone.</p><button class="btn ghost" data-act="sheet-close">Got it</button>`);
   },
+  "voice-test"() { loadVoices(); speak("Next up: World's greatest stretch. Left side.", true); },
   "hide-install"() { db.installHidden = true; save(); render(); },
   "sheet-close"() { closeSheet(); },
   "ob-day"(v) { const i = +v, a = ui.onboardDays; ui.onboardDays = a.includes(i) ? a.filter(x => x !== i) : a.length >= 3 ? a : [...a, i]; onboard(); },
@@ -1294,6 +1354,7 @@ document.addEventListener("change", e => {
   else db.settings[key] = t.value;
   if (key === "len") ui.len = t.value;
   save();
+  if (key === "voiceURI") speak("Next up: World's greatest stretch. Left side.", true);
   if (key !== "week") render(); else toast(`${DOW[+t.dataset.v]}: ${t.value === "rest" ? "Rest day" : SESSIONS[t.value].n}`);
 });
 $("#restoreFile").addEventListener("change", async e => {
