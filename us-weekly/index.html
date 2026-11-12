@@ -1,0 +1,374 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Weekly Us</title>
+<meta name="theme-color" content="#1a1218">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Weekly Us">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: tabs (This week / Explore / Our weeks). This week = 8-card guided check-in with progress dots; one card on a dark plum table. Single dark theme by choice. */
+:root {
+  --table: #160f14;
+  --felt: #24171f;
+  --ink: #f3eef1;
+  --muted: #a8979f;
+  --line: #3a2a33;
+  --rose: #ff8fa3;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Literata", Georgia, "Times New Roman", serif;
+  --c-checkin: #8fd19e; --c-reflect: #7fb2ff; --c-deep: #9a8cff; --c-fun: #3fd0c0;
+  --c-funny: #ffc94a; --c-spicy: #ff7a5c; --c-intimate: #ff5fa2; --c-love: #f2c28b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--table); color: var(--ink); font-family: var(--font-body); -webkit-tap-highlight-color: transparent; }
+body { min-height: 100%; background: radial-gradient(120% 80% at 50% 0%, var(--felt), var(--table) 70%) fixed; }
+.wrap { max-width: 520px; margin: 0 auto; display: grid; gap: 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 18px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 40px) max(16px, env(safe-area-inset-left, 0px)); }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; margin: 0; }
+.sub { color: var(--muted); font-size: .85rem; font-family: var(--font-display); text-align: right; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); background: #1e141a; border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; }
+.tab { font-family: var(--font-display); font-weight: 700; font-size: .9rem; min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--ink); color: #1a1218; }
+button:focus-visible, .chip:focus-visible, textarea:focus-visible, .mini:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+
+.dots { display: flex; gap: 6px; justify-content: center; }
+.dot { width: 30px; height: 6px; border-radius: 3px; background: var(--line); border: 0; padding: 0; cursor: pointer; }
+.dot.done { background: color-mix(in oklab, var(--dc) 55%, var(--line)); }
+.dot.on { background: var(--dc); }
+.dot-hit { padding: 12px 0; background: none; border: 0; cursor: pointer; }
+
+.card { --c: var(--c-deep); border-radius: 22px; padding: 3px; background: linear-gradient(160deg, var(--c), color-mix(in oklab, var(--c) 30%, #000) 60%, var(--c)); box-shadow: 0 20px 50px -20px color-mix(in oklab, var(--c) 60%, transparent); touch-action: pan-y; }
+.card.rare { background: linear-gradient(130deg, #ffd9e0, var(--c), #fff0f3, var(--c), #f2c28b); }
+.face { border-radius: 19px; background: linear-gradient(180deg, color-mix(in oklab, var(--c) 18%, #1b1318), #1b1318 45%); padding: 18px 20px 20px; display: grid; gap: 14px; min-height: 300px; align-content: start; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--font-display); }
+.kind { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .09em; color: var(--c); }
+.step { font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.title { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin: 0; color: var(--muted); }
+.q { font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; line-height: 1.2; margin: 0; text-wrap: balance; }
+.who { margin: 0; color: var(--muted); font-size: .95rem; font-style: italic; }
+textarea { width: 100%; min-height: 84px; resize: vertical; background: #140d11; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); font: 1rem/1.45 var(--font-body); padding: 10px 12px; }
+label.note { font-family: var(--font-display); font-size: .8rem; color: var(--muted); display: grid; gap: 6px; }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { font-family: var(--font-display); font-weight: 700; font-size: .95rem; min-height: 48px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: #22181e; color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--rose); color: #2a0d15; border-color: transparent; }
+.btn.wide { grid-column: 1 / -1; }
+.btn.small { min-height: 44px; font-size: .85rem; font-weight: 600; }
+.btn:disabled { opacity: .5; }
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #1e141a; border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; font-family: var(--font-display); font-size: .9rem; }
+.toggle small { display: block; color: var(--muted); font-weight: 400; }
+.switch { position: relative; width: 52px; height: 32px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.switch span { position: absolute; inset: 0; border-radius: 16px; background: var(--line); transition: background .2s; pointer-events: none; }
+.switch span::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
+.switch input:checked + span { background: var(--c-checkin); }
+.switch input:checked + span::after { transform: translateX(20px); }
+.switch input:focus-visible + span { outline: 2px solid var(--rose); outline-offset: 2px; }
+
+.moods { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--font-display); font-weight: 600; font-size: .9rem; min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+.chip[aria-pressed="true"] { color: #1a1218; background: var(--chip, var(--ink)); border-color: transparent; }
+
+h2 { font-family: var(--font-display); font-size: 1rem; margin: 6px 0 8px; display: flex; justify-content: space-between; }
+h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
+.list { display: grid; gap: 8px; }
+.week { background: #1e141a; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+.week b { font-family: var(--font-display); }
+.week ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .92rem; line-height: 1.45; display: grid; gap: 6px; }
+.week li strong { color: var(--ink); font-weight: 500; }
+.empty { color: var(--muted); font-size: .9rem; margin: 0; }
+.done-box { text-align: center; display: grid; gap: 10px; padding: 26px 18px; border-radius: 22px; background: linear-gradient(180deg, #2a1822, #1b1318); border: 1px solid var(--line); }
+.done-box .big { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; margin: 0; }
+.done-box p { margin: 0; color: var(--muted); }
+.keep p { margin: 0 0 8px; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+.toast { white-space: nowrap; position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: #3a2a33; color: var(--ink); padding: 10px 16px; border-radius: 12px; font-family: var(--font-display); font-size: .9rem; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+@media (prefers-reduced-motion: no-preference) {
+  .card.flip { animation: deal .4s cubic-bezier(.2,.8,.2,1); }
+  @keyframes deal { from { transform: translateY(12px) scale(.98); opacity: .4; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <h1>Weekly Us</h1>
+    <span class="sub" id="sub"></span>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="week" type="button">This week</button>
+    <button class="tab" role="tab" data-tab="explore" type="button">Explore</button>
+    <button class="tab" role="tab" data-tab="history" type="button">Our weeks</button>
+  </div>
+
+  <!-- THIS WEEK -->
+  <section id="v-week" class="wrap" style="padding:0">
+    <div class="dots" id="dots"></div>
+    <article class="card flip" id="wcard">
+      <div class="face">
+        <div class="top"><span class="kind" id="wkind"></span><span class="step" id="wstep"></span></div>
+        <p class="title" id="wtitle"></p>
+        <p class="q" id="wq">Shuffling the deck…</p>
+        <p class="who" id="wwho"></p>
+        <label class="note" for="wnote">Notes for us (stays on this phone)
+          <textarea id="wnote" placeholder="Anything worth remembering…"></textarea>
+        </label>
+      </div>
+    </article>
+    <div class="row">
+      <button class="btn" id="prev" type="button">Back</button>
+      <button class="btn primary" id="next" type="button">Next</button>
+      <button class="btn small wide" id="swap" type="button">Swap this question</button>
+    </div>
+    <div class="done-box" id="donebox" hidden>
+      <p class="big">Check-in done 💞</p>
+      <p id="donetext"></p>
+      <button class="btn" id="review" type="button">Look back at this week's cards</button>
+    </div>
+    <div class="toggle">
+      <div>Keep it PG<small>Swaps spicy and intimate cards for fun and deep ones</small></div>
+      <label class="switch"><input type="checkbox" id="pg" aria-label="Keep it PG"><span></span></label>
+    </div>
+  </section>
+
+  <!-- EXPLORE -->
+  <section id="v-explore" class="wrap" style="padding:0" hidden>
+    <div class="moods" id="moods" role="group" aria-label="Category"></div>
+    <article class="card flip" id="ecard">
+      <div class="face">
+        <div class="top"><span class="kind" id="ekind"></span><span class="step" id="estep"></span></div>
+        <p class="title" id="etitle"></p>
+        <p class="q" id="eq"></p>
+      </div>
+    </article>
+    <div class="row">
+      <button class="btn primary wide" id="draw" type="button">Draw a card</button>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="v-history" class="wrap" style="padding:0" hidden>
+    <h2>Our weeks <span id="streak"></span></h2>
+    <div class="list" id="hist"></div>
+    <div class="keep">
+      <h2>Keep your notes</h2>
+      <p>Notes and history live only on this phone. Back up now and then so a new phone doesn't lose them.</p>
+      <div class="row">
+        <button class="btn small" id="backup" type="button">Back up</button>
+        <button class="btn small" id="restore" type="button">Restore</button>
+      </div>
+      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const KEY = "us-weekly-v1"; // every app on this site shares one browser storage
+const KINDS = {
+  checkin:  { label: "Check-in",  color: "var(--c-checkin)" },
+  reflect:  { label: "Reflect",   color: "var(--c-reflect)" },
+  deep:     { label: "Deep",      color: "var(--c-deep)" },
+  fun:      { label: "Fun",       color: "var(--c-fun)" },
+  funny:    { label: "Funny",     color: "var(--c-funny)" },
+  spicy:    { label: "Spicy",     color: "var(--c-spicy)" },
+  intimate: { label: "Intimate",  color: "var(--c-intimate)" },
+  love:     { label: "Love note", color: "var(--c-love)" }
+};
+const FLOW = ["checkin", "reflect", "deep", "fun", "funny", "spicy", "intimate", "love"];
+const FLOW_PG = ["checkin", "reflect", "deep", "fun", "funny", "fun", "deep", "love"];
+const $ = id => document.getElementById(id);
+
+// Week starts Monday. Same week + same deck = same questions on both phones.
+function weekStart(d = new Date()) { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+const WEEK = weekStart().toLocaleDateString("en-CA");
+const weekLabel = s => "Week of " + new Date(s + "T12:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+let CARDS = [];
+let state = { pg: false, weeks: {} };
+let tab = "week", step = 0, exploreKind = "all", ecur = null;
+
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.weeks) state = Object.assign(state, s); } catch {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
+function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return Math.abs(h); }
+
+function buildWeek() {
+  const flow = state.pg ? FLOW_PG : FLOW, used = new Set();
+  return flow.map((k, i) => {
+    const pool = CARDS.filter(c => c.kind === k && !used.has(c.id));
+    const c = pool[hash(WEEK + "|" + i + "|" + k) % pool.length];
+    used.add(c.id); return c.id;
+  });
+}
+function thisWeek() {
+  let w = state.weeks[WEEK];
+  if (!w || w.pg !== state.pg) {
+    const notes = w ? w.notes : {};
+    w = state.weeks[WEEK] = { ids: buildWeek(), pg: state.pg, notes: notes || {}, done: w ? w.done : false };
+    save();
+  }
+  return w;
+}
+const byId = id => CARDS.find(c => c.id === id);
+
+function paint(prefix, card, stepText) {
+  const k = KINDS[card.kind];
+  const el = $(prefix + "card");
+  el.style.setProperty("--c", k.color);
+  el.className = "card" + (card.rarity ? " rare" : "");
+  void el.offsetWidth; el.classList.add("flip");
+  $(prefix + "kind").textContent = k.label;
+  $(prefix + "step").textContent = stepText;
+  $(prefix + "title").textContent = card.title;
+  $(prefix + "q").textContent = card.q;
+}
+
+function renderWeek() {
+  const w = thisWeek();
+  const ids = w.ids;
+  step = Math.max(0, Math.min(step, ids.length - 1));
+  const card = byId(ids[step]);
+  $("dots").innerHTML = "";
+  ids.forEach((id, i) => {
+    const c = byId(id); const b = document.createElement("button");
+    b.className = "dot-hit"; b.type = "button"; b.setAttribute("aria-label", "Card " + (i + 1) + ": " + KINDS[c.kind].label);
+    const d = document.createElement("span"); d.className = "dot" + (i === step ? " on" : i < step || w.done ? " done" : "");
+    d.style.setProperty("--dc", KINDS[c.kind].color); d.style.display = "block";
+    b.append(d); b.onclick = () => { step = i; renderWeek(); };
+    $("dots").append(b);
+  });
+  paint("w", card, (step + 1) + " of " + ids.length);
+  $("wwho").textContent = step % 2 === 0 ? "You both answer. Read it out loud, then switch." : "Your partner answers first this time.";
+  $("wnote").value = w.notes[card.id] || "";
+  $("prev").disabled = step === 0;
+  $("next").textContent = step === ids.length - 1 ? (w.done ? "Done ✓" : "Finish check-in") : "Next";
+  $("donebox").hidden = !w.done || step !== ids.length - 1;
+  $("donetext").textContent = streakText() + " See you next week.";
+  $("pg").checked = !!state.pg;
+}
+
+function streak() {
+  let n = 0, d = weekStart();
+  if (!(state.weeks[WEEK] && state.weeks[WEEK].done)) d.setDate(d.getDate() - 7);
+  while (state.weeks[d.toLocaleDateString("en-CA")] && state.weeks[d.toLocaleDateString("en-CA")].done) { n++; d.setDate(d.getDate() - 7); }
+  return n;
+}
+function streakText() { const n = streak(); return n ? n + " week" + (n === 1 ? "" : "s") + " in a row." : ""; }
+
+$("wnote").addEventListener("input", () => {
+  const w = thisWeek(); const id = w.ids[step];
+  const v = $("wnote").value.trim(); if (v) w.notes[id] = $("wnote").value; else delete w.notes[id];
+  clearTimeout(save.t); save.t = setTimeout(save, 300);
+});
+$("prev").onclick = () => { step--; renderWeek(); };
+$("next").onclick = () => {
+  const w = thisWeek();
+  if (step < w.ids.length - 1) { step++; renderWeek(); return; }
+  if (!w.done) { w.done = true; save(); toast("Check-in saved"); }
+  renderWeek(); $("donebox").scrollIntoView({ behavior: "smooth", block: "center" });
+};
+$("review").onclick = () => { step = 0; renderWeek(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+$("swap").onclick = () => {
+  const w = thisWeek(); const cur = byId(w.ids[step]);
+  const pool = CARDS.filter(c => c.kind === cur.kind && !w.ids.includes(c.id));
+  if (!pool.length) return toast("No more " + KINDS[cur.kind].label + " cards");
+  w.ids[step] = pool[Math.floor(Math.random() * pool.length)].id; save(); renderWeek();
+};
+$("pg").onchange = () => { state.pg = $("pg").checked; save(); step = 0; renderWeek(); toast(state.pg ? "PG mode on" : "All cards back in"); };
+let sx = null;
+$("wcard").addEventListener("touchstart", e => { if (e.target.closest("textarea")) return; sx = e.touches[0].clientX; }, { passive: true });
+$("wcard").addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (dx < -60 && step < thisWeek().ids.length - 1) { step++; renderWeek(); } else if (dx > 60 && step > 0) { step--; renderWeek(); } });
+
+function renderMoods() {
+  const opts = [["all", "Any", null], ...Object.entries(KINDS).filter(([k]) => !(state.pg && (k === "spicy" || k === "intimate"))).map(([k, v]) => [k, v.label, v.color])];
+  if (!opts.some(o => o[0] === exploreKind)) exploreKind = "all";
+  $("moods").innerHTML = "";
+  for (const [k, label, color] of opts) {
+    const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = label;
+    b.setAttribute("aria-pressed", String(exploreKind === k)); if (color) b.style.setProperty("--chip", color);
+    b.onclick = () => { exploreKind = k; renderMoods(); draw(); };
+    $("moods").append(b);
+  }
+}
+function draw() {
+  let pool = CARDS.filter(c => (exploreKind === "all" || c.kind === exploreKind) && !(state.pg && (c.kind === "spicy" || c.kind === "intimate")));
+  if (ecur && pool.length > 1) pool = pool.filter(c => c.id !== ecur.id);
+  ecur = pool[Math.floor(Math.random() * pool.length)];
+  paint("e", ecur, CARDS.filter(c => c.kind === ecur.kind).length + " " + KINDS[ecur.kind].label.toLowerCase() + " cards");
+}
+$("draw").onclick = draw;
+$("ecard").addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive: true });
+$("ecard").addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 60) draw(); });
+
+function renderHistory() {
+  $("streak").textContent = streakText();
+  const weeks = Object.entries(state.weeks).filter(([, w]) => w.done || Object.keys(w.notes || {}).length).sort((a, b) => b[0].localeCompare(a[0]));
+  const box = $("hist"); box.innerHTML = "";
+  if (!weeks.length) { box.innerHTML = '<p class="empty">Finish a weekly check-in and it shows up here with any notes you wrote.</p>'; return; }
+  for (const [wk, w] of weeks) {
+    const el = document.createElement("div"); el.className = "week";
+    const head = document.createElement("b"); head.textContent = weekLabel(wk) + (w.done ? " · done" : " · in progress");
+    const ul = document.createElement("ul");
+    for (const id of w.ids) {
+      const c = byId(id); if (!c) continue;
+      const li = document.createElement("li"); const s = document.createElement("strong"); s.textContent = c.q;
+      li.append(s); if (w.notes && w.notes[id]) li.append(document.createElement("br"), document.createTextNode(w.notes[id]));
+      ul.append(li);
+    }
+    el.append(head, ul); box.append(el);
+  }
+}
+
+$("backup").onclick = () => {
+  const name = "weekly-us-backup-" + new Date().toLocaleDateString("en-CA") + ".json";
+  const blob = new Blob([JSON.stringify({ app: "us-weekly", state }, null, 1)], { type: "application/json" });
+  const file = new File([blob], name, { type: "application/json" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Weekly Us backup" }).catch(() => {}); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("Backup saved to your downloads");
+};
+$("restore").onclick = () => { $("restoreFile").value = ""; $("restoreFile").click(); };
+$("restoreFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || data.app !== "us-weekly" || !data.state || !data.state.weeks) throw 0;
+    for (const [wk, w] of Object.entries(data.state.weeks)) if (!state.weeks[wk]) state.weeks[wk] = w;
+    save(); renderHistory(); toast("Backup restored");
+  } catch { toast("That file isn't a Weekly Us backup"); }
+};
+
+function setTab(t) {
+  tab = t;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  $("v-week").hidden = t !== "week"; $("v-explore").hidden = t !== "explore"; $("v-history").hidden = t !== "history";
+  if (t === "week") renderWeek();
+  if (t === "explore") { renderMoods(); if (!ecur) draw(); }
+  if (t === "history") renderHistory();
+}
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+async function start() {
+  load();
+  $("sub").textContent = weekLabel(WEEK);
+  try { const r = await fetch("deck.json", { cache: "no-cache" }); const d = await r.json(); CARDS = (d.cards || []).filter(c => c && c.id && c.q && KINDS[c.kind]); } catch {}
+  if (!CARDS.length) { $("wq").textContent = "The deck didn't load. Connect to the internet and open the app again. After that it works offline."; return; }
+  // Drop saved ids that no longer exist in the deck.
+  for (const w of Object.values(state.weeks)) w.ids = (w.ids || []).filter(byId);
+  if (state.weeks[WEEK] && state.weeks[WEEK].ids.length < 8) delete state.weeks[WEEK];
+  setTab("week");
+}
+start();
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>

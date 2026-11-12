@@ -1,0 +1,790 @@
+{
+ "version": 1,
+ "updated": "2026-11-12",
+ "cards": [
+  {
+   "id": "q001",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Weather report",
+   "q": "On a scale from sunny to stormy, how was your week, and what made it that way?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q002",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Battery check",
+   "q": "How full is your tank right now: physically, mentally and socially?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q003",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Week ahead",
+   "q": "What's one thing coming up this week that you're dreading, and one you're excited about?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q004",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Did I get it right?",
+   "q": "Was there a moment this week you needed something from me that you didn't get?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q005",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Load balance",
+   "q": "How did the chores, pets and errands feel this week: fair, or lopsided?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q006",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "One word",
+   "q": "Describe our week together in one word. Then explain the word.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q007",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Small stuff",
+   "q": "Is there a small annoyance you've been holding onto that we should clear out now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q008",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Time together",
+   "q": "Did we get enough real time together this week, or mostly the same-room-different-screens kind?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q009",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Money pulse",
+   "q": "Anything about spending, saving or plans coming up that's on your mind?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q010",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Stress source",
+   "q": "What's taking up the most room in your head right now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q011",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Body check",
+   "q": "How have you been sleeping, eating and moving? Anything I can help with?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q012",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Help wanted",
+   "q": "What's one thing I could take off your plate this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q013",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Plan check",
+   "q": "Is there anything on the calendar we need to talk through before it sneaks up on us?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q014",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Highlight reel",
+   "q": "What was your favorite moment with me this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q015",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Proud of you",
+   "q": "What's something you did this week that you're proud of, even if it was small?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q016",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Do-over",
+   "q": "If you could redo one moment from our week, which would it be and what would you change?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q017",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Felt loved",
+   "q": "When did you feel most loved by me this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q018",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Missed it",
+   "q": "When did you feel most disconnected from me this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q019",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Growth spot",
+   "q": "Where do you think we've grown as a couple in the last few months?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q020",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Pattern",
+   "q": "Is there a fight or friction that keeps coming back? What do you think is really under it?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q021",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Learned",
+   "q": "What's something new you learned about me lately?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q022",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Then and now",
+   "q": "What's something about us now that the early-days version of us would be surprised by?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q023",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Lesson",
+   "q": "What did this week teach you about yourself?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q024",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Thank you",
+   "q": "What's something I did recently that you never thanked me for, but noticed?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q025",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Old habit",
+   "q": "Is there an old habit of yours that's crept back in? How do you feel about it?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q026",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Five years out",
+   "q": "What does a really good life look like for us five years from now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q027",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Fear",
+   "q": "What's a fear about our future that you haven't said out loud yet?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q028",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Childhood echo",
+   "q": "What's something from how you grew up that shows up in how you love me?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q029",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Love language",
+   "q": "Has the way you most like to be loved changed since we met?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q030",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Unsaid",
+   "q": "Is there something you've wanted to tell me but haven't found the right moment for?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q031",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Dream",
+   "q": "What's a dream you have that you think I don't fully know about?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q032",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Hard season",
+   "q": "When we hit a really hard season, what do you most need from me?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q033",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Values",
+   "q": "What's one value you hope we always protect, no matter what changes?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q034",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Who you're becoming",
+   "q": "Who are you trying to become right now, and how can I support that?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q035",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Home",
+   "q": "What makes somewhere feel like home to you?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q036",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Regret",
+   "q": "What's something you'd regret not doing together?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q037",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Trust",
+   "q": "What's one thing I do that makes you trust me more?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q038",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Legacy",
+   "q": "What do you want people to say about our relationship someday?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q039",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Date roulette",
+   "q": "Plan our next date in 60 seconds. Go.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q040",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Trip pick",
+   "q": "If we left tomorrow for anywhere for a week, where are we going?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q041",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "New hobby",
+   "q": "What's a hobby we should try together this month?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q042",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Theme night",
+   "q": "Pick a theme for a night in: food, drinks, music and one rule.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q043",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Top three",
+   "q": "Top three meals we've ever had together. Rank them.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q044",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Adventure",
+   "q": "What's the most adventurous thing you'd want to do together?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q045",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Playlist",
+   "q": "What song should be on the soundtrack of our relationship this month?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q046",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Bucket list",
+   "q": "Add one thing to our couple's bucket list.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q047",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Lottery",
+   "q": "We win a million dollars. What's the first thing we each buy, and the first thing we do together?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q048",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Snow day",
+   "q": "A surprise snow day off together. Plan it hour by hour.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q049",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Pet project",
+   "q": "If our animals each had a job, what would they be?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q050",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Game night",
+   "q": "What game would we be unbeatable at as a team, and which one would end us?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q051",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Sitcom",
+   "q": "If our relationship were a sitcom, what's the running joke?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q052",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Impression",
+   "q": "Do your best impression of me when I'm hungry.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q053",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Zombie plan",
+   "q": "Zombie apocalypse: who survives longer, and why is it obviously you?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q054",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "Roast",
+   "q": "Lovingly roast me in exactly two sentences.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q055",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Pet's view",
+   "q": "What do you think our pets say about us when we're not home?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q056",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Weird habit",
+   "q": "What's my weirdest habit that you've secretly grown to love?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q057",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Swap",
+   "q": "If we swapped bodies for a day, what's the first thing you'd do as me?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q058",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Movie title",
+   "q": "What would the title of a movie about our relationship be?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q059",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Hill to die on",
+   "q": "What's the silliest thing we've ever argued about?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q060",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Superpower",
+   "q": "If I had a completely useless superpower, what would it be?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q061",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Reality show",
+   "q": "Which reality show would we absolutely ruin, and how?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q062",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Villain era",
+   "q": "What would my villain origin story be?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q063",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "First look",
+   "q": "What was the first thing you found attractive about me?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q064",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Outfit",
+   "q": "What's something I wear that drives you a little crazy?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q065",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Flirt",
+   "q": "How do you like to be flirted with when we're out in public?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q066",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Kiss",
+   "q": "Describe your favorite kind of kiss with me, without using the word 'good'.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q067",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Tease",
+   "q": "Send me a text right now that you'd want to get from me.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q068",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Memory",
+   "q": "What's a hot memory of us that pops into your head at random times?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q069",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Compliment",
+   "q": "What's a compliment about my body you've never said out loud?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q070",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Date night",
+   "q": "What would make our next date night feel a little dangerous in the best way?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q071",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Attraction",
+   "q": "When do you find me most attractive that might surprise me?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q072",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Look",
+   "q": "What look or touch from me tells you exactly what I'm thinking?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q073",
+   "kind": "spicy",
+   "rarity": 1,
+   "title": "Dare",
+   "q": "Truth or dare? Whoever's reading picks the dare.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q074",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Secret signal",
+   "q": "Should we have a secret signal for 'let's leave early'? What is it?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q075",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "More of",
+   "q": "What's one thing you'd like more of in our sex life?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q076",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Favorite",
+   "q": "What's your favorite thing I do in bed?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q077",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Curious",
+   "q": "Is there something you've been curious to try together? No pressure, just talk.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q078",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Mood setter",
+   "q": "What gets you in the mood fastest, and what kills it fastest?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q079",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Timing",
+   "q": "Is our current rhythm of intimacy working for you? More, less, different times?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q080",
+   "kind": "intimate",
+   "rarity": 1,
+   "title": "Fantasy",
+   "q": "Share a fantasy, even a small one. We can decide later if it stays a fantasy.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q081",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Touch",
+   "q": "Where do you love to be touched that I might be overlooking?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q082",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "After",
+   "q": "What makes you feel closest to me afterward?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q083",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Yes, no, maybe",
+   "q": "Make a quick yes/no/maybe list together of three new things.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q084",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Confidence",
+   "q": "What helps you feel most confident and comfortable with me?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q085",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Slow down",
+   "q": "Would you like more slow, unhurried time together? What would that look like?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q086",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Words",
+   "q": "What's something you'd like me to say more in the moment?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q087",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Appreciation",
+   "q": "Name three things you appreciated about me this week.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q088",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Favorite thing",
+   "q": "What's your favorite thing about us right now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q089",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Promise",
+   "q": "What's one small promise you'll make me for this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q090",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Gratitude",
+   "q": "What's something about our life together you're grateful for today?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q091",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Hype",
+   "q": "Tell me one thing you're excited to see me do or accomplish.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q092",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Little thing",
+   "q": "What's a little thing I do that makes you feel cared for?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q093",
+   "kind": "love",
+   "rarity": 1,
+   "title": "Why me",
+   "q": "Remind me why you chose me.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q094",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Proud",
+   "q": "What's something about me you're proud of?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q095",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Next week",
+   "q": "What's one thing we can do next week to feel even closer?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q096",
+   "kind": "love",
+   "rarity": 1,
+   "title": "Love note",
+   "q": "Say the one sentence you'd want me to remember this week.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q097",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Team",
+   "q": "What's one way we were a great team this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "q098",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Hug",
+   "q": "Give me a twenty-second hug and tell me what you're thinking during it.",
+   "added": "2026-10-01"
+  }
+ ]
+}
