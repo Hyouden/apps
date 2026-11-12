@@ -91,6 +91,16 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
 .done-box .big { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; margin: 0; }
 .done-box p { margin: 0; color: var(--muted); }
 .keep p { margin: 0 0 8px; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+.cardbar { display: flex; gap: 8px; }
+.icon { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: #140d11; color: var(--muted); font: 600 .85rem var(--font-display); cursor: pointer; }
+.icon svg { width: 18px; height: 18px; }
+.icon.hearted { color: #2a0d15; background: var(--rose); border-color: transparent; }
+.icon.hearted svg path { fill: currentColor; }
+.hidden-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: .92rem; }
+.hidden-row button { flex: none; }
+details summary { cursor: pointer; font-family: var(--font-display); color: var(--muted); min-height: 44px; display: flex; align-items: center; }
+.toast { display: flex; gap: 14px; align-items: center; }
+.toast button { background: none; border: 0; color: var(--rose); font: 700 .9rem var(--font-display); cursor: pointer; padding: 6px 0; }
 .toast { white-space: nowrap; position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: #3a2a33; color: var(--ink); padding: 10px 16px; border-radius: 12px; font-family: var(--font-display); font-size: .9rem; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
 @media (prefers-reduced-motion: no-preference) {
   .card.flip { animation: deal .4s cubic-bezier(.2,.8,.2,1); }
@@ -119,6 +129,7 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
         <p class="title" id="wtitle"></p>
         <p class="q" id="wq">Shuffling the deck…</p>
         <p class="who" id="wwho"></p>
+        <div class="cardbar"><button class="icon" id="wheart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.1A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.8c0 5.7-7.5 10.1-7.5 10.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Keep</span></button><button class="icon" id="wdel" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><span>Remove</span></button></div>
         <label class="note" for="wnote">Notes for us (stays on this phone)
           <textarea id="wnote" placeholder="Anything worth remembering…"></textarea>
         </label>
@@ -148,6 +159,7 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
         <div class="top"><span class="kind" id="ekind"></span><span class="step" id="estep"></span></div>
         <p class="title" id="etitle"></p>
         <p class="q" id="eq"></p>
+        <div class="cardbar"><button class="icon" id="eheart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.1A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.8c0 5.7-7.5 10.1-7.5 10.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Keep</span></button><button class="icon" id="edel" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><span>Remove</span></button></div>
       </div>
     </article>
     <div class="row">
@@ -159,6 +171,9 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
   <section id="v-history" class="wrap" style="padding:0" hidden>
     <h2>Our weeks <span id="streak"></span></h2>
     <div class="list" id="hist"></div>
+    <h2>Kept cards <span id="favcount"></span></h2>
+    <div class="list" id="favs"></div>
+    <details id="hiddenbox"><summary id="hidsum">Removed cards</summary><div id="hidlist"></div></details>
     <div class="keep">
       <h2>Keep your notes</h2>
       <p>Notes and history live only on this phone. Back up now and then so a new phone doesn't lose them.</p>
@@ -170,7 +185,7 @@ h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
     </div>
   </section>
 </div>
-<div class="toast" id="toast" role="status" hidden></div>
+<div class="toast" id="toast" role="status" hidden><span id="tmsg"></span><button id="tundo" type="button" hidden>Undo</button></div>
 
 <script>
 const KEY = "us-weekly-v1"; // every app on this site shares one browser storage
@@ -194,18 +209,37 @@ const WEEK = weekStart().toLocaleDateString("en-CA");
 const weekLabel = s => "Week of " + new Date(s + "T12:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
 
 let CARDS = [];
-let state = { pg: false, weeks: {} };
+let state = { pg: false, weeks: {}, fav: [], hidden: [] };
 let tab = "week", step = 0, exploreKind = "all", ecur = null;
 
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.weeks) state = Object.assign(state, s); } catch {} }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.weeks) state = Object.assign(state, s); } catch {} state.fav = state.fav || []; state.hidden = state.hidden || []; }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
-function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+function toast(m, undo) {
+  const t = $("toast"); $("tmsg").textContent = m; t.hidden = false;
+  $("tundo").hidden = !undo; $("tundo").onclick = () => { t.hidden = true; undo && undo(); };
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, undo ? 5000 : 2200);
+}
+const isFav = id => state.fav.includes(id);
+const isHidden = id => state.hidden.includes(id);
+const live = c => !isHidden(c.id);
+function paintBar(pfx, card) {
+  const h = $(pfx + "heart"); const on = isFav(card.id);
+  h.classList.toggle("hearted", on); h.querySelector("span").textContent = on ? "Kept" : "Keep";
+  h.setAttribute("aria-pressed", String(on)); h.setAttribute("aria-label", on ? "Remove from kept cards" : "Keep this card");
+  $(pfx + "del").setAttribute("aria-label", "Remove this card from the deck");
+}
+function toggleFav(card) {
+  if (!card) return;
+  if (isFav(card.id)) { state.fav = state.fav.filter(x => x !== card.id); toast("Removed from kept cards"); }
+  else { state.fav.push(card.id); toast("Kept ♥"); }
+  save();
+}
 function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return Math.abs(h); }
 
 function buildWeek() {
   const flow = state.pg ? FLOW_PG : FLOW, used = new Set();
   return flow.map((k, i) => {
-    const pool = CARDS.filter(c => c.kind === k && !used.has(c.id));
+    let pool = CARDS.filter(c => c.kind === k && !used.has(c.id) && live(c)); if (!pool.length) pool = CARDS.filter(c => c.kind === k && !used.has(c.id));
     const c = pool[hash(WEEK + "|" + i + "|" + k) % pool.length];
     used.add(c.id); return c.id;
   });
@@ -247,7 +281,7 @@ function renderWeek() {
     b.append(d); b.onclick = () => { step = i; renderWeek(); };
     $("dots").append(b);
   });
-  paint("w", card, (step + 1) + " of " + ids.length);
+  paint("w", card, (step + 1) + " of " + ids.length); paintBar("w", card);
   $("wwho").textContent = step % 2 === 0 ? "You both answer. Read it out loud, then switch." : "Your partner answers first this time.";
   $("wnote").value = w.notes[card.id] || "";
   $("prev").disabled = step === 0;
@@ -280,7 +314,7 @@ $("next").onclick = () => {
 $("review").onclick = () => { step = 0; renderWeek(); window.scrollTo({ top: 0, behavior: "smooth" }); };
 $("swap").onclick = () => {
   const w = thisWeek(); const cur = byId(w.ids[step]);
-  const pool = CARDS.filter(c => c.kind === cur.kind && !w.ids.includes(c.id));
+  const pool = CARDS.filter(c => c.kind === cur.kind && !w.ids.includes(c.id) && live(c));
   if (!pool.length) return toast("No more " + KINDS[cur.kind].label + " cards");
   w.ids[step] = pool[Math.floor(Math.random() * pool.length)].id; save(); renderWeek();
 };
@@ -290,7 +324,7 @@ $("wcard").addEventListener("touchstart", e => { if (e.target.closest("textarea"
 $("wcard").addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (dx < -60 && step < thisWeek().ids.length - 1) { step++; renderWeek(); } else if (dx > 60 && step > 0) { step--; renderWeek(); } });
 
 function renderMoods() {
-  const opts = [["all", "Any", null], ...Object.entries(KINDS).filter(([k]) => !(state.pg && (k === "spicy" || k === "intimate"))).map(([k, v]) => [k, v.label, v.color])];
+  const opts = [["all", "Any", null], ["kept", "♥ Kept", "var(--rose)"], ...Object.entries(KINDS).filter(([k]) => !(state.pg && (k === "spicy" || k === "intimate"))).map(([k, v]) => [k, v.label, v.color])];
   if (!opts.some(o => o[0] === exploreKind)) exploreKind = "all";
   $("moods").innerHTML = "";
   for (const [k, label, color] of opts) {
@@ -301,17 +335,51 @@ function renderMoods() {
   }
 }
 function draw() {
-  let pool = CARDS.filter(c => (exploreKind === "all" || c.kind === exploreKind) && !(state.pg && (c.kind === "spicy" || c.kind === "intimate")));
+  let pool = CARDS.filter(c => live(c) && (exploreKind === "all" || exploreKind === "kept" ? true : c.kind === exploreKind) && (exploreKind !== "kept" || isFav(c.id)) && !(state.pg && (c.kind === "spicy" || c.kind === "intimate")));
+  if (!pool.length) { ecur = null; $("ekind").textContent = ""; $("estep").textContent = ""; $("etitle").textContent = ""; $("eq").textContent = exploreKind === "kept" ? "No kept cards yet. Tap the heart on any card you love." : "No cards left here."; $("ecard").querySelector(".cardbar").hidden = true; return; }
+  $("ecard").querySelector(".cardbar").hidden = false;
   if (ecur && pool.length > 1) pool = pool.filter(c => c.id !== ecur.id);
   ecur = pool[Math.floor(Math.random() * pool.length)];
-  paint("e", ecur, CARDS.filter(c => c.kind === ecur.kind).length + " " + KINDS[ecur.kind].label.toLowerCase() + " cards");
+  paint("e", ecur, exploreKind === "kept" ? pool.length + " kept" : CARDS.filter(c => c.kind === ecur.kind && live(c)).length + " " + KINDS[ecur.kind].label.toLowerCase() + " cards"); paintBar("e", ecur);
 }
 $("draw").onclick = draw;
+$("wheart").onclick = () => { toggleFav(byId(thisWeek().ids[step])); renderWeek(); };
+$("eheart").onclick = () => { toggleFav(ecur); paintBar("e", ecur); if (exploreKind === "kept" && !isFav(ecur.id)) draw(); };
+function hideCard(card, after) {
+  state.hidden.push(card.id); if (isFav(card.id)) state.fav = state.fav.filter(x => x !== card.id);
+  save(); after();
+  toast("Card removed", () => { state.hidden = state.hidden.filter(x => x !== card.id); save(); after(true, card); });
+}
+$("wdel").onclick = () => {
+  const w = thisWeek(); const card = byId(w.ids[step]);
+  const pool = CARDS.filter(c => c.kind === card.kind && !w.ids.includes(c.id) && live(c) && c.id !== card.id);
+  if (!pool.length) return toast("That's the last " + KINDS[card.kind].label + " card left");
+  const at = step;
+  hideCard(card, (undo, c) => {
+    if (undo) { w.ids[at] = c.id; save(); step = at; renderWeek(); return; }
+    w.ids[at] = pool[Math.floor(Math.random() * pool.length)].id; save(); renderWeek();
+  });
+};
+$("edel").onclick = () => { const card = ecur; hideCard(card, (undo, c) => { if (undo) { ecur = c; paint("e", c, ""); paintBar("e", c); } else draw(); }); };
 $("ecard").addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive: true });
 $("ecard").addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 60) draw(); });
 
 function renderHistory() {
   $("streak").textContent = streakText();
+  const favs = state.fav.map(byId).filter(Boolean);
+  $("favcount").textContent = favs.length ? favs.length + " ♥" : "";
+  const fb = $("favs"); fb.innerHTML = "";
+  if (!favs.length) fb.innerHTML = '<p class="empty">Tap the heart on any card to keep it here.</p>';
+  else { const el = document.createElement("div"); el.className = "week"; const ul = document.createElement("ul");
+    for (const c of favs) { const li = document.createElement("li"); const s = document.createElement("strong"); s.textContent = c.q; li.append(s, document.createTextNode(" · " + KINDS[c.kind].label)); ul.append(li); }
+    el.append(ul); fb.append(el); }
+  const hid = state.hidden.map(byId).filter(Boolean);
+  $("hiddenbox").hidden = !hid.length; $("hidsum").textContent = "Removed cards (" + hid.length + ")";
+  const hl = $("hidlist"); hl.innerHTML = "";
+  for (const c of hid) { const r = document.createElement("div"); r.className = "hidden-row"; const t = document.createElement("span"); t.textContent = c.q;
+    const b = document.createElement("button"); b.className = "btn small"; b.type = "button"; b.textContent = "Bring back";
+    b.onclick = () => { state.hidden = state.hidden.filter(x => x !== c.id); save(); renderHistory(); toast("Back in the deck"); };
+    r.append(t, b); hl.append(r); }
   const weeks = Object.entries(state.weeks).filter(([, w]) => w.done || Object.keys(w.notes || {}).length).sort((a, b) => b[0].localeCompare(a[0]));
   const box = $("hist"); box.innerHTML = "";
   if (!weeks.length) { box.innerHTML = '<p class="empty">Finish a weekly check-in and it shows up here with any notes you wrote.</p>'; return; }
@@ -344,6 +412,7 @@ $("restoreFile").onchange = async e => {
     const data = JSON.parse(await f.text());
     if (!data || data.app !== "us-weekly" || !data.state || !data.state.weeks) throw 0;
     for (const [wk, w] of Object.entries(data.state.weeks)) if (!state.weeks[wk]) state.weeks[wk] = w;
+    state.fav = [...new Set([...state.fav, ...(data.state.fav || [])])]; state.hidden = [...new Set([...state.hidden, ...(data.state.hidden || [])])];
     save(); renderHistory(); toast("Backup restored");
   } catch { toast("That file isn't a Weekly Us backup"); }
 };

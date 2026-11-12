@@ -1,7 +1,7 @@
 // Offline support for Weekly Us.
 // Pages load from the network first (so updates show up), falling back to the saved copy offline.
 // Icons and fonts are served from the saved copy for speed.
-const CACHE = "us-weekly-v1";
+const CACHE = "us-weekly-v2";
 const SHELL = ["./", "./index.html", "./deck.json", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png",
   "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];
