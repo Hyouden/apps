@@ -1,8 +1,8 @@
-// Offline support for Safe Eats Japan.
+// Offline support for Sydney Eats Japan.
 // Pages load from the network first (so updates show up), falling back to the saved copy offline.
 // Icons are served from the saved copy. Food and city photos from Wikipedia are saved the first
 // time they load (or when "Save for offline" is tapped) so they still show without signal.
-const CACHE = "safe-eats-japan-v1";
+const CACHE = "safe-eats-japan-v2";
 const IMG_CACHE = "safe-eats-japan-img-v1";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png",
