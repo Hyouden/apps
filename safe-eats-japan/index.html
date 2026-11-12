@@ -1,0 +1,913 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Safe Eats Japan</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Gluten, dairy & soy-free allergy card, phrases, food guide and safe restaurants for Japan">
+<meta name="theme-color" content="#D2452B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Safe Eats">
+<style>
+:root{
+  --paper:#FBF7F0;--card:#FFFFFF;--ink:#1F1B17;--muted:#6B625A;--line:#E8DFD2;
+  --shu:#D2452B;--shu-dark:#A9321C;--shu-soft:#FBE7E1;--indigo:#2C3E73;--indigo-soft:#E6EAF5;
+  --good:#2F7A3A;--good-soft:#E3F1E2;--ask:#9A6410;--ask-soft:#FBF0DA;--avoid:#B3261E;--avoid-soft:#FBE3E1;
+  --jp:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic",Meiryo,system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--indigo)}
+.jp{font-family:var(--jp)}
+
+/* app bar */
+header.bar{position:sticky;top:0;z-index:20;background:rgba(251,247,240,.94);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.bar-in{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.bar-in img{width:30px;height:30px;border-radius:8px}
+.bar-in h1{font-size:1.05rem;margin:0;line-height:1.1}
+.bar-in h1 small{display:block;font-size:.75rem;font-weight:500;color:var(--muted)}
+.bar-in .hanko{margin-left:auto;font-family:var(--jp);font-weight:800;color:var(--shu);border:2px solid var(--shu);border-radius:8px;padding:1px 6px;font-size:.8rem;transform:rotate(-4deg)}
+
+main{max-width:640px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(96px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+section.tab{display:flex;flex-direction:column;gap:16px}
+h2{font-size:1.25rem;margin:4px 0 0}
+h3{font-size:1rem;margin:0}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+
+/* bottom nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs button{background:none;border:0;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.72rem;color:var(--muted);min-height:56px}
+nav.tabs button .ic{font-size:1.35rem;line-height:1}
+nav.tabs button[aria-selected="true"]{color:var(--shu);font-weight:700}
+nav.tabs button[aria-selected="true"] .ic{transform:translateY(-1px)}
+
+/* allergy card */
+.acard{background:var(--card);border-radius:20px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(80,40,20,.08);overflow:hidden;border:1px solid var(--line)}
+.acard .band{background:var(--shu);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.acard .band b{font-family:var(--jp);font-size:1.35rem;letter-spacing:.02em}
+.acard .band span{font-size:.75rem;opacity:.9;margin-left:auto;text-align:right;line-height:1.2}
+.acard .body{padding:16px 18px 18px;font-family:var(--jp)}
+.acard .lead{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.allergens{display:grid;gap:8px;margin:6px 0 12px}
+.allergen{display:flex;align-items:center;gap:12px;border:2px solid var(--avoid);background:var(--avoid-soft);border-radius:14px;padding:8px 12px}
+.allergen .em{font-size:1.6rem;position:relative;width:34px;text-align:center}
+.allergen .em::after{content:"";position:absolute;left:50%;top:50%;width:38px;height:4px;background:var(--avoid);transform:translate(-50%,-50%) rotate(-40deg);border-radius:2px}
+.allergen b{font-size:1.3rem;display:block;line-height:1.25}
+.allergen small{font-size:.82rem;color:#5b3530}
+.allergen.soft{border-color:#D9A441;background:var(--ask-soft)}
+.allergen.soft .em::after{background:#C98A1B}
+.acard .line{font-size:1.02rem;margin:8px 0;line-height:1.6}
+.acard .ok{background:var(--good-soft);border-radius:12px;padding:8px 12px;color:#1d4d24;font-weight:700}
+.acard .ask{font-size:1.2rem;font-weight:800;margin-top:12px;color:var(--shu-dark)}
+.acard .en{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted);margin-top:2px;line-height:1.45}
+.romaji{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted)}
+
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600;text-decoration:none;color:inherit}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--shu);border-color:var(--shu);color:#fff!important}
+.btn.indigo{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.btn.grow{flex:1 1 0}
+.btn.sm{min-height:38px;padding:6px 12px;font-size:.88rem;border-radius:10px}
+
+.toggles{display:grid;gap:8px}
+.tog{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;min-height:52px}
+.tog input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:#d8d0c4;position:relative;flex:none;transition:background .15s;margin:0}
+.tog input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.tog input:checked{background:var(--good)}
+.tog input:checked::after{left:21px}
+.tog b{display:block;font-size:.95rem}
+.tog span{font-size:.8rem;color:var(--muted);line-height:1.3;display:block}
+
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+.kicker{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--shu)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;margin:0 -2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;min-height:40px;font-weight:600;font-size:.9rem;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* phrases */
+.search{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px;min-height:46px}
+.phrase{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 12px 12px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.phrase .en{font-size:.85rem;color:var(--muted);grid-column:1/-1}
+.phrase .ja{font-family:var(--jp);font-size:1.28rem;font-weight:700;line-height:1.35;background:none;border:0;padding:0;text-align:left}
+.phrase .pro{grid-column:1/2;font-size:.85rem}
+.phrase .pro i{color:var(--indigo);font-style:normal;font-weight:600}
+.phrase .acts{grid-row:2/4;grid-column:2;display:flex;flex-direction:column;gap:6px}
+.icon-btn{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;padding:0}
+.icon-btn.say{background:var(--indigo-soft);border-color:#cfd6ea}
+.note{font-size:.85rem;background:var(--indigo-soft);color:#24345f;border-radius:12px;padding:10px 12px}
+
+/* food */
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:.8rem}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 9px;font-size:.74rem;font-weight:700;white-space:nowrap}
+.b-good{background:var(--good-soft);color:var(--good)}
+.b-ask{background:var(--ask-soft);color:var(--ask)}
+.b-avoid{background:var(--avoid-soft);color:var(--avoid)}
+.b-ind{background:var(--indigo-soft);color:var(--indigo)}
+.b-gray{background:#EFEAE3;color:#5d554d}
+.b-shu{background:var(--shu-soft);color:var(--shu-dark)}
+.foodgrid{display:grid;grid-template-columns:1fr;gap:10px}
+.food{display:grid;grid-template-columns:96px 1fr;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;align-items:start}
+.food.good{border-left:5px solid var(--good)} .food.ask{border-left:5px solid #D9A441} .food.avoid{border-left:5px solid var(--avoid)}
+.wimg{position:relative;width:96px;height:96px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#f3ece2,#e9dfd1);display:flex;align-items:center;justify-content:center;font-size:2.4rem;border:0;padding:0}
+.wimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
+.wimg img.on{opacity:1}
+.food h3{font-size:1rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.food .jpn{font-family:var(--jp);font-size:.95rem;color:var(--ink);font-weight:600}
+.food .jpn .romaji{font-weight:400}
+.food p{font-size:.88rem;color:#3d3832;margin-top:3px;line-height:1.45}
+.food .avoid-x{filter:grayscale(.15)}
+.kanji{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.kanji .k{font-family:var(--jp);font-size:1.45rem;font-weight:800;line-height:1.2}
+.kanji .m{font-size:.86rem;line-height:1.35}
+.kanji .m b{display:block;font-size:.95rem}
+.labelbox{font-family:var(--jp);background:#fff;border:2px dashed #cbbfae;border-radius:14px;padding:12px;font-size:.92rem;line-height:1.7}
+.labelbox mark{background:#ffd9d2;border-radius:4px;padding:0 3px}
+ul.clean{margin:0;padding-left:1.15em;display:grid;gap:6px}
+ul.clean li{line-height:1.45}
+
+/* places */
+.banner{position:relative;height:150px;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#2C3E73,#D2452B);display:flex;align-items:flex-end}
+.banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
+.banner img.on{opacity:1}
+.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.65))}
+.banner .t{position:relative;z-index:1;color:#fff;padding:12px 14px;width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.banner .t b{font-size:1.5rem;line-height:1.1}
+.banner .t .jp{font-size:1.1rem;opacity:.95}
+.banner .credit{position:absolute;z-index:2;top:8px;right:8px;font-size:.66rem;background:rgba(0,0,0,.45);color:#fff;border-radius:6px;padding:2px 6px;text-decoration:none}
+.place{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.place .top{display:flex;gap:12px;align-items:flex-start}
+.place .emo{width:48px;height:48px;border-radius:14px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex:none;border:1px solid var(--line)}
+.place h3{font-size:1.05rem;line-height:1.25}
+.place .area{font-size:.82rem;color:var(--muted)}
+.place .jpname{font-family:var(--jp);font-size:.9rem}
+.place .tags{display:flex;gap:6px;flex-wrap:wrap}
+.place p{font-size:.9rem;line-height:1.45}
+.place .tip{font-size:.84rem;background:var(--paper);border-radius:10px;padding:8px 10px;color:#4a433c}
+.place .row .btn{flex:1 1 auto}
+.top-pick{white-space:nowrap;display:inline-block;font-size:.7rem;font-weight:800;color:#fff;background:var(--shu);border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px}
+
+/* tips */
+.tel{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-decoration:none;color:inherit;min-height:56px}
+.tel b{font-size:1.25rem;color:var(--avoid);min-width:64px}
+.tel span{font-size:.88rem;line-height:1.3}
+.links{display:grid;gap:8px}
+.links a{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-decoration:none;color:inherit}
+.links a b{color:var(--indigo)}
+.links a span{display:block;font-size:.84rem;color:var(--muted);line-height:1.35}
+.drinks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drinks div{border-radius:14px;padding:10px 12px;font-size:.88rem;line-height:1.45}
+.progress{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--good);transition:width .2s}
+
+/* show-to-staff overlay */
+#show{position:fixed;inset:0;z-index:100;background:#fff;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 18px calc(14px + env(safe-area-inset-bottom,0px))}
+#show .sbar{display:flex;gap:8px;align-items:center}
+#show .sbar .x{margin-left:auto}
+#show .stage{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center;padding:8px 0}
+#show .big{font-family:var(--jp);font-weight:800;line-height:1.45;color:#111;word-break:break-word}
+#show .big .lineb{display:block;margin:.25em 0}
+#show .sub{font-size:.95rem;color:var(--muted);margin-top:14px;line-height:1.45}
+#show.card-mode .stage{justify-content:flex-start}
+#show .pill{font-family:var(--jp);font-size:.9rem;font-weight:700;color:var(--shu);border:2px solid var(--shu);border-radius:10px;padding:2px 8px}
+
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#1F1B17;color:#fff;padding:10px 14px;border-radius:12px;font-size:.88rem;z-index:120;max-width:88vw;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+.foot{font-size:.78rem;color:var(--muted);text-align:center;line-height:1.45}
+</style>
+</head><body>
+<header class="bar"><div class="bar-in">
+  <img src="icons/icon-192.png" alt="">
+  <h1>Safe Eats Japan<small id="tabTitle">Allergy card</small></h1>
+  <span class="hanko">安心</span>
+</div></header>
+
+<main>
+<!-- ================= CARD ================= -->
+<section class="tab" id="tab-card">
+  <div class="acard" id="acard"></div>
+  <div class="row">
+    <button class="btn primary grow" id="showCard">⤢ Show to staff</button>
+    <button class="btn" id="sayCard" aria-label="Play card in Japanese">🔊 Play</button>
+    <button class="btn" id="enToggle">EN</button>
+  </div>
+  <div class="toggles">
+    <label class="tog"><input type="checkbox" id="optTraces"><div><b>Small traces are OK</b><span>Adds: not life-threatening, so shared pans / frying oil are fine. Makes restaurants more willing to say yes.</span></div></label>
+    <label class="tog"><input type="checkbox" id="optSoy"><div><b>Soy: small amounts OK</b><span>Turn on when options are thin. Card still asks them to avoid soy sauce (it has wheat).</span></div></label>
+  </div>
+  <div class="panel">
+    <div class="kicker">Quick show</div>
+    <p class="small muted" style="margin:4px 0 10px">Tap to flash one line big on screen.</p>
+    <div class="row" id="quickRow"></div>
+  </div>
+  <div class="row">
+    <button class="btn sm" id="copyCard">📋 Copy card text (for hotel emails)</button>
+  </div>
+</section>
+
+<!-- ================= PHRASES ================= -->
+<section class="tab" id="tab-phrases" hidden>
+  <input class="search" id="pSearch" type="search" placeholder="Search phrases (e.g. butter, water, bag)" autocomplete="off">
+  <div class="chips" id="pCats"></div>
+  <p class="note">Tap the Japanese to show it big. 🔊 plays it, 🐢 plays it slowly. Pronounce every vowel: <b>a</b> “ah”, <b>i</b> “ee”, <b>u</b> “oo”, <b>e</b> “eh”, <b>o</b> “oh”. A line over a vowel (ō) means hold it a beat longer.</p>
+  <div id="pList" style="display:grid;gap:10px"></div>
+</section>
+
+<!-- ================= FOOD ================= -->
+<section class="tab" id="tab-food" hidden>
+  <div>
+    <h2>What she can eat</h2>
+    <p class="muted small" style="margin-top:4px">Japanese food is naturally low in dairy. The big enemy is <b>soy sauce</b> — it contains wheat <i>and</i> soy and is in almost everything. Think: <b>raw, grilled, salted</b>.</p>
+  </div>
+  <div class="chips" id="fCats"></div>
+  <div id="fBody" style="display:grid;gap:10px"></div>
+  <p class="foot">Food photos load from Wikipedia / Wikimedia Commons (tap a photo for its source and license). They show the dish in general, not a specific restaurant.</p>
+</section>
+
+<!-- ================= PLACES ================= -->
+<section class="tab" id="tab-places" hidden>
+  <div class="chips" id="cityChips"></div>
+  <div id="cityBody" style="display:grid;gap:12px"></div>
+  <p class="foot">Researched November 2026 from celiac/GF community reviews (Find Me Gluten Free, Atly, HappyCow) and restaurant pages. Hours change — check Maps, and still show the card. “📷 Photos & map” opens Google Maps, which has current photos, menus and directions.</p>
+</section>
+
+<!-- ================= TIPS ================= -->
+<section class="tab" id="tab-tips" hidden>
+  <div class="panel" id="installPanel">
+    <div class="kicker">Set up before you fly</div>
+    <h3 style="margin:4px 0 8px">Put it on your home screen &amp; save offline</h3>
+    <ul class="clean small">
+      <li><b>iPhone:</b> open in Safari → Share button → <b>Add to Home Screen</b>.</li>
+      <li><b>Android:</b> Chrome menu ⋮ → <b>Add to Home screen</b> / <b>Install app</b>.</li>
+    </ul>
+    <div class="row" style="margin-top:10px"><button class="btn indigo grow" id="installBtn" hidden>⬇︎ Install app</button><button class="btn grow" id="offlineBtn">💾 Save all photos for offline</button></div>
+    <div class="progress" style="margin-top:10px" hidden id="offProg"><i></i></div>
+    <p class="small muted" id="offMsg" style="margin-top:6px">The card, phrases and guide already work offline after the first open. This also saves the food photos.</p>
+  </div>
+
+  <div class="panel">
+    <div class="kicker">Pack &amp; prep</div>
+    <ul class="clean small" style="margin-top:8px">
+      <li><b>Bring travel packets of gluten-free tamari</b> (it's soy) or <b>coconut aminos</b> (soy-free). Most restaurants don't stock GF soy sauce — with your own, sashimi, sushi and plain grilled food all open up. Show the card first, then ask: <span class="jp">自分の醤油を使ってもいいですか？</span></li>
+      <li><b>Email hotels &amp; any ryokan dinners ahead</b> — use “Copy card text” on the Card tab. Kaiseki is soy-sauce heavy but kitchens adapt well with notice.</li>
+      <li><b>Install Find Me Gluten Free</b> (GF) and <b>HappyCow</b> (vegan = dairy-free) and star the Places in this app in Google Maps.</li>
+      <li><b>Travel days:</b> station bento (ekiben) are soy-sauce heavy. Grab salt onigiri, boiled eggs, fruit or roasted sweet potato from a konbini, or eat at Soranoiro in Tokyo Station.</li>
+      <li><b>Hotel breakfast buffets:</b> plain rice, grilled salmon, fruit, salad and boiled eggs are usually safe. Skip miso soup, natto and anything glossy.</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <div class="kicker">Drinks</div>
+    <div class="drinks" style="margin-top:8px">
+      <div style="background:var(--good-soft)"><b style="color:var(--good)">✅ Usually fine</b><br>Water, green tea, hōjicha, sake (rice), shochu, highballs, umeshu, wine, black coffee</div>
+      <div style="background:var(--avoid-soft)"><b style="color:var(--avoid)">❌ Watch out</b><br>Beer (barley), <b>barley tea 麦茶</b> (often served free!), matcha &amp; café lattes, milk tea, soy-milk lattes</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="kicker">If she feels unwell</div>
+    <div style="display:grid;gap:8px;margin-top:8px">
+      <a class="tel" href="tel:119"><b>119</b><span><b>Ambulance / fire</b> — free from any phone. Say: <span class="jp">救急車をお願いします</span> (kyūkyūsha o onegai shimasu)</span></a>
+      <a class="tel" href="tel:110"><b>110</b><span><b>Police</b></span></a>
+      <a class="tel" href="tel:05038162787"><b style="font-size:1rem">050-3816-2787</b><span><b>Japan Visitor Hotline</b> (JNTO) — 24/7 in English; tourist help, sickness &amp; emergencies</span></a>
+    </div>
+    <p class="small muted" style="margin-top:8px">Pharmacies are 薬局 (yakkyoku) or ドラッグストア (drugstore). The Phrases tab → Help has what to say.</p>
+  </div>
+
+  <div class="panel">
+    <div class="kicker">Best guides to read</div>
+    <div class="links" style="margin-top:8px">
+      <a href="https://www.legalnomads.com/gluten-free/japan/" target="_blank" rel="noopener"><b>Legal Nomads — A Celiac's Gluten Free Guide to Japan</b><span>The most thorough guide: what's safe, what isn't, hidden wheat, convenience stores. Written for celiacs, so it's stricter than she needs.</span></a>
+      <a href="https://www.justonecookbook.com/gluten-free-travel-to-japan/" target="_blank" rel="noopener"><b>Just One Cookbook — Gluten-Free Travel Guide to Japan</b><span>Japanese-run food site: what to eat, label words (incl. mizuame), restaurants and phrases.</span></a>
+      <a href="https://unseen-japan.com/gluten-free-travel-japan/" target="_blank" rel="noopener"><b>Unseen Japan — Traveling Gluten-Free in Japan</b><span>Good short primer on soy sauce, miso and juwari soba.</span></a>
+      <a href="https://trulytokyo.com/gluten-free-tokyo/" target="_blank" rel="noopener"><b>Truly Tokyo — Gluten-free Tokyo</b><span>Where to buy gluten-free soy sauce in Tokyo, plus safe-dish list.</span></a>
+      <a href="https://www.findmeglutenfree.com/" target="_blank" rel="noopener"><b>Find Me Gluten Free</b><span>App with live reviews — search near you when plans change.</span></a>
+      <a href="https://www.happycow.net/" target="_blank" rel="noopener"><b>HappyCow</b><span>Vegan restaurants = guaranteed dairy-free (but often soy-heavy).</span></a>
+    </div>
+  </div>
+
+  <p class="foot">Made for one trip, Nov 17 – Dec 5. Not medical advice — she knows her body best. Restaurant details were researched in November 2026 and can change.</p>
+</section>
+</main>
+
+<nav class="tabs" aria-label="Sections"><div class="in" role="tablist">
+  <button role="tab" data-tab="card"><span class="ic">🪪</span>Card</button>
+  <button role="tab" data-tab="phrases"><span class="ic">💬</span>Say it</button>
+  <button role="tab" data-tab="food"><span class="ic">🍱</span>Food</button>
+  <button role="tab" data-tab="places"><span class="ic">📍</span>Places</button>
+  <button role="tab" data-tab="tips"><span class="ic">🧭</span>Tips</button>
+</div></nav>
+
+<div id="show" hidden role="dialog" aria-modal="true">
+  <div class="sbar">
+    <span class="pill">お願いします</span>
+    <button class="btn sm" id="showSay">🔊</button>
+    <button class="btn sm" id="showSlow">🐢</button>
+    <button class="btn sm" id="showEn">EN</button>
+    <button class="btn sm x" id="showClose">✕ Close</button>
+  </div>
+  <div class="stage"><div class="big" id="showBig"></div><div class="sub" id="showSub"></div></div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const PREFIX = "safe-eats-japan-"; // every app on this site shares one browser storage
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(PREFIX + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch {} }
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function toast(msg, ms = 2600) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms); }
+
+/* ---------------- speech ---------------- */
+let jaVoice = null;
+function pickVoice() {
+  if (!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices().filter(v => /^ja([-_]|$)/i.test(v.lang));
+  jaVoice = vs.find(v => /kyoko|o-ren|siri|google/i.test(v.name)) || vs[0] || null;
+}
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+let warnedVoice = false;
+function speak(text, slow) {
+  if (!("speechSynthesis" in window)) { toast("This browser can't play audio — use the romaji guide."); return; }
+  const clean = text.replace(/[・（）()「」【】／/]/g, " ").replace(/[\u{1F300}-\u{1FAFF}☀-➿]/gu, "");
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = "ja-JP"; if (jaVoice) u.voice = jaVoice;
+  u.rate = slow ? 0.6 : 0.9;
+  speechSynthesis.speak(u);
+  if (!jaVoice && !warnedVoice) { warnedVoice = true; toast("If it sounds wrong, add a Japanese voice in your phone's language/speech settings.", 4200); }
+}
+
+/* ---------------- wake lock while showing ---------------- */
+let wake = null;
+async function keepAwake(on) {
+  try {
+    if (on && "wakeLock" in navigator) wake = await navigator.wakeLock.request("screen");
+    else if (!on && wake) { await wake.release(); wake = null; }
+  } catch {}
+}
+
+/* ================= ALLERGY CARD ================= */
+const opts = { traces: store.get("traces", true), soy: store.get("soyOk", false), en: store.get("cardEn", true) };
+function cardParts() {
+  const p = [];
+  p.push({ ja: "私は次の食品にアレルギーがあります。", en: "I'm allergic to the following foods." });
+  p.push({ type: "allergen", em: "🌾", ja: "小麦・大麦（グルテン）", en: "Wheat & barley (gluten)" });
+  p.push({ type: "allergen", em: "🥛", ja: "乳製品（牛乳・バター・チーズ・生クリーム）", en: "Dairy (milk, butter, cheese, cream)" });
+  p.push({ type: "allergen", em: "🫘", ja: "大豆（豆腐・味噌・豆乳など）", en: "Soy (tofu, miso, soy milk, etc.)", soft: opts.soy });
+  p.push({ ja: "これらは醤油・味噌・天ぷら粉・パン粉・カレールー・麺類・麦茶にも含まれているので、使わないでください。", en: "These are also in soy sauce, miso, tempura batter, breadcrumbs, curry roux, noodles and barley tea — please don't use them." });
+  p.push({ type: "ok", ja: "塩・わさび・レモンなら大丈夫です。", en: "Salt, wasabi and lemon are fine." });
+  if (opts.soy) p.push({ ja: "大豆は少量なら食べられます。（醤油は小麦が入っているので避けてください）", en: "Small amounts of soy are OK (but please avoid soy sauce — it contains wheat)." });
+  if (opts.traces) p.push({ ja: "命に関わるアレルギーではないので、同じ調理器具や油を使っても大丈夫です。", en: "It isn't life-threatening, so shared cookware or frying oil is fine." });
+  p.push({ type: "ask", ja: "これらを使わない料理はありますか？", en: "Do you have any dishes made without these?" });
+  p.push({ ja: "お手数をおかけしますが、よろしくお願いいたします。", en: "Sorry for the trouble — thank you so much." });
+  return p;
+}
+const CARD_TITLE = { ja: "食物アレルギーがあります", ro: "Shokumotsu arerugī ga arimasu", en: "I have food allergies" };
+function cardText(withEn) {
+  const parts = cardParts();
+  let s = "【" + CARD_TITLE.ja + "】\n" + parts.map(x => (x.type === "allergen" ? "・" : "") + x.ja).join("\n");
+  if (withEn) s += "\n\n[English]\n" + CARD_TITLE.en + ".\n" + parts.map(x => (x.type === "allergen" ? "• " : "") + x.en).join("\n");
+  return s;
+}
+function renderCard() {
+  const parts = cardParts();
+  const en = t => opts.en ? `<div class="en">${esc(t)}</div>` : "";
+  let h = `<div class="band"><b>${CARD_TITLE.ja}</b><span>Food allergy card<br>${CARD_TITLE.ro}</span></div><div class="body">`;
+  let inList = false;
+  for (const x of parts) {
+    if (x.type === "allergen") {
+      if (!inList) { h += `<div class="allergens">`; inList = true; }
+      h += `<div class="allergen${x.soft ? " soft" : ""}"><span class="em">${x.em}</span><div><b>${esc(x.ja)}</b>${opts.en ? `<small>${esc(x.en)}${x.soft ? " — small amounts OK" : ""}</small>` : ""}</div></div>`;
+      continue;
+    }
+    if (inList) { h += `</div>`; inList = false; }
+    const cls = x.type === "ok" ? "line ok" : x.type === "ask" ? "ask" : "line";
+    h += `<div class="${cls}">${esc(x.ja)}${en(x.en)}</div>`;
+  }
+  h += `</div>`;
+  $("#acard").innerHTML = h;
+  $("#enToggle").textContent = opts.en ? "EN ✓" : "EN";
+  $("#optTraces").checked = opts.traces; $("#optSoy").checked = opts.soy;
+}
+$("#optTraces").addEventListener("change", e => { opts.traces = e.target.checked; store.set("traces", opts.traces); renderCard(); });
+$("#optSoy").addEventListener("change", e => { opts.soy = e.target.checked; store.set("soyOk", opts.soy); renderCard(); });
+$("#enToggle").addEventListener("click", () => { opts.en = !opts.en; store.set("cardEn", opts.en); renderCard(); });
+$("#sayCard").addEventListener("click", () => speak(CARD_TITLE.ja + "。" + cardParts().map(x => x.ja).join("。")));
+$("#copyCard").addEventListener("click", async () => {
+  const txt = cardText(true);
+  try { await navigator.clipboard.writeText(txt); toast("Copied — paste it into your hotel email."); }
+  catch { showText({ ja: txt, en: "Press and hold to copy." }); }
+});
+
+/* ================= SHOW-TO-STAFF OVERLAY ================= */
+let showing = null, showEn = false;
+function fitSize(len) { return Math.max(24, Math.min(64, Math.round(1500 / Math.max(len, 8)))); }
+function openShow(item) {
+  showing = item; showEn = false;
+  const ov = $("#show"), big = $("#showBig");
+  ov.classList.toggle("card-mode", !!item.card);
+  if (item.card) {
+    const parts = cardParts();
+    big.innerHTML = `<span class="lineb" style="color:var(--shu);font-size:1.15em">${CARD_TITLE.ja}</span>` +
+      parts.map(x => `<span class="lineb"${x.type === "allergen" ? ' style="color:var(--avoid)"' : x.type === "ask" ? ' style="color:var(--shu-dark)"' : ""}>${x.type === "allergen" ? "✕ " : ""}${esc(x.ja)}</span>`).join("");
+    big.style.fontSize = "24px";
+    $("#showSub").textContent = "";
+  } else {
+    big.innerHTML = esc(item.ja).replace(/\n/g, "<br>");
+    big.style.fontSize = fitSize(item.ja.length) + "px";
+    $("#showSub").textContent = "";
+  }
+  ov.hidden = false; document.body.style.overflow = "hidden"; keepAwake(true);
+}
+function showText(item) { openShow(item); }
+function closeShow() { $("#show").hidden = true; document.body.style.overflow = ""; keepAwake(false); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+$("#showClose").addEventListener("click", closeShow);
+$("#showSay").addEventListener("click", () => showing && speak(showing.card ? CARD_TITLE.ja + "。" + cardParts().map(x => x.ja).join("。") : showing.ja));
+$("#showSlow").addEventListener("click", () => showing && speak(showing.card ? cardParts().map(x => x.ja).join("。") : showing.ja, true));
+$("#showEn").addEventListener("click", () => {
+  if (!showing) return; showEn = !showEn;
+  const sub = $("#showSub");
+  if (!showEn) { sub.textContent = ""; return; }
+  sub.textContent = showing.card ? CARD_TITLE.en + ". " + cardParts().map(x => x.en).join(" ") : [showing.en, showing.ro].filter(Boolean).join(" — ");
+});
+$("#showCard").addEventListener("click", () => openShow({ card: true }));
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#show").hidden) closeShow(); });
+
+/* ================= PHRASES ================= */
+const PHRASES = [
+  // allergy
+  { c: "Allergy", en: "I have food allergies.", ja: "食物アレルギーがあります。", ro: "Shokumotsu arerugī ga arimasu.", say: "show-koo-moh-tsoo ah-reh-roo-ghee gah ah-ree-mahs", q: 1 },
+  { c: "Allergy", en: "I can't eat wheat, dairy or soy.", ja: "小麦と乳製品と大豆が食べられません。", ro: "Komugi to nyūseihin to daizu ga taberaremasen.", say: "koh-moo-ghee toh nyoo-say-heen toh dye-zoo gah tah-beh-rah-reh-mah-sen", q: 1 },
+  { c: "Allergy", en: "No soy sauce, please.", ja: "醤油なしでお願いします。", ro: "Shōyu nashi de onegai shimasu.", say: "show-yoo nah-shee deh oh-neh-gai shee-mahs", q: 1 },
+  { c: "Allergy", en: "Soy sauce contains wheat, so I can't have it.", ja: "醤油には小麦が入っているので、食べられません。", ro: "Shōyu ni wa komugi ga haitte iru node, taberaremasen.", say: "show-yoo nee wah koh-moo-ghee gah hai-teh ee-roo noh-deh, tah-beh-rah-reh-mah-sen" },
+  { c: "Allergy", en: "Does this have wheat in it?", ja: "これに小麦は入っていますか？", ro: "Kore ni komugi wa haitte imasu ka?", say: "koh-reh nee koh-moo-ghee wah hai-teh ee-mahs kah", q: 1 },
+  { c: "Allergy", en: "Does this have dairy (milk or butter)?", ja: "これに乳製品（牛乳やバター）は入っていますか？", ro: "Kore ni nyūseihin (gyūnyū ya batā) wa haitte imasu ka?", say: "koh-reh nee nyoo-say-heen (gyoo-nyoo yah bah-tah) wah hai-teh ee-mahs kah" },
+  { c: "Allergy", en: "Does this have soy in it?", ja: "これに大豆は入っていますか？", ro: "Kore ni daizu wa haitte imasu ka?", say: "koh-reh nee dye-zoo wah hai-teh ee-mahs kah" },
+  { c: "Allergy", en: "Is there anything I can eat?", ja: "私が食べられるものはありますか？", ro: "Watashi ga taberareru mono wa arimasu ka?", say: "wah-tah-shee gah tah-beh-rah-reh-roo moh-noh wah ah-ree-mahs kah", q: 1 },
+  { c: "Allergy", en: "Do you have an allergen chart?", ja: "アレルギー表はありますか？", ro: "Arerugī-hyō wa arimasu ka?", say: "ah-reh-roo-ghee hyoh wah ah-ree-mahs kah" },
+  { c: "Allergy", en: "With salt, please (instead of sauce).", ja: "タレではなく、塩でお願いします。", ro: "Tare de wa naku, shio de onegai shimasu.", say: "tah-reh deh wah nah-koo, shee-oh deh oh-neh-gai shee-mahs", q: 1 },
+  { c: "Allergy", en: "No butter, please.", ja: "バターなしでお願いします。", ro: "Batā nashi de onegai shimasu.", say: "bah-tah nah-shee deh oh-neh-gai shee-mahs", q: 1 },
+  { c: "Allergy", en: "No butter and no soy sauce, please.", ja: "バターと醤油なしでお願いします。", ro: "Batā to shōyu nashi de onegai shimasu.", say: "bah-tah toh show-yoo nah-shee deh oh-neh-gai shee-mahs" },
+  { c: "Allergy", en: "Sauce on the side, please.", ja: "ソースは別にしてください。", ro: "Sōsu wa betsu ni shite kudasai.", say: "soh-soo wah beh-tsoo nee shteh koo-dah-sai" },
+  { c: "Allergy", en: "No miso soup, please.", ja: "味噌汁はなしでお願いします。", ro: "Misoshiru wa nashi de onegai shimasu.", say: "mee-soh-shee-roo wah nah-shee deh oh-neh-gai shee-mahs" },
+  { c: "Allergy", en: "Do you have gluten-free soy sauce?", ja: "グルテンフリーの醤油はありますか？", ro: "Guruten furī no shōyu wa arimasu ka?", say: "goo-roo-ten foo-ree noh show-yoo wah ah-ree-mahs kah" },
+  { c: "Allergy", en: "May I use my own soy sauce?", ja: "自分の醤油を使ってもいいですか？", ro: "Jibun no shōyu o tsukatte mo ii desu ka?", say: "jee-boon noh show-yoo oh tsoo-kah-teh moh ee dess kah" },
+  { c: "Allergy", en: "A little is OK.", ja: "少しなら大丈夫です。", ro: "Sukoshi nara daijōbu desu.", say: "skoh-shee nah-rah dye-joh-boo dess" },
+  { c: "Allergy", en: "Is this made with rice flour?", ja: "これは米粉で作っていますか？", ro: "Kore wa komeko de tsukutte imasu ka?", say: "koh-reh wah koh-meh-koh deh tsoo-koo-teh ee-mahs kah" },
+  // ordering
+  { c: "Ordering", en: "Excuse me! (to call staff)", ja: "すみません！", ro: "Sumimasen!", say: "soo-mee-mah-sen" },
+  { c: "Ordering", en: "Two people.", ja: "二人です。", ro: "Futari desu.", say: "foo-tah-ree dess" },
+  { c: "Ordering", en: "I have a reservation.", ja: "予約しています。", ro: "Yoyaku shite imasu.", say: "yoh-yah-koo shteh ee-mahs" },
+  { c: "Ordering", en: "Do you have an English menu?", ja: "英語のメニューはありますか？", ro: "Eigo no menyū wa arimasu ka?", say: "ay-goh noh meh-nyoo wah ah-ree-mahs kah" },
+  { c: "Ordering", en: "This one, please.", ja: "これをください。", ro: "Kore o kudasai.", say: "koh-reh oh koo-dah-sai" },
+  { c: "Ordering", en: "Water, please.", ja: "お水をください。", ro: "O-mizu o kudasai.", say: "oh-mee-zoo oh koo-dah-sai" },
+  { c: "Ordering", en: "Is this barley tea? (has gluten)", ja: "これは麦茶ですか？", ro: "Kore wa mugicha desu ka?", say: "koh-reh wah moo-ghee-chah dess kah" },
+  { c: "Ordering", en: "Green tea, please.", ja: "お茶をください。", ro: "O-cha o kudasai.", say: "oh-chah oh koo-dah-sai" },
+  { c: "Ordering", en: "What do you recommend?", ja: "おすすめは何ですか？", ro: "Osusume wa nan desu ka?", say: "oh-soo-soo-meh wah nahn dess kah" },
+  { c: "Ordering", en: "The check, please.", ja: "お会計お願いします。", ro: "O-kaikei onegai shimasu.", say: "oh-kai-kay oh-neh-gai shee-mahs" },
+  { c: "Ordering", en: "Thank you for the meal! (as you leave)", ja: "ごちそうさまでした。", ro: "Gochisōsama deshita.", say: "goh-chee-soh-sah-mah desh-tah" },
+  { c: "Ordering", en: "Thank you very much.", ja: "ありがとうございます。", ro: "Arigatō gozaimasu.", say: "ah-ree-gah-toh goh-zai-mahs" },
+  // shopping
+  { c: "Shopping", en: "Where is the gluten-free food?", ja: "グルテンフリーの食べ物はどこですか？", ro: "Guruten furī no tabemono wa doko desu ka?", say: "goo-roo-ten foo-ree noh tah-beh-moh-noh wah doh-koh dess kah" },
+  { c: "Shopping", en: "Do you sell soy sauce without wheat?", ja: "小麦不使用の醤油はありますか？", ro: "Komugi fushiyō no shōyu wa arimasu ka?", say: "koh-moo-ghee foo-shee-yoh noh show-yoo wah ah-ree-mahs kah" },
+  { c: "Shopping", en: "(Pointing at label) Does this contain wheat, milk or soy?", ja: "これに小麦・乳・大豆は入っていますか？", ro: "Kore ni komugi, nyū, daizu wa haitte imasu ka?", say: "koh-reh nee koh-moo-ghee, nyoo, dye-zoo wah hai-teh ee-mahs kah" },
+  { c: "Shopping", en: "No bag, thanks.", ja: "袋はいりません。", ro: "Fukuro wa irimasen.", say: "foo-koo-roh wah ee-ree-mah-sen" },
+  { c: "Shopping", en: "Yes, please heat it up. / No thanks.", ja: "はい、お願いします。／ 大丈夫です。", ro: "Hai, onegai shimasu. / Daijōbu desu.", say: "hai, oh-neh-gai shee-mahs / dye-joh-boo dess" },
+  // you'll hear
+  { c: "You'll hear", en: "“Shall I heat this up?” (konbini)", ja: "温めますか？", ro: "Atatamemasu ka?", say: "ah-tah-tah-meh-mahs kah" },
+  { c: "You'll hear", en: "“Do you need a bag?”", ja: "袋はご利用ですか？", ro: "Fukuro wa go-riyō desu ka?", say: "foo-koo-roh wah goh-ree-yoh dess kah" },
+  { c: "You'll hear", en: "“How many people?”", ja: "何名様ですか？", ro: "Nan-mei-sama desu ka?", say: "nahn-may-sah-mah dess kah" },
+  { c: "You'll hear", en: "“It contains it.” ❌", ja: "入っています。", ro: "Haitte imasu.", say: "hai-teh ee-mahs" },
+  { c: "You'll hear", en: "“It doesn't contain it.” ✅", ja: "入っていません。", ro: "Haitte imasen.", say: "hai-teh ee-mah-sen" },
+  { c: "You'll hear", en: "“We can't accommodate that.”", ja: "対応できません。", ro: "Taiō dekimasen.", say: "tai-oh deh-kee-mah-sen" },
+  { c: "You'll hear", en: "“It's fine / No problem.” (also a polite “no thanks”)", ja: "大丈夫です。", ro: "Daijōbu desu.", say: "dye-joh-boo dess" },
+  { c: "You'll hear", en: "“One moment, please.” (they're checking)", ja: "少々お待ちください。", ro: "Shōshō o-machi kudasai.", say: "shoh-shoh oh-mah-chee koo-dah-sai" },
+  // help
+  { c: "Help", en: "I feel sick.", ja: "気分が悪いです。", ro: "Kibun ga warui desu.", say: "kee-boon gah wah-roo-ee dess" },
+  { c: "Help", en: "I may have eaten something I'm allergic to.", ja: "アレルギーのものを食べたかもしれません。", ro: "Arerugī no mono o tabeta kamo shiremasen.", say: "ah-reh-roo-ghee noh moh-noh oh tah-beh-tah kah-moh shee-reh-mah-sen" },
+  { c: "Help", en: "Do you have allergy medicine?", ja: "アレルギーの薬はありますか？", ro: "Arerugī no kusuri wa arimasu ka?", say: "ah-reh-roo-ghee noh koo-soo-ree wah ah-ree-mahs kah" },
+  { c: "Help", en: "Where is a pharmacy?", ja: "薬局はどこですか？", ro: "Yakkyoku wa doko desu ka?", say: "yahk-kyoh-koo wah doh-koh dess kah" },
+  { c: "Help", en: "Where is the bathroom?", ja: "トイレはどこですか？", ro: "Toire wa doko desu ka?", say: "toy-reh wah doh-koh dess kah" },
+  { c: "Help", en: "Please call an ambulance.", ja: "救急車を呼んでください。", ro: "Kyūkyūsha o yonde kudasai.", say: "kyoo-kyoo-shah oh yohn-deh koo-dah-sai" }
+];
+const PCATS = ["All", "Allergy", "Ordering", "Shopping", "You'll hear", "Help"];
+let pCat = "All";
+function renderPhraseCats() {
+  $("#pCats").innerHTML = PCATS.map(c => `<button class="chip" aria-pressed="${c === pCat}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+}
+$("#pCats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; pCat = b.dataset.c; renderPhraseCats(); renderPhrases(); });
+$("#pSearch").addEventListener("input", renderPhrases);
+function renderPhrases() {
+  const q = $("#pSearch").value.trim().toLowerCase();
+  const list = PHRASES.map((p, i) => ({ ...p, i })).filter(p => (pCat === "All" || p.c === pCat) && (!q || (p.en + p.ja + p.ro).toLowerCase().includes(q)));
+  $("#pList").innerHTML = list.length ? list.map(p => `
+    <div class="phrase">
+      <div class="en">${esc(p.en)}</div>
+      <button class="ja" data-show="${p.i}">${esc(p.ja)}</button>
+      <div class="acts"><button class="icon-btn say" data-say="${p.i}" aria-label="Play">🔊</button><button class="icon-btn" data-slow="${p.i}" aria-label="Play slowly">🐢</button></div>
+      <div class="pro"><span class="romaji">${esc(p.ro)}</span><br><i>say:</i> ${esc(p.say)}</div>
+    </div>`).join("") : `<p class="muted">No phrases match “${esc(q)}”.</p>`;
+}
+document.addEventListener("click", e => {
+  const s = e.target.closest("[data-show]"); if (s) { openShow(PHRASES[+s.dataset.show]); return; }
+  const a = e.target.closest("[data-say]"); if (a) { speak(PHRASES[+a.dataset.say].ja); return; }
+  const w = e.target.closest("[data-slow]"); if (w) { speak(PHRASES[+w.dataset.slow].ja, true); return; }
+});
+function renderQuick() {
+  $("#quickRow").innerHTML = PHRASES.map((p, i) => p.q ? `<button class="btn sm" data-show="${i}">${esc(p.en.replace(/\.$/, ""))}</button>` : "").join("");
+}
+
+/* ================= FOOD ================= */
+const FOOD = [
+  // good
+  { s: "good", n: "Sashimi", ja: "刺身", ro: "sashimi", w: ["Sashimi"], e: "🐟", t: "Naturally safe. Skip the soy sauce — use salt, wasabi or lemon, or her own GF tamari." },
+  { s: "good", n: "Sushi (nigiri & chirashi)", ja: "寿司", ro: "sushi", w: ["Sushi"], e: "🍣", t: "Rice is seasoned with vinegar, sugar & salt. Say 醤油なし — some chefs brush soy sauce on top. Skip eel, tamago, crab stick, mayo and tempura rolls." },
+  { s: "good", n: "Salt yakitori", ja: "焼き鳥（塩）", ro: "yakitori shio", w: ["Yakitori"], e: "🍢", t: "Order shio (salt), never tare (sweet soy glaze). Tsukune meatballs can contain breadcrumbs." },
+  { s: "good", n: "Yakiniku with salt", ja: "焼肉（塩）", ro: "yakiniku shio", w: ["Yakiniku"], e: "🥩", t: "Grill-it-yourself beef. Choose un-marinated cuts with salt or lemon; skip the tare dipping sauce." },
+  { s: "good", n: "Onigiri", ja: "おにぎり", ro: "onigiri", w: ["Onigiri"], e: "🍙", t: "Salt (塩むすび), ume (梅) or salmon (鮭) are usually fine. Seasoned fillings vary — check the label for 小麦 / 乳成分." },
+  { s: "good", n: "Salt-grilled fish", ja: "焼き魚（塩焼き）", ro: "yakizakana, shioyaki", w: ["Shioyaki", "Grilled fish", "Pacific saury"], e: "🐠", t: "Classic set-meal and breakfast main. Salt only — leave the soy sauce and the miso soup." },
+  { s: "good", n: "Roasted sweet potato", ja: "焼き芋", ro: "yaki-imo", w: ["Yaki-imo", "Roasted sweet potato"], e: "🍠", t: "Just sweet potato, slow-roasted. Peak season in Nov–Dec — sold from trucks, markets and konbini." },
+  { s: "good", n: "Plain rice", ja: "ご飯・白米", ro: "gohan, hakumai", w: ["Japanese rice", "Cooked rice"], e: "🍚", t: "Always safe. Avoid seasoned mixed rice (炊き込みご飯) and fried rice." },
+  { s: "good", n: "Daifuku & plain mochi", ja: "大福・餅", ro: "daifuku, mochi", w: ["Daifuku", "Mochi"], e: "🍡", t: "Rice cake + sweet red bean = safe. Avoid kinako (soy powder) and mitarashi dango (soy-sauce glaze)." },
+  { s: "good", n: "Winter fruit", ja: "みかん・いちご", ro: "mikan, ichigo", w: ["Satsuma mandarin"], e: "🍊", t: "Mandarins are in season; Japanese strawberries arrive in December. Ichigo daifuku = strawberry mochi treat." },
+  { s: "good", n: "Sake & shochu", ja: "日本酒・焼酎", ro: "nihonshu, shōchū", w: ["Sake"], e: "🍶", t: "Sake is made from rice. Shochu, highballs, umeshu and wine are generally fine. Beer is barley." },
+  { s: "good", n: "Green tea & matcha (plain)", ja: "緑茶・抹茶", ro: "ryokucha, matcha", w: ["Matcha"], e: "🍵", t: "Plain tea is fine. Matcha lattes, soft-serve and parfaits contain milk." },
+  // ask
+  { s: "ask", n: "Juwari soba", ja: "十割そば", ro: "jūwari soba", w: ["Soba"], e: "🍜", t: "Only 十割 (100% buckwheat) is wheat-free — most soba is mixed. The dipping sauce (tsuyu) is soy sauce, so ask or bring her own." },
+  { s: "ask", n: "Shabu-shabu", ja: "しゃぶしゃぶ", ro: "shabu-shabu", w: ["Shabu-shabu"], e: "🍲", t: "Meat & veg swished in kombu broth — great. Skip ponzu and sesame dips (soy sauce, sometimes dairy); ask for salt." },
+  { s: "ask", n: "Teppanyaki / wagyu", ja: "鉄板焼き", ro: "teppanyaki", w: ["Teppanyaki"], e: "🥩", t: "Chefs often finish with butter and soy sauce. Ask: バターと醤油なしで (no butter, no soy sauce) — salt & wasabi instead." },
+  { s: "ask", n: "Eel", ja: "うなぎ（白焼き）", ro: "unagi shirayaki", w: ["Unagi"], e: "🐍", t: "The usual kabayaki glaze is soy sauce. Ask for shirayaki 白焼き — salt-grilled eel with wasabi." },
+  { s: "ask", n: "Rolled omelette", ja: "卵焼き", ro: "tamagoyaki", w: ["Tamagoyaki"], e: "🍳", t: "Often seasoned with soy sauce or dashi mix; some recipes add milk." },
+  { s: "ask", n: "Savory egg custard", ja: "茶碗蒸し", ro: "chawanmushi", w: ["Chawanmushi"], e: "🥚", t: "Usually seasoned with a little soy sauce." },
+  { s: "ask", n: "Rice porridge", ja: "お粥", ro: "okayu", w: ["Okayu", "Congee"], e: "🥣", t: "Plain is safe; toppings often include soy sauce or miso." },
+  { s: "ask", n: "Rice crackers", ja: "せんべい", ro: "senbei", w: ["Senbei"], e: "🍘", t: "Rice-based but usually brushed with soy sauce. Salt (塩) versions can be OK — check the label." },
+  { s: "ask", n: "Kaiseki / ryokan dinners", ja: "懐石料理", ro: "kaiseki", w: ["Kaiseki"], e: "🎎", t: "Many courses use soy sauce & miso. Email the card text before you arrive — most ryokan adapt with notice." },
+  { s: "ask", n: "Oden", ja: "おでん", ro: "oden", w: ["Oden"], e: "🍢", t: "Soy-sauce broth. Fish cakes often contain wheat starch and chikuwabu is pure wheat. Daikon, egg and konnyaku are safer." },
+  // avoid
+  { s: "avoid", n: "Ramen", ja: "ラーメン", ro: "rāmen", w: ["Ramen"], e: "🍜", t: "Wheat noodles; soy-sauce tare; some bowls use butter or milk. Go to a GF ramen shop instead (see Places)." },
+  { s: "avoid", n: "Udon", ja: "うどん", ro: "udon", w: ["Udon"], e: "🍜", t: "Thick wheat noodles." },
+  { s: "avoid", n: "Tempura", ja: "天ぷら", ro: "tenpura", w: ["Tempura"], e: "🍤", t: "Wheat batter — except at dedicated GF Tempura Asakusa SAKURA in Tokyo." },
+  { s: "avoid", n: "Tonkatsu & katsu", ja: "とんかつ", ro: "tonkatsu", w: ["Tonkatsu"], e: "🐖", t: "Flour + breadcrumbs; the sauce contains wheat." },
+  { s: "avoid", n: "Karaage fried chicken", ja: "唐揚げ", ro: "karaage", w: ["Karaage"], e: "🍗", t: "Marinated in soy sauce, dredged in flour. GF versions exist at T's Kitchen and Shinbu Sakiya." },
+  { s: "avoid", n: "Gyoza", ja: "餃子", ro: "gyōza", w: ["Gyoza", "Jiaozi"], e: "🥟", t: "Wheat wrappers and a soy-sauce dip." },
+  { s: "avoid", n: "Okonomiyaki & takoyaki", ja: "お好み焼き・たこ焼き", ro: "okonomiyaki, takoyaki", w: ["Okonomiyaki"], e: "🥞", t: "Wheat batter and wheat-based sauce. Great GF versions exist in Osaka & Kyoto (see Places)." },
+  { s: "avoid", n: "Japanese curry", ja: "カレーライス", ro: "karē raisu", w: ["Japanese curry"], e: "🍛", t: "Roux is wheat flour, often with milk or butter. Exception: CoCo Ichibanya's allergen-free curry." },
+  { s: "avoid", n: "Miso soup", ja: "味噌汁", ro: "misoshiru", w: ["Miso soup"], e: "🥣", t: "Soy (and some miso has barley). Comes with most set meals — ask to skip it." },
+  { s: "avoid", n: "Tofu, edamame, natto", ja: "豆腐・枝豆・納豆", ro: "tōfu, edamame, nattō", w: ["Tofu"], e: "🫘", t: "All soy — her most tolerable allergen, so small amounts only if she's OK that day." },
+  { s: "avoid", n: "Teriyaki & sukiyaki", ja: "照り焼き・すき焼き", ro: "teriyaki, sukiyaki", w: ["Sukiyaki"], e: "🍖", t: "Built on sweet soy sauce." },
+  { s: "avoid", n: "Bread & pastries", ja: "パン・メロンパン", ro: "pan, meronpan", w: ["Melonpan"], e: "🥐", t: "Wheat + butter/milk. Even 米粉 (rice-flour) bakes often contain dairy — ask." },
+  { s: "avoid", n: "Taiyaki & dorayaki", ja: "たい焼き・どら焼き", ro: "taiyaki, dorayaki", w: ["Taiyaki"], e: "🐟", t: "Wheat batter. Look for 米粉 (rice-flour) taiyaki shops." },
+  { s: "avoid", n: "Crab sticks & fish cakes", ja: "カニカマ・かまぼこ", ro: "kanikama, kamaboko", w: ["Kamaboko"], e: "🦀", t: "Often bound with wheat starch." },
+  { s: "avoid", n: "Barley tea", ja: "麦茶", ro: "mugicha", w: ["Barley tea"], e: "🫖", t: "Often poured free instead of water — it's barley (gluten). Ask for お水 (water) or お茶 (green tea)." },
+  { s: "avoid", n: "Beer", ja: "ビール", ro: "bīru", w: ["Beer in Japan", "Beer"], e: "🍺", t: "Barley malt. A few GF restaurants stock gluten-free beer." },
+  { s: "avoid", n: "Matcha latte & soft-serve", ja: "抹茶ラテ・ソフトクリーム", ro: "matcha rate, sofuto kurīmu", w: ["Soft serve"], e: "🍦", t: "Milk. Look for vegan gelato or sorbet instead." }
+];
+const KANJI = [
+  { k: "小麦", r: "komugi", m: "Wheat", s: "avoid" },
+  { k: "大麦・麦芽", r: "ōmugi · bakuga", m: "Barley · malt (gluten)", s: "avoid" },
+  { k: "醤油", r: "shōyu", m: "Soy sauce (wheat + soy)", s: "avoid" },
+  { k: "乳・乳成分", r: "nyū · nyūseibun", m: "Milk / milk ingredients", s: "avoid" },
+  { k: "乳製品", r: "nyūseihin", m: "Dairy products", s: "avoid" },
+  { k: "バター・チーズ", r: "batā · chīzu", m: "Butter · cheese", s: "avoid" },
+  { k: "生クリーム", r: "nama-kurīmu", m: "Fresh cream", s: "avoid" },
+  { k: "脱脂粉乳・乳糖", r: "dasshi-funnyū · nyūtō", m: "Skim-milk powder · lactose", s: "avoid" },
+  { k: "大豆", r: "daizu", m: "Soy", s: "ask" },
+  { k: "味噌・豆乳", r: "miso · tōnyū", m: "Miso · soy milk", s: "ask" },
+  { k: "米粉", r: "komeko", m: "Rice flour (good sign — check for dairy)", s: "good" },
+  { k: "小麦不使用", r: "komugi fushiyō", m: "Made without wheat", s: "good" },
+  { k: "乳不使用", r: "nyū fushiyō", m: "Made without dairy", s: "good" },
+  { k: "グルテンフリー", r: "guruten furī", m: "Gluten-free", s: "good" },
+  { k: "アレルゲン不使用", r: "arerugen fushiyō", m: "Major allergens not used (check that soy is included)", s: "good" }
+];
+const HIDDEN = [
+  ["🧂", "Soy sauce is everywhere", "Teriyaki, tare, ponzu, tsuyu, dressings, marinated eggs (味付け卵), rice crackers. It's wheat + soy."],
+  ["🫖", "Free barley tea", "Many restaurants pour mugicha instead of water. Ask for お水 or お茶."],
+  ["🥣", "Miso soup comes with set meals", "Teishoku, breakfasts and bento usually include it. Ask to skip it."],
+  ["🍤", "Tempura bits & breadcrumbs", "Tenkasu gets sprinkled on noodles and okonomiyaki; tsukune and hamburg steak often contain breadcrumbs."],
+  ["🦀", "Fish cakes & crab sticks", "Frequently bound with wheat starch."],
+  ["🧈", "Butter in surprising places", "Hokkaido-style ramen, bata-shōyu anything, teppanyaki, corn and potatoes, hotel omelettes."],
+  ["🍛", "Curry & stews", "Japanese curry roux, cream stews, gratins and doria are wheat + dairy."],
+  ["🍰", "Sweets & cafés", "Cakes, crepes, soft-serve, matcha lattes = dairy. Rice-flour bakes are wheat-free but often have butter."]
+];
+const FCATS = [["good", "✅ Good to eat"], ["ask", "⚠️ Ask first"], ["avoid", "❌ Avoid"], ["labels", "🔍 Read labels"], ["hidden", "🕵️ Hidden traps"]];
+let fCat = store.get("fCat", "good");
+function renderFoodCats() { $("#fCats").innerHTML = FCATS.map(([k, l]) => `<button class="chip" aria-pressed="${k === fCat}" data-f="${k}">${l}</button>`).join(""); }
+$("#fCats").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return; fCat = b.dataset.f; store.set("fCat", fCat); renderFoodCats(); renderFood(); });
+function renderFood() {
+  const body = $("#fBody");
+  if (fCat === "labels") {
+    body.innerHTML = `
+      <p class="small">Japanese law <b>requires</b> wheat (小麦) and milk (乳) to be labeled on packaged food. Soy (大豆) is only <i>recommended</i>, so if it isn't in the allergen box, still scan the ingredient list for 大豆・醤油・味噌.</p>
+      <div class="labelbox">原材料名：米（国産）、鮭、食塩、<mark>しょうゆ</mark>、のり、<mark>（一部に小麦・乳成分・大豆を含む）</mark></div>
+      <p class="small muted">↑ Look for the bracket at the end: <span class="jp">一部に〇〇を含む</span> = “contains (some) ___”. This one has wheat, milk and soy. Lines like <span class="jp">本品製造工場では…</span> mean “made in a factory that also handles…” — fine for her.</p>
+      ${KANJI.map(x => `<div class="kanji"><span class="k jp">${esc(x.k)}</span><span class="m"><b>${esc(x.m)}</b><span class="romaji">${esc(x.r)}</span></span><span class="badge b-${x.s}">${x.s === "good" ? "✅ good" : x.s === "ask" ? "⚠️ soy" : "❌ avoid"}</span></div>`).join("")}`;
+    return;
+  }
+  if (fCat === "hidden") {
+    body.innerHTML = HIDDEN.map(([e, h, t]) => `<div class="panel" style="display:flex;gap:12px"><span style="font-size:1.6rem">${e}</span><div><h3>${esc(h)}</h3><p class="small" style="margin-top:2px">${esc(t)}</p></div></div>`).join("");
+    return;
+  }
+  const lab = { good: ["b-good", "✅ Good"], ask: ["b-ask", "⚠️ Ask"], avoid: ["b-avoid", "❌ Avoid"] }[fCat];
+  body.innerHTML = `<div class="foodgrid">` + FOOD.filter(f => f.s === fCat).map(f => `
+    <div class="food ${f.s}">
+      <button class="wimg" data-w='${esc(JSON.stringify(f.w))}' aria-label="Photo of ${esc(f.n)}">${f.e}</button>
+      <div>
+        <h3>${esc(f.n)} <span class="badge ${lab[0]}">${lab[1]}</span></h3>
+        <div class="jpn">${esc(f.ja)} <span class="romaji">${esc(f.ro)}</span></div>
+        <p>${esc(f.t)}</p>
+      </div>
+    </div>`).join("") + `</div>`;
+  observeImages();
+}
+
+/* ---------------- Wikipedia photos (lazy, cached) ---------------- */
+const IMGKEY = "wikiimg-v1";
+const imgMeta = store.get(IMGKEY, {});
+const pending = new Map();
+async function wikiImage(titles) {
+  const key = titles.join("|");
+  if (imgMeta[key]) return imgMeta[key];
+  if (pending.has(key)) return pending.get(key);
+  const job = (async () => {
+    for (const t of titles) {
+      try {
+        const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_")));
+        if (!r.ok) continue;
+        const j = await r.json();
+        const th = j.thumbnail, orig = j.originalimage;
+        if (!th) continue;
+        let src = th.source;
+        const want = 640;
+        if (orig && orig.width > want && /\/\d+px-/.test(src)) src = src.replace(/\/\d+px-/, "/" + want + "px-");
+        const out = { src, page: (j.content_urls && (j.content_urls.mobile || j.content_urls.desktop) || {}).page || "", title: j.title };
+        imgMeta[key] = out; store.set(IMGKEY, imgMeta);
+        return out;
+      } catch {}
+    }
+    return null;
+  })();
+  pending.set(key, job);
+  const res = await job; pending.delete(key); return res;
+}
+async function fillImage(el) {
+  if (el.dataset.done) return; el.dataset.done = "1";
+  const titles = JSON.parse(el.dataset.w);
+  const meta = await wikiImage(titles);
+  if (!meta) return;
+  const img = new Image(); img.alt = ""; img.decoding = "async"; img.referrerPolicy = "no-referrer";
+  img.onload = () => img.classList.add("on");
+  img.onerror = () => { img.remove(); delete imgMeta[titles.join("|")]; store.set(IMGKEY, imgMeta); };
+  img.src = meta.src; el.appendChild(img);
+  el.dataset.page = meta.page;
+  const cr = el.querySelector(".credit"); if (cr && meta.page) { cr.href = meta.page; cr.hidden = false; }
+}
+let io = null;
+function observeImages() {
+  const els = document.querySelectorAll("[data-w]:not([data-done])");
+  if (!("IntersectionObserver" in window)) { els.forEach(fillImage); return; }
+  if (!io) io = new IntersectionObserver(ents => ents.forEach(en => { if (en.isIntersecting) { io.unobserve(en.target); fillImage(en.target); } }), { rootMargin: "300px" });
+  els.forEach(el => io.observe(el));
+}
+document.addEventListener("click", e => {
+  const w = e.target.closest(".wimg");
+  if (w && w.dataset.page) window.open(w.dataset.page, "_blank", "noopener");
+});
+
+/* ================= PLACES ================= */
+const CITIES = [
+  { k: "tokyo", n: "Tokyo", ja: "東京", w: ["Sensō-ji"] },
+  { k: "kyoto", n: "Kyoto", ja: "京都", w: ["Fushimi Inari-taisha"] },
+  { k: "osaka", n: "Osaka", ja: "大阪", w: ["Dōtonbori"] },
+  { k: "nara", n: "Nara", ja: "奈良", w: ["Nara Park"] },
+  { k: "any", n: "Anywhere", ja: "全国", w: ["Konbini", "Convenience store"] }
+];
+// tags: gf = 100% gluten-free, gfo = GF options, df = dairy-free menu, soy = soy-heavy, res = reserve, cash = cash only, info = other
+const PLACES = [
+  // ---------- TOKYO
+  { c: "tokyo", top: 1, e: "🍜", n: "Gluten Free T's Kitchen", ja: "グルテンフリー T's キッチン 上野広小路", a: "Ueno-Hirokoji (also Roppongi)", tags: [["gf", "100% gluten-free"], ["df", "Dairy-free items labeled"], ["df", "Soy-free items labeled"], ["res", "Reserve"]],
+    why: "Japan's best-known dedicated GF restaurant, certified by the Gluten Intolerance Group. Japanese comfort food — ramen, gyoza, karaage, okonomiyaki, tempura — with dairy- and soy-free dishes marked on the menu.",
+    tip: "Book on TableCheck — free changes need a week's notice (¥3,000 per group inside 7 days). Breakfast is walk-in. Closed Wednesday lunch & dinner. No elevator.",
+    url: "https://www.tablecheck.com/en/glutenfree-uenohirokoji/reserve", ul: "Book", q: "Gluten Free T's Kitchen Ueno-hirokoji" },
+  { c: "tokyo", top: 1, e: "🍤", n: "Tempura Asakusa SAKURA", ja: "天ぷら浅草 SAKURA", a: "Asakusa — THE CITY bldg 7F, by Asakusa Stn exit A4", tags: [["gf", "100% gluten-free"], ["res", "Reserve"]],
+    why: "Real tempura — normally off-limits — fried in rice-flour batter. Everything down to the dipping sauces is gluten-free and they offer GF soy sauce. English-speaking staff, cherry-blossom ceiling, 10-seat counter.",
+    tip: "Show the card anyway to confirm the batter and sauces are dairy-free. Tempura bowls at lunch, omakase courses all day.",
+    url: "https://www.tablecheck.com/en/tempura-asakusa", ul: "Book", q: "Tempura Asakusa SAKURA" },
+  { c: "tokyo", e: "🥗", n: "Marugoto Vegan Dining Asakusa", ja: "まるごとVeganダイニング浅草", a: "Asakusa — on the Sumida River, near Senso-ji", tags: [["gf", "100% gluten-free"], ["df", "100% dairy-free (vegan)"], ["soy", "Uses soy"]],
+    why: "Every dish is vegan and gluten-free, so nothing on the menu has wheat or dairy. Curry lunch plates, vegetable tempura, fried tempeh, GF waffles.",
+    tip: "Tempeh and soy nuggets are soy — pick around them if needed. Set menus need a reservation.",
+    url: "https://www.tablecheck.com/en/shops/marugoto-vegan-asakusa/reserve", ul: "Book", q: "Marugoto Vegan Dining Asakusa" },
+  { c: "tokyo", e: "🍜", n: "Soranoiro NIPPON", ja: "ソラノイロ NIPPON（東京ラーメンストリート）", a: "Tokyo Station — Ramen Street B1, outside the Yaesu gates", tags: [["gfo", "GF ramen"], ["cash", "Ticket machine, cash"]],
+    why: "From a Michelin Bib Gourmand ramen group: a gluten-free shio (salt) ramen made with brown-rice noodles. Perfect before or after a Shinkansen.",
+    tip: "Buy the gluten-free shio ramen ticket. Ask バターなし if a topping looks creamy. The ‘veggie soba’ uses soy milk.",
+    url: "https://soranoiro-vege.com/en/", ul: "Website", q: "Soranoiro NIPPON Tokyo Ramen Street" },
+  { c: "tokyo", e: "🍜", n: "Shinbu Sakiya Ramen", ja: "炙り味噌らーめん 麺匠 真武咲弥 渋谷店", a: "Shibuya — Dogenzaka, ~5 min from the Crossing", tags: [["gfo", "GF menu"], ["info", "Open until 2:30am+"], ["cash", "Suica / PayPay"]],
+    why: "A whole gluten-free section on the multilingual ticket machine: brown-rice-noodle ramen, GF & vegan gyoza, GF fries and GF fried chicken. Open into the small hours.",
+    tip: "Hokkaido-style = miso (soy) and sometimes butter. Pick a vegan GF ramen to avoid dairy, or say バターなしで.",
+    q: "Shinbu Sakiya Ramen Shibuya Dogenzaka" },
+  { c: "tokyo", e: "🥞", n: "Ain Soph. Journey", ja: "アインソフ ジャーニー 新宿", a: "Shinjuku 3-chome", tags: [["df", "100% dairy-free (vegan)"], ["gfo", "GF items marked"]],
+    why: "Well-loved all-vegan café (so dairy-free throughout) famous for fluffy pancakes, with gluten-free items marked.",
+    tip: "Not everything is GF — ask for the グルテンフリー dishes. Vegan cooking leans on soy.",
+    q: "Ain Soph Journey Shinjuku" },
+  { c: "tokyo", e: "🍣", n: "Uobei (conveyor sushi)", ja: "魚べい 渋谷道玄坂店", a: "Shibuya — Dogenzaka", tags: [["gfo", "GF soy sauce (reported)"], ["info", "Cheap & fast"]],
+    why: "Touch-screen sushi that zooms to your seat on a rail. Families with celiac kids report it provides gluten-free soy sauce. Sushi is naturally dairy-free.",
+    tip: "Ask: グルテンフリーの醤油はありますか？ Skip eel, tamago, crab stick, mayo and tempura pieces.",
+    q: "Uobei Shibuya Dogenzaka" },
+
+  // ---------- KYOTO
+  { c: "kyoto", top: 1, e: "🍜", n: "Kyoto Engine Ramen", ja: "KYOTO ENGINE RAMEN", a: "Nakagyo — near Shijo / Shinkyogoku", tags: [["gfo", "Any ramen can be GF"], ["df", "Vegan bowls"]],
+    why: "Every ramen can be made with GF noodles, plus GF gyoza. English-speaking staff put a gluten-free marker on your table. Vegan bowls are dairy-free.",
+    tip: "Always a line — take a queue ticket and wander. The ‘BEANing’ vegan ramen is soy-based; the spicy one is less so.",
+    q: "Kyoto Engine Ramen" },
+  { c: "kyoto", top: 1, e: "🥞", n: "Ikkakuju (Karasuma)", ja: "いっかくじゅう 烏丸店", a: "Shijo-Karasuma — 3 min from Karasuma / Shijo stations", tags: [["gf", "100% gluten-free"], ["info", "Dinner 17:00–23:00"]],
+    why: "The whole menu is gluten-free — even the soy sauce. Rice-flour okonomiyaki, yakisoba and teppanyaki in semi-private rooms. Great value.",
+    tip: "Ask for no mayo/cheese/butter. Skip the yuba okonomiyaki (soy-milk sauce). They'll clean the grill if asked.",
+    url: "https://gurunavi.com/en/kafz300/rev/rst", ul: "Info", q: "Ikkakuju Karasuma Kyoto" },
+  { c: "kyoto", e: "🍜", n: "Gion Soy Milk Ramen UNO YUKIKO", ja: "祇園豆乳ラーメン うのゆきこ", a: "Gion", tags: [["gf", "100% gluten-free"], ["df", "100% dairy-free (vegan)"], ["soy", "Soy-milk broth"]],
+    why: "Dedicated gluten-free and vegan ramen and gyoza — nothing with wheat or dairy. Rice noodles, GF soy sauce.",
+    tip: "The broth is soy milk — save it for a day she's fine with soy. Small shop; expect to queue. Sister UNO RAMEN shops are at Kyoto Station and Sanjo.",
+    q: "Gion Soy Milk Ramen Uno Yukiko" },
+  { c: "kyoto", e: "🍣", n: "Kikyo Sushi", ja: "", a: "Nakagyo — near Nijo Castle", tags: [["gfo", "GF soy sauce"], ["res", "Reserve"]],
+    why: "Family-run sushi counter that GF travelers rave about: gluten-free soy sauce, English menu, staff who understand allergies. Sushi is naturally dairy-free.",
+    tip: "Reserve ahead: +81-75-231-7361.",
+    tel: "+81752317361", q: "Kikyo Sushi Kyoto" },
+  { c: "kyoto", e: "🥪", n: "cafe planet", ja: "", a: "Kamigyo — north of downtown", tags: [["gf", "100% gluten-free"], ["df", "Vegan options"]],
+    why: "Dedicated gluten-free café with vegan (dairy-free) options — an easy, relaxed lunch.",
+    tip: "Small café — check hours on Maps before heading over.",
+    q: "cafe planet Kyoto Kajiicho" },
+  { c: "kyoto", e: "🍰", n: "Musubi Sweets Factory", ja: "", a: "Arashiyama", tags: [["gf", "100% gluten-free"], ["df", "100% dairy-free (vegan)"], ["soy", "Tofu-based"]],
+    why: "All-vegan, all-gluten-free cake shop near the Arashiyama sights: tofu-based cakes, tarts, vegan ice-cream sandwiches.",
+    tip: "11:00–17:00, closed Tuesday. Tofu = soy.",
+    q: "Musubi Sweets Factory Arashiyama" },
+
+  // ---------- OSAKA
+  { c: "osaka", top: 1, e: "🐙", n: "Vegan and Gluten Free Osaka", ja: "THE SECOND ROOM", a: "Umeda — Osaka Ekimae Dai-4 Bldg, B1", tags: [["gf", "100% gluten-free"], ["df", "100% dairy-free (vegan)"], ["soy", "Uses soy"]],
+    why: "Every dish is vegan and gluten-free: okonomiyaki, takoyaki, kushikatsu, karaage, temaki sushi — the Osaka classics she normally can't touch.",
+    tip: "It's a café by day and switches to the vegan/GF menu from late afternoon — check hours on Maps.",
+    q: "Vegan and Gluten Free Osaka Umeda Second Room" },
+  { c: "osaka", top: 1, e: "🥞", n: "OKO – Fun Okonomiyaki Bar", ja: "", a: "Higashi-Shinsaibashi", tags: [["gfo", "GF okonomiyaki"], ["df", "Vegan option + vegan cheese"], ["info", "Opens 6pm"]],
+    why: "Tiny, quirky bar run by one very fun owner. The okonomiyaki is gluten-free and there's a vegan version (dairy-free) with vegan cheese.",
+    tip: "Opens 6pm and closes when sold out — go early. Sister shop OKO takoyaki is vegan + GF (made with soybeans).",
+    q: "OKO Fun Okonomiyaki Bar Osaka" },
+  { c: "osaka", e: "🥞", n: "Gluten-Free & Vegan Okonomiyaki Vim", ja: "", a: "Namba", tags: [["gf", "100% gluten-free"], ["df", "Vegan options"], ["res", "Reservation only"]],
+    why: "Celiac owner, everything gluten-free, just 6 seats. Vegan okonomiyaki = dairy-free (the menu isn't all vegan).",
+    tip: "Evenings only, closed Thursday; ¥2,000 cancellation fee. Tucked down a small alley.",
+    q: "Gluten-Free Vegan Okonomiyaki Vim Namba" },
+  { c: "osaka", e: "🍲", n: "Genji-soba", ja: "源氏蕎麦", a: "Namba", tags: [["gfo", "GF items marked"], ["info", "Best at dinner"]],
+    why: "100% buckwheat soba plus gluten-free tempura, marked on the English menu. Say it's an allergy and they cook GF soba in a separate pot.",
+    tip: "Reviewers say the GF soba is a dinner thing. Confirm the dipping sauce (tsuyu) is GF too.",
+    q: "Genji-soba Namba" },
+  { c: "osaka", e: "🍣", n: "Kura Sushi Dotonbori", ja: "くら寿司 道頓堀", a: "Dotonbori — Global Flagship Store", tags: [["gfo", "GF soy sauce"], ["info", "Cheap & fun"]],
+    why: "Conveyor sushi on Dotonbori with gluten-free soy sauce available. Fun, cheap, naturally dairy-free.",
+    tip: "Order on the touch screen. Skip eel, tamago, mayo and tempura items.",
+    q: "Kura Sushi Dotonbori Global Flagship" },
+  { c: "osaka", e: "🍛", n: "Paprika Shokudo Vegan & GF", ja: "", a: "Shinsekai — near Tsutenkaku tower", tags: [["gfo", "GF dishes"], ["df", "100% dairy-free (vegan)"]],
+    why: "Vegan diner with gluten-free dishes, steps from the retro Shinsekai streets.",
+    tip: "Ask which dishes are グルテンフリー.",
+    q: "Shinsekai Paprika Shokudo Vegan Gluten-free" },
+
+  // ---------- NARA
+  { c: "nara", top: 1, e: "🍱", n: "onwa", ja: "onwa（オンワ）", a: "5–10 min walk from JR Nara Station", tags: [["gf", "100% gluten-free"], ["df", "100% dairy-free (vegan)"], ["soy", "Soy karaage"]],
+    why: "All-vegan, all-gluten-free café in an old house, cooking with local Yamato vegetables. Karaage bowls, plates and a famous GF matcha cake.",
+    tip: "11:00–17:00 (Sat to 20:00), closed Tuesday. About 10 seats — book online. The karaage is soy-based.",
+    url: "https://autoreserve.com/en/restaurants/SgzyemorUdSTJ2P21e2X", ul: "Book", q: "onwa vegan cafe Nara" },
+  { c: "nara", e: "🍱", n: "Naramachi Vegan Nabi", ja: "ならまちヴィーガン菜美", a: "Naramachi", tags: [["gf", "100% gluten-free"], ["df", "100% dairy-free (vegan)"], ["res", "Reserve lunch set"]],
+    why: "Traditional vegan Japanese food — dashi, pickles, ferments — every dish gluten-free and nut-free. Cat-themed and cozy.",
+    tip: "Closed Tue–Thu. The full lunch set must be reserved; bento and GF muffins are walk-in.",
+    q: "Naramachi Vegan Nabi" },
+  { c: "nara", e: "🍙", n: "Omusubi Banshun", ja: "おむすび 番旬", a: "Naramachi", tags: [["gfo", "GF marked"], ["info", "Quick lunch"]],
+    why: "Fresh onigiri shop with a big ‘gluten free’ sign and GF choices clearly marked — an easy lunch near Nara Park.",
+    tip: "Ask about fillings for dairy.",
+    q: "おむすび 番旬 奈良" },
+  { c: "nara", e: "🥖", n: "Sarasojyu (Comeco Café)", ja: "", a: "Near Naramachi", tags: [["gf", "100% gluten-free"], ["soy", "Lots of dairy"]],
+    why: "Dedicated gluten-free café-bakery: rice-flour bread, pasta, quiche and cakes.",
+    tip: "Many dishes use cream and cheese — ask for 乳製品なし options before ordering.",
+    q: "Sarasojyu gluten free Nara" },
+  { c: "nara", e: "🥗", n: "Tsukihiboshi", ja: "", a: "Near Kintetsu Nara Station", tags: [["gfo", "GF"], ["info", "Allergy-friendly"], ["cash", "Cash only"]],
+    why: "Calm Japanese lunch spot with a gluten-free pickle buffet and allergen-friendly options.",
+    tip: "Cash only.",
+    q: "Tsukihiboshi Nara" },
+
+  // ---------- ANYWHERE
+  { c: "any", top: 1, e: "🍛", n: "CoCo Ichibanya — allergen-free curry", ja: "特定原材料（7品目）を使用していないカレー", a: "Japan's biggest curry chain — hundreds of branches", tags: [["gfo", "No wheat or milk"], ["soy", "Soy not covered"], ["info", "Open late"]],
+    why: "A special curry made without the major allergens — including wheat and milk. A reliable hot meal almost anywhere, any time.",
+    tip: "Tap ‘Show name’ and point. Shared kitchen (fine for traces). Soy isn't on that allergen list — ask 大豆は入っていますか？",
+    show: "特定原材料（7品目）を使用していないカレーをください。", q: "CoCo Ichibanya" },
+  { c: "any", e: "🍔", n: "MOS Burger — low-allergen menu", ja: "低アレルゲンメニュー（ポークサンド・ポークロール）", a: "Nationwide burger chain", tags: [["gfo", "No wheat or milk"], ["soy", "May contain soy"]],
+    why: "MOS's low-allergen pork sandwich and roll are made without egg, milk, wheat and the other major allergens.",
+    tip: "Tap ‘Show name’ to order. Full allergen chart in English on mos.jp.",
+    show: "低アレルゲンメニューのポークサンドをください。", url: "https://www.mos.jp/menu/pdf/allergy.pdf", ul: "Allergen chart", q: "MOS Burger" },
+  { c: "any", e: "🏪", n: "Konbini (7-Eleven, Lawson, FamilyMart)", ja: "コンビニ", a: "On every corner", tags: [["info", "Read labels"]],
+    why: "Best fallback: salt onigiri (塩むすび), ume or salmon onigiri, plain boiled eggs (ゆで卵), roasted sweet potato, bananas, fruit cups, plain salads (bring her own dressing).",
+    tip: "Check the allergen box for 小麦・乳成分・大豆 (see Food → Read labels). Marinated eggs (味付け卵) have soy sauce.",
+    q: "convenience store" },
+  { c: "any", e: "🛒", n: "Where to buy GF soy sauce", ja: "小麦不使用 醤油", a: "Tokyo · Kyoto · nationwide", tags: [["gfo", "GF soy sauce"]],
+    why: "Ran out of tamari packets? Seijo Ishii (Shin-Marunouchi Bldg by Tokyo Station), Takashimaya Times Square B1 (Shinjuku), the Aeon Mall supermarket by Kyoto Station, and Life supermarkets (allergy section) have stocked it.",
+    tip: "Look for 小麦不使用 or グルテンフリー on the bottle.",
+    show: "小麦不使用の醤油はありますか？", q: "Seijo Ishii" }
+];
+const TAGCLS = { gf: "b-good", gfo: "b-good", df: "b-ind", soy: "b-ask", res: "b-shu", cash: "b-gray", info: "b-gray" };
+let city = store.get("city", "tokyo");
+function renderCityChips() { $("#cityChips").innerHTML = CITIES.map(c => `<button class="chip" aria-pressed="${c.k === city}" data-city="${c.k}">${esc(c.n)}</button>`).join(""); }
+$("#cityChips").addEventListener("click", e => { const b = e.target.closest("[data-city]"); if (!b) return; city = b.dataset.city; store.set("city", city); renderCityChips(); renderPlaces(); window.scrollTo({ top: 0 }); });
+const mapsUrl = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+function renderPlaces() {
+  const C = CITIES.find(c => c.k === city);
+  const list = PLACES.filter(p => p.c === city);
+  let h = `<div class="banner" data-w='${esc(JSON.stringify(C.w))}'><a class="credit" target="_blank" rel="noopener" hidden>photo: Wikipedia</a><div class="t"><b>${esc(C.n)}</b><span class="jp">${esc(C.ja)}</span></div></div>`;
+  if (city === "any") h += `<p class="small muted">Chains and stores you'll find in every city — good backups on travel days.</p>`;
+  else h += `<p class="small muted"><span class="badge b-good">GF</span> gluten-free &nbsp;<span class="badge b-ind">dairy-free</span> &nbsp;<span class="badge b-ask">soy note</span> — ★ = top pick for her.</p>`;
+  h += list.map((p, i) => {
+    const idx = PLACES.indexOf(p);
+    return `<div class="place">
+      <div class="top"><div class="emo">${p.e}</div><div>
+        <h3>${esc(p.n)}${p.top ? `<span class="top-pick">★ TOP PICK</span>` : ""}</h3>
+        ${p.ja ? `<div class="jpname">${esc(p.ja)}</div>` : ""}
+        <div class="area">📍 ${esc(p.a)}</div>
+      </div></div>
+      <div class="tags">${p.tags.map(([k, l]) => `<span class="badge ${TAGCLS[k]}">${esc(l)}</span>`).join("")}</div>
+      <p>${esc(p.why)}</p>
+      <div class="tip">💡 ${esc(p.tip)}</div>
+      <div class="row">
+        <a class="btn sm primary" href="${mapsUrl(p.q)}" target="_blank" rel="noopener">📷 Photos &amp; map</a>
+        ${p.url ? `<a class="btn sm" href="${esc(p.url)}" target="_blank" rel="noopener">🌐 ${esc(p.ul || "Website")}</a>` : ""}
+        ${p.tel ? `<a class="btn sm" href="tel:${esc(p.tel)}">📞 Call</a>` : ""}
+        ${(p.show || p.ja) ? `<button class="btn sm" data-place="${idx}">🈁 Show name</button>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+  $("#cityBody").innerHTML = h;
+  observeImages();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-place]"); if (!b) return;
+  const p = PLACES[+b.dataset.place];
+  openShow({ ja: p.show || p.ja, en: p.n, ro: p.a });
+});
+
+/* ================= TABS ================= */
+const TITLES = { card: "Allergy card", phrases: "Phrases & pronunciation", food: "What to eat", places: "Safe restaurants", tips: "Tips & setup" };
+function setTab(t, push) {
+  if (!TITLES[t]) t = "card";
+  document.querySelectorAll("section.tab").forEach(s => s.hidden = s.id !== "tab-" + t);
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  $("#tabTitle").textContent = TITLES[t];
+  store.set("tab", t);
+  if (push) history.replaceState(null, "", "#" + t);
+  window.scrollTo({ top: 0 });
+  if (t === "food" || t === "places") observeImages();
+}
+document.querySelector("nav.tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab, true); });
+window.addEventListener("hashchange", () => setTab(location.hash.slice(1)));
+
+/* ================= INSTALL + OFFLINE ================= */
+let deferred = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; $("#installBtn").hidden = false; });
+$("#installBtn").addEventListener("click", async () => { if (!deferred) return; deferred.prompt(); try { await deferred.userChoice; } catch {} deferred = null; $("#installBtn").hidden = true; });
+if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) $("#installPanel").querySelector("h3").textContent = "Installed ✓ — save photos for offline";
+$("#offlineBtn").addEventListener("click", async () => {
+  const sets = [...FOOD.map(f => f.w), ...CITIES.map(c => c.w)];
+  const prog = $("#offProg"), bar = prog.querySelector("i"), msg = $("#offMsg");
+  prog.hidden = false; let done = 0, ok = 0;
+  msg.textContent = "Saving photos…";
+  const queue = sets.slice();
+  async function worker() {
+    while (queue.length) {
+      const w = queue.shift();
+      try {
+        const m = await wikiImage(w);
+        if (m) { await fetch(m.src, { mode: "no-cors" }); ok++; }
+      } catch {}
+      done++; bar.style.width = Math.round(done / sets.length * 100) + "%";
+    }
+  }
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  msg.textContent = navigator.onLine === false ? "You're offline — connect and try again." : `Saved ${ok} of ${sets.length} photos. Everything else already works offline.`;
+});
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+
+/* ================= START ================= */
+renderCard(); renderQuick();
+renderPhraseCats(); renderPhrases();
+renderFoodCats(); renderFood();
+renderCityChips(); renderPlaces();
+setTab(location.hash.slice(1) || store.get("tab", "card"));
+</script>
+</body></html>
