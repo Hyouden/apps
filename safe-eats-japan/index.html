@@ -84,7 +84,7 @@ details.opts .toggles{padding:2px 0 12px}
 #full .fhead{font-weight:800;font-size:min(8vw,4.3vh);line-height:1.35;color:var(--shu)}
 #full .nos{display:grid;gap:1.2vh}
 #full .no{padding:1.3vh 14px;border-width:3px;border-radius:18px}
-#full .no b{font-size:min(8.6vw,4.5vh)}
+#full .no b{font-size:min(11vw,6vh)}
 #full .no .sub{font-size:min(5.2vw,2.8vh)}
 #full .no .x{width:min(10vw,5.4vh);height:min(10vw,5.4vh);line-height:min(10vw,5.4vh);font-size:min(6vw,3.2vh)}
 #full .fnote{font-size:min(5.8vw,3.1vh);font-weight:700;color:#1d4d24}
@@ -223,13 +223,6 @@ ul.clean li{line-height:1.45}
   <div class="acard" id="acard" role="button" tabindex="0" aria-label="Show card full screen"></div>
   <button class="btn primary big" id="showCard">⤢ Show card full screen</button>
   <button class="btn ghost" id="sayCard">🔊 Hear it in Japanese</button>
-  <details class="opts">
-    <summary>Card options</summary>
-    <div class="toggles">
-      <label class="tog"><input type="checkbox" id="optTraces"><div><b>Shared cookware is fine</b><span>Adds one line so kitchens know cross-contact is OK — they're more likely to say yes.</span></div></label>
-      <label class="tog"><input type="checkbox" id="optSoy"><div><b>A little soy is OK</b><span>Use when options are thin. Wheat still includes soy sauce.</span></div></label>
-    </div>
-  </details>
 </section>
 
 <!-- ================= PHRASES ================= -->
@@ -413,16 +406,14 @@ const awake = (() => {
 })();
 
 /* ================= ALLERGY CARD ================= */
-const opts = { traces: store.get("traces", true), soy: store.get("soyOk", false) };
 function cardModel() {
   return {
     head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have food allergies." },
     items: [
-      { ja: "小麦", sub: "醤油にも入っています", en: "Wheat — it's in soy sauce too" },
-      { ja: "乳製品", sub: "バター・牛乳など", en: "Dairy — butter, milk, etc." },
-      opts.soy ? { ja: "大豆", sub: "少量なら大丈夫です", en: "Soy — a little is OK", soft: true } : { ja: "大豆", en: "Soy" }
+      { ja: "小麦", en: "Wheat" },
+      { ja: "乳製品", en: "Dairy" }
     ],
-    note: opts.traces ? { ja: "同じ調理器具でも大丈夫です。", en: "Shared cookware is fine." } : null,
+    note: null,
     ask: { ja: "これらを使わないおすすめの料理を教えていただけますか？", en: "Could you recommend a dish made without these?" },
     thanks: { ja: "よろしくお願いします。", en: "Thank you so much." }
   };
@@ -437,11 +428,8 @@ function cardInner(m) {
 function renderCard() {
   const m = cardModel();
   $("#acard").innerHTML = `<div class="band">${esc(m.head.ja)}${enSpan(m.head.en)}</div><div class="body">${cardInner(m)}</div>`;
-  $("#optTraces").checked = opts.traces; $("#optSoy").checked = opts.soy;
 }
 function cardSpeech() { const m = cardModel(); return [m.head.ja, ...m.items.map(i => i.sub ? i.ja + "。" + i.sub : i.ja), m.note && m.note.ja, m.ask.ja, m.thanks.ja].filter(Boolean).join("。"); }
-$("#optTraces").addEventListener("change", e => { opts.traces = e.target.checked; store.set("traces", opts.traces); renderCard(); });
-$("#optSoy").addEventListener("change", e => { opts.soy = e.target.checked; store.set("soyOk", opts.soy); renderCard(); });
 $("#sayCard").addEventListener("click", () => speak(cardSpeech()));
 
 const HOTEL_NOTE = `【食物アレルギーについて】
