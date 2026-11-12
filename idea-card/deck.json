@@ -1,0 +1,456 @@
+{
+ "version": 1,
+ "updated": "2026-11-11",
+ "cards": [
+  {
+   "id": "c001",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "The Ship of Theseus",
+   "body": "Replace every plank of a ship one at a time and you still call it the same ship. Your body swaps out most of its cells over the years, and your opinions change even faster.",
+   "chew": "What part of you, if it changed, would make you a different person?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c002",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Amor fati",
+   "body": "Nietzsche's idea: don't just put up with what happened to you. Love it, because every bad day was part of the road that made you.",
+   "chew": "Which rough stretch of your life are you secretly glad about now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c003",
+   "kind": "deep",
+   "rarity": 2,
+   "title": "The eternal return",
+   "body": "Imagine you had to live this exact life again, every moment in the same order, forever. Nietzsche used it as a test: would that thought crush you or thrill you?",
+   "chew": "What would you change this week so the answer is 'thrill'?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c004",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "The examined life",
+   "body": "Socrates thought most people sleepwalk through their days on autopilot and borrowed opinions. Examining your life means asking why you want what you want.",
+   "chew": "Name one thing you want that you've never actually questioned.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c005",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Wu wei",
+   "body": "Taoists praise 'effortless action': moving with the grain of a situation the way water flows around rocks. It's the feeling of a run where you stop thinking and just ride.",
+   "chew": "Where in your life are you forcing something that would go better if you flowed?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c006",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "The present is all you get",
+   "body": "The past is a memory and the future is a guess. Every experience you'll ever have happens in a now that's always a few seconds wide.",
+   "chew": "What's happening right now that you're not noticing?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c007",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "The view from nowhere",
+   "body": "Thomas Nagel asked how we can see the world from no particular perspective. Zoom out far enough and your worst embarrassment is a pixel on a speck in a galaxy.",
+   "chew": "Does zooming out make your problems feel smaller, or your life feel smaller? Can it be both?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c008",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Hedonic treadmill",
+   "body": "Get the new board, the raise, the bigger place, and within months it feels normal. Happiness snaps back to a baseline almost no matter what you add.",
+   "chew": "What's something that has never stopped making you happy?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c009",
+   "kind": "deep",
+   "rarity": 2,
+   "title": "Memento mori",
+   "body": "Roman generals in parades supposedly had someone whisper 'remember you will die.' The point wasn't gloom. It's that a short life makes today expensive.",
+   "chew": "If you had one year, what would you stop doing tomorrow?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c010",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Sonder",
+   "body": "The realization that every stranger in traffic has a whole life as vivid and complicated as yours, and you're an extra in theirs.",
+   "chew": "Who did you see today who's the main character of a story you'll never know?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c011",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "The dichotomy of control",
+   "body": "Epictetus split the world in two: what's up to you (your effort, your response) and what isn't (weather, other people, results). Stress lives in mixing them up.",
+   "chew": "What are you worrying about this week that sits in the second pile?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c012",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Premeditatio malorum",
+   "body": "Stoics rehearsed things going wrong ahead of time: the lost job, the injury, the canceled trip. Not to be gloomy, but so nothing knocks them flat.",
+   "chew": "What's one setback you could plan a calm response to now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c013",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Two-minute rule",
+   "body": "If something takes under two minutes, do it now. Little undone tasks pile up and quietly drain your energy.",
+   "chew": "What tiny task have you been carrying around in your head for days?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c014",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Strong opinions, loosely held",
+   "body": "Pick a direction and commit hard, but drop it the moment the evidence changes. Being decisive and being open aren't opposites.",
+   "chew": "What opinion of yours would you drop if you found out you were wrong?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c015",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Chesterton's fence",
+   "body": "Before you tear down a fence in the middle of nowhere, find out why someone built it. Old rules sometimes look dumb until you learn what they prevented.",
+   "chew": "What 'dumb' rule at work might be guarding against something?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c016",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "The map is not the territory",
+   "body": "Your plan, your org chart and your mental picture of a person are all simplified maps. Reality always has more detail than the map.",
+   "chew": "Where are you trusting a map over what's actually in front of you?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c017",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Second-order thinking",
+   "body": "Ask 'and then what?' The first effect of a decision is obvious. The second and third effects are where the surprises live.",
+   "chew": "Take a decision you're weighing and ask 'and then what?' three times.",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c018",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Done is a feature",
+   "body": "A finished thing that's 80% good beats a perfect thing that lives in your head. You can't improve what you never shipped.",
+   "chew": "What could you ship this week at 80%?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c019",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Reply to the best version",
+   "body": "When someone says something that annoys you, answer the smartest version of their point, not the dumbest. It changes how arguments go.",
+   "chew": "Who could you steelman instead of strawman this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c020",
+   "kind": "steady",
+   "rarity": 2,
+   "title": "Sympatheia",
+   "body": "Marcus Aurelius kept reminding himself that everyone is connected, like limbs of one body. What's bad for the hive is bad for the bee.",
+   "chew": "Who is quietly carrying something heavy that you could lighten?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c021",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Dogs have no idea",
+   "body": "Your dog thinks you leave every morning to go hunting and come back with groceries. Honestly, it's not that far off.",
+   "chew": "What do you think your pets believe your job is?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c022",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Cats are landlords",
+   "body": "Your cats let you live in their house in exchange for food, cleaning, and the occasional chin scratch, which they can revoke at any time.",
+   "chew": "Which of your animals would be the worst roommate as a human?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c023",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "Confident wrong",
+   "body": "Somewhere right now, a man is explaining to a ski instructor how to ski.",
+   "chew": "What's a topic you're dangerously confident about?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c024",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "The meeting that could've been an email",
+   "body": "Every meeting has a ghost email living inside it, trying to escape.",
+   "chew": "What's the shortest possible version of your next meeting?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c025",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Bread is a hostage situation",
+   "body": "A bag of bread twist-tie is a tiny puzzle box designed by someone who hates breakfast.",
+   "chew": "What everyday object would you redesign out of spite?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c026",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "Disc golf physics",
+   "body": "The disc will skip off a tree, ricochet off a rock, and land exactly where you couldn't putt from. Every time. It's not luck. It's personal.",
+   "chew": "What sport or game do you swear is rigged against you?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c027",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Adulthood",
+   "body": "Being an adult is mostly saying 'we should hang out soon' for six years.",
+   "chew": "Who have you been 'getting together soon' with for too long?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c028",
+   "kind": "funny",
+   "rarity": 2,
+   "title": "The snooze button",
+   "body": "Hitting snooze is negotiating with a hostage taker who is also you, and you always lose.",
+   "chew": "What's your most pointless daily negotiation with yourself?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c029",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Card game math",
+   "body": "Every card player is one draw away from either godhood or quitting forever. There is no in-between.",
+   "chew": "What's your best 'topdeck of destiny' story?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c030",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "Socks",
+   "body": "Somewhere there's a planet populated entirely by single socks, and they're all wondering where their other half went too.",
+   "chew": "What mundane mystery would you want solved before you die?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c031",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Gamer time",
+   "body": "'Five more minutes' in gamer time is a unit of measurement roughly equal to two hours and one missed dinner.",
+   "chew": "What's your most dangerous 'just one more'?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c032",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "Experience machine",
+   "body": "Robert Nozick offered a machine that gives you any experiences you want, perfectly real-feeling, forever. Most people say no. Why, if it feels identical?",
+   "chew": "Would you plug in? What would you miss that you can't name?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c033",
+   "kind": "bender",
+   "rarity": 2,
+   "title": "Boltzmann brain",
+   "body": "Some physicists joke that it's statistically likelier for a lone brain with fake memories to pop into existence than a whole universe. You might be one, remembering this card.",
+   "chew": "How do you know your memories happened?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c034",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "The teleporter",
+   "body": "A teleporter scans you, destroys you, and builds an exact copy on Mars. The copy feels like you and remembers your breakfast. Did you travel, or die?",
+   "chew": "Would you step in? Would you if it saved a 6-hour drive?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c035",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "Mary's room",
+   "body": "Mary knows every physical fact about color but has lived in a black-and-white room. When she walks out and sees a red apple, does she learn something new?",
+   "chew": "Is there something you 'know' but haven't actually experienced?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c036",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "The trolley, but you're the trolley",
+   "body": "Every choice you make sends the future down one track and not another. You're always pulling a lever, just slowly.",
+   "chew": "What 'lever' did you pull this year without noticing?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c037",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "Newcomb's box",
+   "body": "A perfect predictor puts $1M in a box only if it predicted you'd take just that box, and leaves $1K in another box. It already decided. Do you take one box or both?",
+   "chew": "Are you a one-boxer or two-boxer, and what does that say about you?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c038",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "Sorites heap",
+   "body": "Remove one grain from a heap of sand and it's still a heap. Repeat. When exactly does it stop being a heap? Nobody can say.",
+   "chew": "What change in your life happened grain by grain?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c039",
+   "kind": "bender",
+   "rarity": 2,
+   "title": "Simulation tax",
+   "body": "If we're in a simulation, the cheapest way to run it would be to render only what someone is looking at. Quantum physics behaves a little suspiciously like that.",
+   "chew": "If you found out it was a sim, what would you do differently tomorrow?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c040",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "Fermi's question",
+   "body": "The universe is huge and old, so where is everybody? Either life is rare, it doesn't last, or it's hiding. Every answer is kind of wild.",
+   "chew": "Which answer scares you the most?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c041",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "Roko's sandwich",
+   "body": "Imagine a future AI that only rewards people who brought it a sandwich. You now know about it. Are you obligated? (No. But you thought about it.)",
+   "chew": "What weird idea lives in your head rent-free?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c042",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Send it",
+   "body": "The worst version of the line you were scared of is still more fun than standing at the top for 20 minutes.",
+   "chew": "What are you standing at the top of right now?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c043",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "1% better",
+   "body": "Get 1% better every day and you're about 37 times better in a year. Get 1% worse and you're almost at zero. Tiny daily stuff compounds.",
+   "chew": "What's one 1% thing you can do today?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c044",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Bails are reps",
+   "body": "Every skater has eaten it hundreds of times on a trick before landing it once. The slams weren't failure. They were the practice.",
+   "chew": "What are you bailing on that just needs more reps?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c045",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Start ugly",
+   "body": "The first version of anything good was bad. The first board you rode, the first code you wrote, the first drawing. Ugly is how you start.",
+   "chew": "What could you start ugly today?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c046",
+   "kind": "fuel",
+   "rarity": 2,
+   "title": "Future you is watching",
+   "body": "In ten years, a version of you will look back at this exact week. Give them something to be proud of, or at least something funny to tell.",
+   "chew": "What would future you thank you for doing tonight?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c047",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "Energy, not time",
+   "body": "You can't make more hours, but you can stop spending your best energy on stuff you don't care about.",
+   "chew": "What drains you that you could cut or delegate this week?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c048",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "The boring middle",
+   "body": "Every project has an exciting start, a satisfying finish, and a long boring middle where most people quit. That's where it's won.",
+   "chew": "What project of yours is in the boring middle?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c049",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Ask anyway",
+   "body": "The worst answer you'll get is no, and 'no' is where you already are if you never ask.",
+   "chew": "What do you want to ask for but haven't?",
+   "added": "2026-10-01"
+  },
+  {
+   "id": "c050",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "Small wins stack",
+   "body": "Finishing one small thing gives you momentum to finish the next. Momentum is a cheat code.",
+   "chew": "What's the smallest finishable thing on your list?",
+   "added": "2026-10-01"
+  }
+ ]
+}

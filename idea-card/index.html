@@ -1,0 +1,279 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daily Idea Card</title>
+<meta name="theme-color" content="#12161c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Idea Card">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: one collectible card on a felt table; mood chips above, actions below, collection list and backup at the bottom. Single dark theme by choice. */
+:root {
+  --table: #12161c;
+  --felt: #1a2029;
+  --ink: #eef0f3;
+  --muted: #98a1ae;
+  --line: #2b3340;
+  --gold: #e7c26b;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Literata", Georgia, "Times New Roman", serif;
+  --c-deep: #7d8cff;
+  --c-steady: #9fb3c8;
+  --c-funny: #ffc94a;
+  --c-bender: #3fd0c0;
+  --c-fuel: #ff7a45;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--table); color: var(--ink); font-family: var(--font-body); -webkit-tap-highlight-color: transparent; }
+body { min-height: 100%; background: radial-gradient(120% 80% at 50% 0%, var(--felt), var(--table) 70%) fixed; }
+.wrap { max-width: 520px; margin: 0 auto; display: grid; gap: 18px;
+  padding: calc(env(safe-area-inset-top, 0px) + 18px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 40px) max(16px, env(safe-area-inset-left, 0px)); }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; margin: 0; letter-spacing: -0.01em; }
+.date { color: var(--muted); font-size: .85rem; font-family: var(--font-display); }
+.moods { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--font-display); font-weight: 600; font-size: .9rem; min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+.chip[aria-pressed="true"] { color: #10141a; background: var(--chip, var(--ink)); border-color: transparent; }
+.chip:focus-visible, button:focus-visible, .mini:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.newbadge { font-family: var(--font-display); font-size: .85rem; color: #1a1406; background: var(--gold); border-radius: 10px; padding: 8px 12px; border: 0; text-align: left; cursor: pointer; font-weight: 600; }
+
+.card { --c: var(--c-deep); position: relative; border-radius: 22px; padding: 3px; background: linear-gradient(160deg, var(--c), color-mix(in oklab, var(--c) 30%, #000) 60%, var(--c)); box-shadow: 0 20px 50px -20px color-mix(in oklab, var(--c) 60%, transparent); touch-action: pan-y; }
+.card.legendary { background: linear-gradient(130deg, #ffe7a3, var(--c), #fff3c8, var(--c), #e7c26b); }
+.face { border-radius: 19px; background: linear-gradient(180deg, color-mix(in oklab, var(--c) 18%, #151a22), #151a22 45%); padding: 18px 20px 20px; display: grid; gap: 14px; min-height: 360px; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--font-display); }
+.kind { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .09em; color: var(--c); }
+.rarity { font-size: .75rem; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.gem { width: 9px; height: 9px; transform: rotate(45deg); background: var(--muted); border-radius: 2px; }
+.rare .gem { background: var(--c); }
+.legendary .gem { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+.title { font-family: var(--font-display); font-weight: 800; font-size: 1.7rem; line-height: 1.1; margin: 0; text-wrap: balance; }
+.body { font-size: 1.08rem; line-height: 1.55; margin: 0; }
+.chew { margin: 0; border-top: 1px dashed var(--line); padding-top: 12px; color: var(--muted); font-style: italic; line-height: 1.5; }
+.chew b { font-style: normal; font-family: var(--font-display); color: var(--c); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+.serial { font-family: var(--font-display); font-size: .7rem; color: var(--muted); display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { font-family: var(--font-display); font-weight: 700; font-size: .95rem; min-height: 48px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: #1b222c; color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--gold); color: #1a1406; border-color: transparent; }
+.btn.wide { grid-column: 1 / -1; }
+.btn.small { min-height: 44px; font-size: .85rem; font-weight: 600; }
+.btn:disabled { opacity: .6; }
+.status { font-size: .85rem; color: var(--muted); min-height: 1.2em; margin: 0; }
+h2 { font-family: var(--font-display); font-size: 1rem; margin: 6px 0 8px; display: flex; justify-content: space-between; }
+h2 span { color: var(--muted); font-weight: 500; font-size: .85rem; }
+.saved { display: grid; gap: 8px; }
+.mini { display: grid; grid-template-columns: 6px 1fr auto; gap: 12px; align-items: center; background: #171d26; border: 1px solid var(--line); border-radius: 12px; padding: 8px 6px 8px 12px; cursor: pointer; color: var(--ink); min-height: 52px; }
+.mini i { align-self: stretch; border-radius: 3px; background: var(--c); }
+.mini strong { font-family: var(--font-display); display: block; }
+.mini small { color: var(--muted); }
+.x { background: none; border: 0; color: var(--muted); font-size: 1.3rem; cursor: pointer; width: 44px; height: 44px; }
+.empty { color: var(--muted); font-size: .9rem; margin: 0; }
+.keep { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.keep p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+.toast { white-space: nowrap; position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: #2a3240; color: var(--ink); padding: 10px 16px; border-radius: 12px; font-family: var(--font-display); font-size: .9rem; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+@media (prefers-reduced-motion: no-preference) {
+  .card.flip { animation: deal .45s cubic-bezier(.2,.8,.2,1); }
+  @keyframes deal { from { transform: translateY(14px) rotate(-2deg) scale(.97); opacity: .4; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <h1>Daily Idea Card</h1>
+    <span class="date" id="date"></span>
+  </header>
+
+  <button class="newbadge" id="newbadge" type="button" hidden></button>
+
+  <div class="moods" role="group" aria-label="Mood" id="moods"></div>
+
+  <article class="card flip" id="card" aria-live="polite">
+    <div class="face">
+      <div class="top"><span class="kind" id="kind"></span><span class="rarity"><span class="gem"></span><span id="rarity"></span></span></div>
+      <h3 class="title" id="title">Shuffling the deck…</h3>
+      <p class="body" id="body"></p>
+      <p class="chew"><b>Chew on it</b><span id="chew"></span></p>
+      <div class="serial"><span id="isnew"></span><span id="serial"></span></div>
+    </div>
+  </article>
+
+  <div class="actions">
+    <button class="btn" id="today" type="button">Today's card</button>
+    <button class="btn" id="shuffle" type="button">Draw another</button>
+    <button class="btn primary wide" id="save" type="button">Save to my collection</button>
+  </div>
+  <p class="status" id="status"></p>
+
+  <section>
+    <h2>My collection <span id="count"></span></h2>
+    <div class="saved" id="saved"></div>
+  </section>
+
+  <section>
+    <h2>Keep your cards</h2>
+    <div class="keep">
+      <p>Your collection lives on this phone. Back it up now and then so a new phone doesn't lose it.</p>
+      <button class="btn small" id="backup" type="button">Back up</button>
+      <button class="btn small" id="restore" type="button">Restore</button>
+    </div>
+    <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const KEY = "idea-card-v1"; // every app on this site shares one browser storage
+const KINDS = {
+  deep:   { label: "Deep end",    color: "var(--c-deep)" },
+  steady: { label: "Steady",      color: "var(--c-steady)" },
+  funny:  { label: "Laugh",       color: "var(--c-funny)" },
+  bender: { label: "Mind-bender", color: "var(--c-bender)" },
+  fuel:   { label: "Fuel",        color: "var(--c-fuel)" }
+};
+const RAR = ["Common", "Rare", "Legendary"];
+const $ = id => document.getElementById(id);
+const todayKey = new Date().toLocaleDateString("en-CA");
+$("date").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+
+let CARDS = [];
+let mood = "all";
+let current = null;
+let state = { saved: [], lastSeenCount: 0, mood: "all" };
+
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.saved)) state = Object.assign(state, s); } catch {} mood = state.mood || "all"; }
+function save() { state.mood = mood; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+
+function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return Math.abs(h); }
+function pool() { const p = mood === "all" ? CARDS : CARDS.filter(c => c.kind === mood); return p.length ? p : CARDS; }
+function todaysCard() { const p = pool(); return p[hash(todayKey + mood) % p.length]; }
+function randomCard() { const p = pool().filter(c => !current || c.id !== current.id); return p[Math.floor(Math.random() * p.length)] || pool()[0]; }
+const isSaved = c => state.saved.some(s => s.id === c.id);
+const daysOld = c => c.added ? (Date.now() - new Date(c.added + "T12:00:00").getTime()) / 864e5 : 999;
+
+function show(card) {
+  if (!card) return;
+  current = card;
+  const k = KINDS[card.kind] || KINDS.deep;
+  const el = $("card");
+  el.style.setProperty("--c", k.color);
+  el.className = "card " + ["common", "rare", "legendary"][card.rarity || 0];
+  void el.offsetWidth; el.classList.add("flip");
+  $("kind").textContent = k.label;
+  $("rarity").textContent = RAR[card.rarity || 0];
+  $("title").textContent = card.title;
+  $("body").textContent = card.body;
+  $("chew").textContent = card.chew;
+  const n = CARDS.indexOf(card);
+  $("serial").textContent = n >= 0 ? "#" + String(n + 1).padStart(3, "0") + " / " + CARDS.length : "In your collection";
+  $("isnew").textContent = daysOld(card) < 8 ? "New this week" : "";
+  $("save").textContent = isSaved(card) ? "Saved ✓" : "Save to my collection";
+  $("save").disabled = isSaved(card);
+}
+
+function renderMoods() {
+  const opts = [["all", "Any mood", null], ...Object.entries(KINDS).map(([k, v]) => [k, v.label, v.color])];
+  $("moods").innerHTML = "";
+  for (const [k, label, color] of opts) {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = label;
+    b.setAttribute("aria-pressed", String(mood === k));
+    if (color) b.style.setProperty("--chip", color);
+    b.onclick = () => { mood = k; save(); renderMoods(); show(todaysCard()); };
+    $("moods").appendChild(b);
+  }
+}
+
+function renderSaved() {
+  const box = $("saved");
+  const list = state.saved;
+  $("count").textContent = list.length ? list.length + " card" + (list.length === 1 ? "" : "s") : "";
+  if (!list.length) { box.innerHTML = '<p class="empty">Cards you save show up here.</p>'; return; }
+  box.innerHTML = "";
+  [...list].reverse().forEach(card => {
+    const row = document.createElement("div");
+    row.className = "mini"; row.setAttribute("role", "button"); row.tabIndex = 0;
+    row.style.setProperty("--c", (KINDS[card.kind] || KINDS.deep).color);
+    row.innerHTML = '<i></i><span><strong></strong><small></small></span><button class="x" type="button" aria-label="Remove from collection">×</button>';
+    row.querySelector("strong").textContent = card.title;
+    row.querySelector("small").textContent = (KINDS[card.kind] || KINDS.deep).label + " · " + RAR[card.rarity || 0];
+    const open = () => { show(CARDS.find(c => c.id === card.id) || card); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    row.onclick = e => { if (!e.target.closest(".x")) open(); };
+    row.onkeydown = e => { if (e.key === "Enter") open(); };
+    row.querySelector(".x").onclick = () => { state.saved = state.saved.filter(s => s.id !== card.id); save(); renderSaved(); show(current); };
+    box.appendChild(row);
+  });
+}
+
+function renderNew() {
+  const fresh = CARDS.filter(c => daysOld(c) < 8);
+  const b = $("newbadge");
+  if (state.lastSeenCount && CARDS.length > state.lastSeenCount && fresh.length) {
+    const n = CARDS.length - state.lastSeenCount;
+    b.textContent = n + " new card" + (n === 1 ? "" : "s") + " in the deck. Tap to draw one.";
+    b.hidden = false;
+    b.onclick = () => { show(fresh[Math.floor(Math.random() * fresh.length)]); b.hidden = true; };
+  }
+  state.lastSeenCount = CARDS.length; save();
+}
+
+$("today").onclick = () => show(todaysCard());
+$("shuffle").onclick = () => show(randomCard());
+$("save").onclick = () => {
+  if (!current || isSaved(current)) return;
+  const { id, kind, rarity, title, body, chew } = current;
+  state.saved.push({ id, kind, rarity, title, body, chew });
+  save(); renderSaved(); show(current); toast("Added to your collection");
+};
+let sx = null;
+$("card").addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive: true });
+$("card").addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 60) show(randomCard()); });
+
+$("backup").onclick = () => {
+  const name = "idea-card-backup-" + todayKey + ".json";
+  const blob = new Blob([JSON.stringify({ app: "idea-card", saved: state.saved }, null, 1)], { type: "application/json" });
+  const file = new File([blob], name, { type: "application/json" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Idea Card backup" }).catch(() => {}); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("Backup saved to your downloads");
+};
+$("restore").onclick = () => { $("restoreFile").value = ""; $("restoreFile").click(); };
+$("restoreFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || !Array.isArray(data.saved)) throw 0;
+    const ids = new Set(state.saved.map(s => s.id));
+    let added = 0;
+    for (const c of data.saved) if (c && c.id && c.title && !ids.has(c.id)) { state.saved.push(c); added++; }
+    save(); renderSaved(); show(current); toast(added ? "Restored " + added + " card" + (added === 1 ? "" : "s") : "Nothing new in that backup");
+  } catch { toast("That file isn't an Idea Card backup"); }
+};
+
+async function start() {
+  load(); renderMoods(); renderSaved();
+  try {
+    const res = await fetch("deck.json", { cache: "no-cache" });
+    const data = await res.json();
+    CARDS = (data.cards || []).filter(c => c && c.id && c.title && KINDS[c.kind]);
+  } catch {}
+  if (!CARDS.length) {
+    $("title").textContent = "The deck didn't load";
+    $("body").textContent = "Connect to the internet and open the app again. After that it works offline.";
+    return;
+  }
+  show(todaysCard());
+  renderNew();
+}
+start();
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>
