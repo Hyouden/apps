@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-11",
+ "updated": "2026-11-12",
  "cards": [
   {
    "id": "c001",
@@ -451,6 +451,168 @@
    "body": "Finishing one small thing gives you momentum to finish the next. Momentum is a cheat code.",
    "chew": "What's the smallest finishable thing on your list?",
    "added": "2026-10-01"
+  },
+  {
+   "id": "c051",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Plato's cave",
+   "body": "Plato imagined prisoners chained in a cave their whole lives, watching shadows on a wall and taking them for reality. One breaks free, sees the sun, and comes back to tell the others. They laugh at him and would rather keep the shadows.",
+   "chew": "What shadow did you once take for the real thing?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c052",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "The useless tree",
+   "body": "Zhuangzi tells of a huge, gnarled tree whose wood was too twisted to build anything with, so no carpenter ever bothered to cut it down. Being useless is exactly why it grew so old. Not everything good in your life has to be productive.",
+   "chew": "What do you love doing that has no practical point at all?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c053",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "The second arrow",
+   "body": "The Buddha compared pain to being struck by an arrow, then pointed out that we usually shoot ourselves with a second one: the worrying, blaming and replaying. The first arrow often can't be dodged. The second one is mostly up to you.",
+   "chew": "What second arrow have you been firing at yourself lately?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c054",
+   "kind": "deep",
+   "rarity": 2,
+   "title": "Sisyphus, smiling",
+   "body": "In Greek myth, Sisyphus is doomed to roll a boulder uphill forever, only to watch it roll back down. Albert Camus argued he could still be happy. The meaning isn't waiting at the top of the hill; it's in owning the push.",
+   "chew": "What's your boulder, and could you learn to love the push?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c055",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Hanlon's razor",
+   "body": "Don't blame malice for what carelessness explains. The coworker who ignored your message probably has a pile of other unread ones. Most things that feel like attacks are just people being busy, tired or distracted.",
+   "chew": "Whose 'rude' move this week might just have been a rushed one?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c056",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Invert, always invert",
+   "body": "The mathematician Carl Jacobi advised attacking hard problems by flipping them around. Instead of asking how to have a great year, ask what would guarantee a miserable one. Then stop doing those things.",
+   "chew": "What's the surest way to wreck next month, and are you already doing any of it?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c057",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Sunk costs stay sunk",
+   "body": "You paid for the lift ticket, but the runs are pure ice and you're miserable. That money is gone whether you stay or leave. The only real question is the best way to spend the next three hours.",
+   "chew": "What are you still doing mostly because you already paid for it?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c058",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "Five-star review",
+   "body": "To a skateboarder, a 'No Skateboarding' sign isn't a rule. It's a glowing review confirming the ledge is perfect.",
+   "chew": "What 'no' in your life is secretly a sign you've found a good spot?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c059",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Cats do science",
+   "body": "Your cat pushes your pen off the desk while staring right at you. It's not rude, it's research: confirming gravity still works, again, with you as the unpaid lab assistant.",
+   "chew": "What do you keep re-checking even though you already know the answer?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c060",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "The door always wins",
+   "body": "A D&D party spends forty minutes planning how to get past one locked door, with disguises, forged letters and a bard distraction. Then the barbarian just kicks it. He rolls a 1, and the door wins.",
+   "chew": "What simple problem have you spent forty minutes overplanning?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c061",
+   "kind": "bender",
+   "rarity": 2,
+   "title": "Hilbert's hotel",
+   "body": "Mathematician David Hilbert pictured a hotel with infinitely many rooms, every one of them full. A new guest shows up, so everyone moves to the next room up, and room 1 opens. Full, yet there's still room: infinity plays by its own rules.",
+   "chew": "Your calendar isn't Hilbert's hotel, so what could move out to make room?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c062",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "The Chinese room",
+   "body": "John Searle imagined sitting in a room with a rulebook for matching Chinese symbols. Notes slide in, you follow the rules, and perfect Chinese replies slide out, though you don't understand a word. Is a computer doing the same thing, or something more?",
+   "chew": "How could you prove you understand something, rather than just following the rules well?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c063",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "Monty Hall's doors",
+   "body": "Three doors, one car, two goats. You pick one, then the host, who knows where the car is, always opens another door to show a goat and offers a swap. Switching wins two times out of three, because your first pick only ever had a one-in-three shot.",
+   "chew": "Where are you sticking with a first choice just because it came first?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c064",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "The surprise test",
+   "body": "A teacher announces a surprise test next week. A student reasons it can't be Friday, since by Thursday night it wouldn't be a surprise, so it can't be Thursday either, and so on back to Monday. Feeling clever, he skips studying, and Wednesday's test surprises him completely.",
+   "chew": "What did you rule out as impossible right before it happened?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c065",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "Eyes on the line",
+   "body": "Mountain bikers learn it fast: the bike goes where your eyes go. Stare at the rock you're scared of and you'll ride straight into it. Look at the gap past it and you'll flow right through.",
+   "chew": "What rock are you staring at so hard that you're steering toward it?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c066",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "The spotlight effect",
+   "body": "In a classic study, students made to wear an embarrassing T-shirt into a room guessed about half the people there noticed. Only about a quarter did. Everyone else is too busy starring in their own life to watch you fall.",
+   "chew": "What would you try in public if you knew hardly anyone was watching?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c067",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Recovery is training",
+   "body": "Muscles don't get stronger during the workout. Training stresses them, and they rebuild stronger while you rest and sleep. Skipping recovery isn't hardcore; it's skipping the part where you actually improve.",
+   "chew": "When did you last rest on purpose instead of by collapsing?",
+   "added": "2026-11-12"
+  },
+  {
+   "id": "c068",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Spend your skill points",
+   "body": "In most RPGs you can't max every stat. The strongest builds pick a few skills and pour everything into them, while spreading points evenly makes a hero who's fine at everything and great at nothing.",
+   "chew": "If you only had three skill points to spend this year, where would they go?",
+   "added": "2026-11-12"
   }
  ]
 }
