@@ -98,6 +98,11 @@ details.opts .toggles{padding:2px 0 12px}
 #full .fthanks{font-size:min(7vw,3.7vh);font-weight:800}
 #full .en{font-size:min(3.9vw,2.1vh)}
 #full.no-en .en{display:none}
+#full .rq-em{display:block;text-align:center;font-size:min(17vw,9vh);line-height:1.1}
+#full .rq-lead{font-size:min(5.8vw,3.1vh);font-weight:700;line-height:1.5;color:#3a332c}
+#full .rq-algs{display:flex;gap:8px;flex-wrap:wrap}
+#full .rq-alg{border:2px solid var(--avoid);background:var(--avoid-soft);color:var(--avoid);border-radius:999px;padding:.15em .75em;font-weight:800;font-size:min(4.8vw,2.6vh)}
+#full .rq-close{font-size:min(6vw,3.2vh);font-weight:800;line-height:1.55}
 #full .awake{text-align:center;font-size:.75rem;color:var(--muted);padding-top:4px}
 .romaji{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted)}
 
@@ -231,7 +236,7 @@ ul.clean li{line-height:1.45}
   <button class="btn ghost" id="sayCard">🔊 Hear it in Japanese</button>
   <div class="panel">
     <div class="kicker">Ask for a change</div>
-    <p class="small muted" style="margin-top:2px">Polite “if possible… thank you” requests. Tap one to show it big.</p>
+    <p class="small muted" style="margin-top:2px">Each opens a polite full-screen card to show staff.</p>
     <div class="reqgrid" id="reqGrid"></div>
   </div>
 </section>
@@ -456,15 +461,30 @@ $("#copyCard").addEventListener("click", async () => {
   catch { openShow({ ja: HOTEL_NOTE, en: "Press and hold to copy." }); }
 });
 
-/* ---------------- full-screen card ---------------- */
-async function openFull() {
+/* ---------------- full-screen cards (allergy card + polite requests) ---------------- */
+let fullSpeech = "";
+async function showFull(html, speech) {
   const f = $("#full");
-  $("#fullCard").innerHTML = `<div class="fhead">${esc(cardModel().head.ja)}${enSpan(cardModel().head.en)}</div>` + cardInner(cardModel());
+  $("#fullCard").innerHTML = html; $("#fullCard").scrollTop = 0; fullSpeech = speech;
   f.classList.add("no-en"); $("#fullEn").textContent = "EN";
   f.hidden = false; document.body.style.overflow = "hidden";
   $("#awakeMsg").textContent = "";
   const ok = await awake.on();
   $("#awakeMsg").textContent = ok ? "☀︎ Screen stays on while this is open" : "Tip: set Auto-Lock to a longer time in Settings";
+}
+function openFull() {
+  const m = cardModel();
+  showFull(`<div class="fhead">${esc(m.head.ja)}${enSpan(m.head.en)}</div>` + cardInner(m), cardSpeech());
+}
+function openRequest(i) {
+  const r = PHRASES[i];
+  const html = `<span class="rq-em" aria-hidden="true">${r.em}</span>
+    <div class="fhead">すみません。${enSpan("Excuse me.")}</div>
+    <div class="rq-lead">${esc(REQ_LEAD.ja)}${enSpan(REQ_LEAD.en)}</div>
+    <div class="fask">${esc(r.ask)}${enSpan(r.askEn)}</div>
+    <div class="rq-algs">${cardModel().items.map(x => `<span class="rq-alg">✕ ${esc(x.ja)}</span>`).join("")}</div>
+    <div class="rq-close">${esc(REQ_CLOSE.ja).replace("\n", "<br>")}${enSpan(REQ_CLOSE.en)}</div>`;
+  showFull(html, r.ja.replace(/\n/g, "。"));
 }
 function closeFull() {
   $("#full").hidden = true; document.body.style.overflow = ""; awake.off();
@@ -474,7 +494,7 @@ $("#showCard").addEventListener("click", openFull);
 $("#acard").addEventListener("click", openFull);
 $("#acard").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFull(); } });
 $("#fullClose").addEventListener("click", closeFull);
-$("#fullSay").addEventListener("click", () => speak(cardSpeech()));
+$("#fullSay").addEventListener("click", () => speak(fullSpeech));
 $("#fullEn").addEventListener("click", () => { const f = $("#full"); f.classList.toggle("no-en"); $("#fullEn").textContent = f.classList.contains("no-en") ? "EN" : "EN ✓"; });
 
 /* ================= SHOW-A-PHRASE OVERLAY ================= */
@@ -504,16 +524,26 @@ document.addEventListener("keydown", e => {
 });
 
 /* ================= PHRASES ================= */
+/* polite requests: each opens as its own full-screen card */
+const REQ_LEAD = { ja: "アレルギーがあるので、もし可能でしたら…", en: "Because of my allergy, if at all possible…", ro: "Arerugī ga aru node, moshi kanō deshitara,", say: "ah-reh-roo-ghee gah ah-roo noh-deh, moh-shee kah-noh desh-tah-rah" };
+const REQ_CLOSE = { ja: "お手数をおかけしてすみません。\nありがとうございます！", en: "Sorry for the trouble — thank you so much!", ro: "O-tesū o okake shite sumimasen. Arigatō gozaimasu!", say: "oh-teh-soo oh oh-kah-keh shteh soo-mee-mah-sen. ah-ree-gah-toh goh-zai-mahs" };
+const REQS = [
+  { em: "🍣", dish: "Sushi & sashimi", label: "No soy sauce on the fish", ask: "お魚に醤油をつけずに出していただけますでしょうか？", askEn: "could you serve the fish without soy sauce?", askRo: "o-sakana ni shōyu o tsukezu ni dashite itadakemasu deshō ka?", askSay: "oh-sah-kah-nah nee show-yoo oh tsoo-keh-zoo nee dah-shteh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🍢", dish: "Yakitori & skewers", label: "Salt instead of sauce", ask: "タレではなく、塩で焼いていただけますでしょうか？", askEn: "could you grill them with salt instead of sauce?", askRo: "tare de wa naku, shio de yaite itadakemasu deshō ka?", askSay: "tah-reh deh wah nah-koo, shee-oh deh yai-teh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🥩", dish: "Steak & grill", label: "No butter or soy sauce", ask: "バターとお醤油を使わずに、塩で焼いていただけますでしょうか？", askEn: "could you cook it with salt, without butter or soy sauce?", askRo: "batā to o-shōyu o tsukawazu ni, shio de yaite itadakemasu deshō ka?", askSay: "bah-tah toh oh-show-yoo oh tsoo-kah-wah-zoo nee, shee-oh deh yai-teh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🥗", dish: "Salad", label: "Dressing on the side", ask: "ドレッシングを別にしていただけますでしょうか？", askEn: "could you put the dressing on the side?", askRo: "doresshingu o betsu ni shite itadakemasu deshō ka?", askSay: "doh-res-sheen-goo oh beh-tsoo nee shteh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🍱", dish: "Set meal", label: "No miso soup", ask: "お味噌汁を抜いていただけますでしょうか？", askEn: "could you leave out the miso soup?", askRo: "o-misoshiru o nuite itadakemasu deshō ka?", askSay: "oh-mee-soh-shee-roo oh noo-ee-teh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🍳", dish: "Eggs & omelettes", label: "No butter or milk", ask: "卵料理を、バターや牛乳なしで作っていただけますでしょうか？", askEn: "could you make the eggs without butter or milk?", askRo: "tamago-ryōri o, batā ya gyūnyū nashi de tsukutte itadakemasu deshō ka?", askSay: "tah-mah-goh-ryoh-ree oh, bah-tah yah gyoo-nyoo nah-shee deh tsoo-koo-teh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🍞", dish: "Bread & toast", label: "Rice instead", ask: "パンの代わりに、ご飯にしていただけますでしょうか？", askEn: "could I have rice instead of bread?", askRo: "pan no kawari ni, gohan ni shite itadakemasu deshō ka?", askSay: "pahn noh kah-wah-ree nee, goh-hahn nee shteh ee-tah-dah-keh-mahs deh-shoh kah" },
+  { em: "🍵", dish: "Drinks", label: "Water or tea, not barley tea", ask: "麦茶ではなく、お水かお茶をいただけますでしょうか？", askEn: "could I have water or green tea instead of barley tea?", askRo: "mugicha de wa naku, o-mizu ka o-cha o itadakemasu deshō ka?", askSay: "moo-ghee-chah deh wah nah-koo, oh-mee-zoo kah oh-chah oh ee-tah-dah-keh-mahs deh-shoh kah" }
+];
+const mkReq = r => ({ ...r, c: "Requests", req: 1,
+  en: `${r.dish}: Excuse me — because of my allergy, if at all possible, ${r.askEn} Sorry for the trouble, thank you!`,
+  ja: "すみません。" + REQ_LEAD.ja.replace("…", "、") + r.ask + "\n" + REQ_CLOSE.ja.replace("\n", ""),
+  ro: `Sumimasen. ${REQ_LEAD.ro} ${r.askRo} ${REQ_CLOSE.ro}`,
+  say: `soo-mee-mah-sen. ${REQ_LEAD.say}, ${r.askSay}? ${REQ_CLOSE.say}` });
 const PHRASES = [
-  // polite "if possible" requests by dish (also the buttons on the Card screen)
-  { c: "Requests", req: 1, em: "🍣", dish: "Sushi & sashimi", label: "No soy sauce on the fish", en: "If possible, could you not put soy sauce on the fish? Thank you.", ja: "可能でしたら、お魚に醤油をつけないでいただけますか？\nありがとうございます。", ro: "Kanō deshitara, o-sakana ni shōyu o tsukenaide itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, oh-sah-kah-nah nee show-yoo oh tsoo-keh-nai-deh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🍢", dish: "Yakitori & skewers", label: "Salt instead of sauce", en: "If possible, could I have them with salt instead of sauce? Thank you.", ja: "可能でしたら、タレではなく塩でお願いできますか？\nありがとうございます。", ro: "Kanō deshitara, tare de wa naku shio de onegai dekimasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, tah-reh deh wah nah-koo shee-oh deh oh-neh-gai deh-kee-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🥩", dish: "Steak & grill", label: "No butter or soy sauce", en: "If possible, could you grill it with salt, without butter or soy sauce? Thank you.", ja: "可能でしたら、バターと醤油を使わずに、塩で焼いていただけますか？\nありがとうございます。", ro: "Kanō deshitara, batā to shōyu o tsukawazu ni, shio de yaite itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, bah-tah toh show-yoo oh tsoo-kah-wah-zoo nee, shee-oh deh yai-teh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🥗", dish: "Salad", label: "Dressing on the side", en: "If possible, could you put the dressing on the side? Thank you.", ja: "可能でしたら、ドレッシングを別にしていただけますか？\nありがとうございます。", ro: "Kanō deshitara, doresshingu o betsu ni shite itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, doh-res-sheen-goo oh beh-tsoo nee shteh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🍱", dish: "Set meal", label: "No miso soup", en: "If possible, could I have it without the miso soup? Thank you.", ja: "可能でしたら、お味噌汁なしでお願いできますか？\nありがとうございます。", ro: "Kanō deshitara, o-misoshiru nashi de onegai dekimasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, oh-mee-soh-shee-roo nah-shee deh oh-neh-gai deh-kee-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🍳", dish: "Eggs & omelettes", label: "No butter or milk", en: "If possible, could you make the eggs without butter or milk? Thank you.", ja: "可能でしたら、卵料理にバターや牛乳を使わないでいただけますか？\nありがとうございます。", ro: "Kanō deshitara, tamago-ryōri ni batā ya gyūnyū o tsukawanaide itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, tah-mah-goh-ryoh-ree nee bah-tah yah gyoo-nyoo oh tsoo-kah-wah-nai-deh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🍞", dish: "Bread & toast", label: "Rice instead", en: "If possible, could I have rice instead of bread? Thank you.", ja: "可能でしたら、パンの代わりにご飯にしていただけますか？\nありがとうございます。", ro: "Kanō deshitara, pan no kawari ni gohan ni shite itadakemasu ka? Arigatō gozaimasu.", say: "kah-noh desh-tah-rah, pahn noh kah-wah-ree nee goh-hahn nee shteh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
-  { c: "Requests", req: 1, em: "🍵", dish: "Drinks", label: "Water or tea, not barley tea", en: "Could I have water or green tea instead of barley tea? Thank you.", ja: "麦茶ではなく、お水かお茶をいただけますか？\nありがとうございます。", ro: "Mugicha de wa naku, o-mizu ka o-cha o itadakemasu ka? Arigatō gozaimasu.", say: "moo-ghee-chah deh wah nah-koo, oh-mee-zoo kah oh-chah oh ee-tah-dah-keh-mahs kah? ah-ree-gah-toh goh-zai-mahs" },
+  ...REQS.map(mkReq),
   // allergy
   { c: "Allergy", en: "I have food allergies.", ja: "食物アレルギーがあります。", ro: "Shokumotsu arerugī ga arimasu.", say: "show-koo-moh-tsoo ah-reh-roo-ghee gah ah-ree-mahs", q: 1 },
   { c: "Allergy", en: "I can't eat wheat, dairy or soy.", ja: "小麦と乳製品と大豆が食べられません。", ro: "Komugi to nyūseihin to daizu ga taberaremasen.", say: "koh-moo-ghee toh nyoo-say-heen toh dye-zoo gah tah-beh-rah-reh-mah-sen", q: 1 },
@@ -582,19 +612,20 @@ function renderPhrases() {
   $("#pList").innerHTML = list.length ? list.map(p => `
     <div class="phrase">
       <div class="en">${esc(p.en)}</div>
-      <button class="ja" data-show="${p.i}">${esc(p.ja)}</button>
+      <button class="ja" ${p.req ? `data-req="${p.i}"` : `data-show="${p.i}"`}>${esc(p.ja)}</button>
       <div class="acts"><button class="icon-btn say" data-say="${p.i}" aria-label="Play">🔊</button><button class="icon-btn" data-slow="${p.i}" aria-label="Play slowly">🐢</button></div>
       <div class="pro"><span class="romaji">${esc(p.ro)}</span><br><i>say:</i> ${esc(p.say)}</div>
     </div>`).join("") : `<p class="muted">No phrases match “${esc(q)}”.</p>`;
 }
 document.addEventListener("click", e => {
+  const rq = e.target.closest("[data-req]"); if (rq) { openRequest(+rq.dataset.req); return; }
   const s = e.target.closest("[data-show]"); if (s) { openShow(PHRASES[+s.dataset.show]); return; }
   const a = e.target.closest("[data-say]"); if (a) { speak(PHRASES[+a.dataset.say].ja); return; }
   const w = e.target.closest("[data-slow]"); if (w) { speak(PHRASES[+w.dataset.slow].ja, true); return; }
 });
 
 function renderRequests() {
-  $("#reqGrid").innerHTML = PHRASES.map((p, i) => p.req ? `<button class="req" data-show="${i}"><span class="em">${p.em}</span><span><b>${esc(p.dish)}</b><small>${esc(p.label)}</small></span></button>` : "").join("");
+  $("#reqGrid").innerHTML = PHRASES.map((p, i) => p.req ? `<button class="req" data-req="${i}"><span class="em">${p.em}</span><span><b>${esc(p.dish)}</b><small>${esc(p.label)}</small></span></button>` : "").join("");
 }
 
 /* ================= FOOD ================= */
