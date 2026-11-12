@@ -52,25 +52,47 @@ nav.tabs button .ic{font-size:1.35rem;line-height:1}
 nav.tabs button[aria-selected="true"]{color:var(--shu);font-weight:700}
 nav.tabs button[aria-selected="true"] .ic{transform:translateY(-1px)}
 
-/* allergy card */
-.acard{background:var(--card);border-radius:20px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(80,40,20,.08);overflow:hidden;border:1px solid var(--line)}
-.acard .band{background:var(--shu);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px}
-.acard .band b{font-family:var(--jp);font-size:1.35rem;letter-spacing:.02em}
-.acard .band span{font-size:.75rem;opacity:.9;margin-left:auto;text-align:right;line-height:1.2}
-.acard .body{padding:16px 18px 18px;font-family:var(--jp)}
-.acard .lead{font-size:1.1rem;font-weight:700;margin-bottom:8px}
-.allergens{display:grid;gap:8px;margin:6px 0 12px}
-.allergen{display:flex;align-items:center;gap:12px;border:2px solid var(--avoid);background:var(--avoid-soft);border-radius:14px;padding:8px 12px}
-.allergen .em{font-size:1.6rem;position:relative;width:34px;text-align:center}
-.allergen .em::after{content:"";position:absolute;left:50%;top:50%;width:38px;height:4px;background:var(--avoid);transform:translate(-50%,-50%) rotate(-40deg);border-radius:2px}
-.allergen b{font-size:1.3rem;display:block;line-height:1.25}
-.allergen small{font-size:.82rem;color:#5b3530}
-.allergen.soft{border-color:#D9A441;background:var(--ask-soft)}
-.allergen.soft .em::after{background:#C98A1B}
-.acard .line{font-size:1.02rem;margin:8px 0;line-height:1.6}
-.acard .ok{background:var(--good-soft);border-radius:12px;padding:8px 12px;color:#1d4d24;font-weight:700}
-.acard .ask{font-size:1.2rem;font-weight:800;margin-top:12px;color:var(--shu-dark)}
-.acard .en{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted);margin-top:2px;line-height:1.45}
+/* allergy card (home preview) */
+.acard{background:var(--card);border-radius:22px;border:1px solid var(--line);box-shadow:0 8px 24px rgba(80,40,20,.08);overflow:hidden;cursor:pointer}
+.acard:active{transform:scale(.99)}
+.acard .band{background:var(--shu);color:#fff;padding:14px 18px;font-family:var(--jp);font-weight:800;font-size:1.25rem;line-height:1.4}
+.acard .body{padding:14px 18px 18px;display:grid;gap:10px;font-family:var(--jp)}
+.no{display:flex;align-items:center;gap:12px;border:2px solid var(--avoid);background:var(--avoid-soft);border-radius:14px;padding:8px 12px}
+.no .x{width:30px;height:30px;border-radius:50%;background:var(--avoid);color:#fff;font:800 17px/30px system-ui,sans-serif;text-align:center;flex:none}
+.no b{font-size:1.3rem;line-height:1.3;display:block}
+.no .sub{display:block;font-size:.95rem;font-weight:700;color:#7a2a22;line-height:1.35}
+.no.soft{border-color:#D9A441;background:var(--ask-soft)} .no.soft .x{background:#C98A1B}
+.acard .fnote{font-size:1rem;font-weight:700;color:#1d4d24}
+.acard .fask{font-size:1.15rem;font-weight:800;line-height:1.5;background:var(--shu-soft);border-radius:14px;padding:10px 12px}
+.acard .fthanks{font-size:1.05rem;font-weight:700}
+.en{display:block;font-family:system-ui,-apple-system,sans-serif;font-size:.8rem;color:var(--muted);font-weight:500;line-height:1.35;margin-top:1px}
+.band .en{color:#fff;opacity:.9}
+.btn.big{min-height:64px;font-size:1.15rem;border-radius:16px;width:100%}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--indigo)}
+details.opts{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 12px}
+details.opts summary{min-height:46px;display:flex;align-items:center;font-weight:600;cursor:pointer;list-style:none;color:var(--muted)}
+details.opts summary::-webkit-details-marker{display:none}
+details.opts summary::after{content:"›";margin-left:auto;transform:rotate(90deg);transition:transform .15s;font-size:1.3rem}
+details.opts[open] summary::after{transform:rotate(-90deg)}
+details.opts .toggles{padding:2px 0 12px}
+
+/* full-screen card */
+#full{position:fixed;inset:0;z-index:110;background:#FFFDF8;display:flex;flex-direction:column;padding:calc(8px + env(safe-area-inset-top,0px)) 16px calc(8px + env(safe-area-inset-bottom,0px))}
+#full .fbar{display:flex;gap:8px;align-items:center}
+#full .fbar .sp{flex:1}
+#full .fcard{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;gap:1.4vh;font-family:var(--jp);overflow:auto;padding:4px 2px}
+#full .fhead{font-weight:800;font-size:min(8vw,4.3vh);line-height:1.35;color:var(--shu)}
+#full .nos{display:grid;gap:1.2vh}
+#full .no{padding:1.3vh 14px;border-width:3px;border-radius:18px}
+#full .no b{font-size:min(8.6vw,4.5vh)}
+#full .no .sub{font-size:min(5.2vw,2.8vh)}
+#full .no .x{width:min(10vw,5.4vh);height:min(10vw,5.4vh);line-height:min(10vw,5.4vh);font-size:min(6vw,3.2vh)}
+#full .fnote{font-size:min(5.8vw,3.1vh);font-weight:700;color:#1d4d24}
+#full .fask{font-size:min(7vw,3.8vh);font-weight:800;line-height:1.45;color:#111;background:var(--shu-soft);border-radius:18px;padding:1.6vh 14px}
+#full .fthanks{font-size:min(7vw,3.7vh);font-weight:800}
+#full .en{font-size:min(3.9vw,2.1vh)}
+#full.no-en .en{display:none}
+#full .awake{text-align:center;font-size:.75rem;color:var(--muted);padding-top:4px}
 .romaji{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted)}
 
 .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -182,7 +204,6 @@ ul.clean li{line-height:1.45}
 #show .big{font-family:var(--jp);font-weight:800;line-height:1.45;color:#111;word-break:break-word}
 #show .big .lineb{display:block;margin:.25em 0}
 #show .sub{font-size:.95rem;color:var(--muted);margin-top:14px;line-height:1.45}
-#show.card-mode .stage{justify-content:flex-start}
 #show .pill{font-family:var(--jp);font-size:.9rem;font-weight:700;color:var(--shu);border:2px solid var(--shu);border-radius:10px;padding:2px 8px}
 
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#1F1B17;color:#fff;padding:10px 14px;border-radius:12px;font-size:.88rem;z-index:120;max-width:88vw;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .2s}
@@ -199,24 +220,16 @@ ul.clean li{line-height:1.45}
 <main>
 <!-- ================= CARD ================= -->
 <section class="tab" id="tab-card">
-  <div class="acard" id="acard"></div>
-  <div class="row">
-    <button class="btn primary grow" id="showCard">⤢ Show to staff</button>
-    <button class="btn" id="sayCard" aria-label="Play card in Japanese">🔊 Play</button>
-    <button class="btn" id="enToggle">EN</button>
-  </div>
-  <div class="toggles">
-    <label class="tog"><input type="checkbox" id="optTraces"><div><b>Small traces are OK</b><span>Adds: not life-threatening, so shared pans / frying oil are fine. Makes restaurants more willing to say yes.</span></div></label>
-    <label class="tog"><input type="checkbox" id="optSoy"><div><b>Soy: small amounts OK</b><span>Turn on when options are thin. Card still asks them to avoid soy sauce (it has wheat).</span></div></label>
-  </div>
-  <div class="panel">
-    <div class="kicker">Quick show</div>
-    <p class="small muted" style="margin:4px 0 10px">Tap to flash one line big on screen.</p>
-    <div class="row" id="quickRow"></div>
-  </div>
-  <div class="row">
-    <button class="btn sm" id="copyCard">📋 Copy card text (for hotel emails)</button>
-  </div>
+  <div class="acard" id="acard" role="button" tabindex="0" aria-label="Show card full screen"></div>
+  <button class="btn primary big" id="showCard">⤢ Show card full screen</button>
+  <button class="btn ghost" id="sayCard">🔊 Hear it in Japanese</button>
+  <details class="opts">
+    <summary>Card options</summary>
+    <div class="toggles">
+      <label class="tog"><input type="checkbox" id="optTraces"><div><b>Shared cookware is fine</b><span>Adds one line so kitchens know cross-contact is OK — they're more likely to say yes.</span></div></label>
+      <label class="tog"><input type="checkbox" id="optSoy"><div><b>A little soy is OK</b><span>Use when options are thin. Wheat still includes soy sauce.</span></div></label>
+    </div>
+  </details>
 </section>
 
 <!-- ================= PHRASES ================= -->
@@ -263,7 +276,7 @@ ul.clean li{line-height:1.45}
     <div class="kicker">Pack &amp; prep</div>
     <ul class="clean small" style="margin-top:8px">
       <li><b>Bring travel packets of gluten-free tamari</b> (it's soy) or <b>coconut aminos</b> (soy-free). Most restaurants don't stock GF soy sauce — with your own, sashimi, sushi and plain grilled food all open up. Show the card first, then ask: <span class="jp">自分の醤油を使ってもいいですか？</span></li>
-      <li><b>Email hotels &amp; any ryokan dinners ahead</b> — use “Copy card text” on the Card tab. Kaiseki is soy-sauce heavy but kitchens adapt well with notice.</li>
+      <li><b>Email hotels &amp; any ryokan dinners ahead</b> — Kaiseki is soy-sauce heavy but kitchens adapt well with notice. This note is more detailed than the card:<br><button class="btn sm" id="copyCard" style="margin-top:6px">📋 Copy hotel note (Japanese + English)</button></li>
       <li><b>Install Find Me Gluten Free</b> (GF) and <b>HappyCow</b> (vegan = dairy-free) and star the Places in this app in Google Maps.</li>
       <li><b>Travel days:</b> station bento (ekiben) are soy-sauce heavy. Grab salt onigiri, boiled eggs, fruit or roasted sweet potato from a konbini, or eat at Soranoiro in Tokyo Station.</li>
       <li><b>Hotel breakfast buffets:</b> plain rice, grilled salmon, fruit, salad and boiled eggs are usually safe. Skip miso soup, natto and anything glossy.</li>
@@ -322,6 +335,16 @@ ul.clean li{line-height:1.45}
   </div>
   <div class="stage"><div class="big" id="showBig"></div><div class="sub" id="showSub"></div></div>
 </div>
+<div id="full" class="no-en" hidden role="dialog" aria-modal="true" aria-label="Allergy card">
+  <div class="fbar">
+    <button class="btn sm" id="fullClose">✕ Close</button>
+    <span class="sp"></span>
+    <button class="btn sm" id="fullSay" aria-label="Play in Japanese">🔊</button>
+    <button class="btn sm" id="fullEn">EN</button>
+  </div>
+  <div class="fcard" id="fullCard"></div>
+  <div class="awake" id="awakeMsg"></div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -355,101 +378,129 @@ function speak(text, slow) {
   if (!jaVoice && !warnedVoice) { warnedVoice = true; toast("If it sounds wrong, add a Japanese voice in your phone's language/speech settings.", 4200); }
 }
 
-/* ---------------- wake lock while showing ---------------- */
-let wake = null;
-async function keepAwake(on) {
-  try {
-    if (on && "wakeLock" in navigator) wake = await navigator.wakeLock.request("screen");
-    else if (!on && wake) { await wake.release(); wake = null; }
-  } catch {}
-}
+/* ---------------- keep the screen on while a card is showing ---------------- */
+const SILENT_MP4 = "data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAMpbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAlN0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAAAAABAAAAAAHLbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAABAAAAAgABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABdm1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAATZzdGJsAAAAtnN0c2QAAAAAAAAAAQAAAKZhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALGF2Y0MBQsAK/+EAFWdCwAraewEQAAADABAAAAMAIPEiagEABGjOD8gAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAKQAAACkAAAAAYc3R0cwAAAAAAAAABAAAAAgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAAgAAAAEAAAAcc3RzegAAAAAAAAAAAAAAAgAAAoYAAAAKAAAAFHN0Y28AAAAAAAAAAQAAA1kAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAACmG1kYXQAAAJvBgX//2vcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MSBkZWJsb2NrPTE6LTM6LTMgYW5hbHlzZT0weDE6MHgxIG1lPWhleCBzdWJtZT0yIHBzeT0xIHBzeV9yZD0yLjAwOjAuNzAgbWl4ZWRfcmVmPTAgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdHJlbGxpcz0wIDh4OGRjdD0wIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PTAgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTEgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD0xMCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjIwAIAAAAAPZYiEBfOf//8PRQABV5+AAAAABkGaIBfOdQ==";
+const awake = (() => {
+  let lock = null, video = null, want = false;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  function playVideo() {
+    if (!video) {
+      video = document.createElement("video");
+      video.setAttribute("playsinline", ""); video.setAttribute("muted", ""); video.muted = true; video.loop = true;
+      video.src = SILENT_MP4;
+      video.style.cssText = "position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;pointer-events:none";
+      document.body.appendChild(video);
+    }
+    return video.play().then(() => true).catch(() => false);
+  }
+  async function on() {
+    want = true;
+    // iPhones: start the silent video inside the tap, before anything async, as a backup to Wake Lock
+    const vid = (isIOS || !("wakeLock" in navigator)) ? playVideo() : Promise.resolve(false);
+    let ok = false;
+    if ("wakeLock" in navigator) {
+      try { lock = await navigator.wakeLock.request("screen"); lock.addEventListener("release", () => { lock = null; }); ok = true; } catch {}
+    }
+    return (await vid) || ok;
+  }
+  async function off() {
+    want = false;
+    try { if (lock) await lock.release(); } catch {}
+    lock = null; if (video) video.pause();
+  }
+  document.addEventListener("visibilitychange", () => { if (want && document.visibilityState === "visible" && !lock && "wakeLock" in navigator) navigator.wakeLock.request("screen").then(l => { lock = l; }).catch(() => {}); });
+  return { on, off };
+})();
 
 /* ================= ALLERGY CARD ================= */
-const opts = { traces: store.get("traces", true), soy: store.get("soyOk", false), en: store.get("cardEn", true) };
-function cardParts() {
-  const p = [];
-  p.push({ ja: "私は次の食品にアレルギーがあります。", en: "I'm allergic to the following foods." });
-  p.push({ type: "allergen", em: "🌾", ja: "小麦・大麦（グルテン）", en: "Wheat & barley (gluten)" });
-  p.push({ type: "allergen", em: "🥛", ja: "乳製品（牛乳・バター・チーズ・生クリーム）", en: "Dairy (milk, butter, cheese, cream)" });
-  p.push({ type: "allergen", em: "🫘", ja: "大豆（豆腐・味噌・豆乳など）", en: "Soy (tofu, miso, soy milk, etc.)", soft: opts.soy });
-  p.push({ ja: "これらは醤油・味噌・天ぷら粉・パン粉・カレールー・麺類・麦茶にも含まれているので、使わないでください。", en: "These are also in soy sauce, miso, tempura batter, breadcrumbs, curry roux, noodles and barley tea — please don't use them." });
-  p.push({ type: "ok", ja: "塩・わさび・レモンなら大丈夫です。", en: "Salt, wasabi and lemon are fine." });
-  if (opts.soy) p.push({ ja: "大豆は少量なら食べられます。（醤油は小麦が入っているので避けてください）", en: "Small amounts of soy are OK (but please avoid soy sauce — it contains wheat)." });
-  if (opts.traces) p.push({ ja: "命に関わるアレルギーではないので、同じ調理器具や油を使っても大丈夫です。", en: "It isn't life-threatening, so shared cookware or frying oil is fine." });
-  p.push({ type: "ask", ja: "これらを使わない料理はありますか？", en: "Do you have any dishes made without these?" });
-  p.push({ ja: "お手数をおかけしますが、よろしくお願いいたします。", en: "Sorry for the trouble — thank you so much." });
-  return p;
+const opts = { traces: store.get("traces", true), soy: store.get("soyOk", false) };
+function cardModel() {
+  return {
+    head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have food allergies." },
+    items: [
+      { ja: "小麦", sub: "醤油にも入っています", en: "Wheat — it's in soy sauce too" },
+      { ja: "乳製品", sub: "バター・牛乳など", en: "Dairy — butter, milk, etc." },
+      opts.soy ? { ja: "大豆", sub: "少量なら大丈夫です", en: "Soy — a little is OK", soft: true } : { ja: "大豆", en: "Soy" }
+    ],
+    note: opts.traces ? { ja: "同じ調理器具でも大丈夫です。", en: "Shared cookware is fine." } : null,
+    ask: { ja: "これらを使わないおすすめの料理を教えていただけますか？", en: "Could you recommend a dish made without these?" },
+    thanks: { ja: "よろしくお願いします。", en: "Thank you so much." }
+  };
 }
-const CARD_TITLE = { ja: "食物アレルギーがあります", ro: "Shokumotsu arerugī ga arimasu", en: "I have food allergies" };
-function cardText(withEn) {
-  const parts = cardParts();
-  let s = "【" + CARD_TITLE.ja + "】\n" + parts.map(x => (x.type === "allergen" ? "・" : "") + x.ja).join("\n");
-  if (withEn) s += "\n\n[English]\n" + CARD_TITLE.en + ".\n" + parts.map(x => (x.type === "allergen" ? "• " : "") + x.en).join("\n");
-  return s;
+const enSpan = t => `<span class="en">${esc(t)}</span>`;
+function cardInner(m) {
+  return `<div class="nos" style="display:grid;gap:10px">${m.items.map(i => `<div class="no${i.soft ? " soft" : ""}"><span class="x">✕</span><div><b>${esc(i.ja)}</b>${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}${enSpan(i.en)}</div></div>`).join("")}</div>` +
+    (m.note ? `<div class="fnote">${esc(m.note.ja)}${enSpan(m.note.en)}</div>` : "") +
+    `<div class="fask">${esc(m.ask.ja)}${enSpan(m.ask.en)}</div>` +
+    `<div class="fthanks">${esc(m.thanks.ja)}${enSpan(m.thanks.en)}</div>`;
 }
 function renderCard() {
-  const parts = cardParts();
-  const en = t => opts.en ? `<div class="en">${esc(t)}</div>` : "";
-  let h = `<div class="band"><b>${CARD_TITLE.ja}</b><span>Food allergy card<br>${CARD_TITLE.ro}</span></div><div class="body">`;
-  let inList = false;
-  for (const x of parts) {
-    if (x.type === "allergen") {
-      if (!inList) { h += `<div class="allergens">`; inList = true; }
-      h += `<div class="allergen${x.soft ? " soft" : ""}"><span class="em">${x.em}</span><div><b>${esc(x.ja)}</b>${opts.en ? `<small>${esc(x.en)}${x.soft ? " — small amounts OK" : ""}</small>` : ""}</div></div>`;
-      continue;
-    }
-    if (inList) { h += `</div>`; inList = false; }
-    const cls = x.type === "ok" ? "line ok" : x.type === "ask" ? "ask" : "line";
-    h += `<div class="${cls}">${esc(x.ja)}${en(x.en)}</div>`;
-  }
-  h += `</div>`;
-  $("#acard").innerHTML = h;
-  $("#enToggle").textContent = opts.en ? "EN ✓" : "EN";
+  const m = cardModel();
+  $("#acard").innerHTML = `<div class="band">${esc(m.head.ja)}${enSpan(m.head.en)}</div><div class="body">${cardInner(m)}</div>`;
   $("#optTraces").checked = opts.traces; $("#optSoy").checked = opts.soy;
 }
+function cardSpeech() { const m = cardModel(); return [m.head.ja, ...m.items.map(i => i.sub ? i.ja + "。" + i.sub : i.ja), m.note && m.note.ja, m.ask.ja, m.thanks.ja].filter(Boolean).join("。"); }
 $("#optTraces").addEventListener("change", e => { opts.traces = e.target.checked; store.set("traces", opts.traces); renderCard(); });
 $("#optSoy").addEventListener("change", e => { opts.soy = e.target.checked; store.set("soyOk", opts.soy); renderCard(); });
-$("#enToggle").addEventListener("click", () => { opts.en = !opts.en; store.set("cardEn", opts.en); renderCard(); });
-$("#sayCard").addEventListener("click", () => speak(CARD_TITLE.ja + "。" + cardParts().map(x => x.ja).join("。")));
+$("#sayCard").addEventListener("click", () => speak(cardSpeech()));
+
+const HOTEL_NOTE = `【食物アレルギーについて】
+小麦・大麦（グルテン）、乳製品、大豆にアレルギーがあります。
+醤油・味噌・天ぷら粉・パン粉・カレールー・麺類・麦茶にも含まれるため、これらを使わないお料理をご用意いただけますでしょうか。
+塩・わさび・レモンでの味付けは大丈夫です。命に関わるアレルギーではないため、調理器具の共用は問題ありません。
+お手数をおかけしますが、どうぞよろしくお願いいたします。
+
+[English]
+I'm allergic to wheat and barley (gluten), dairy and soy. These are also in soy sauce, miso, tempura batter, breadcrumbs, curry roux, noodles and barley tea — could you prepare dishes without them? Salt, wasabi and lemon are fine. It isn't life-threatening, so shared cookware is OK. Thank you very much for your help.`;
 $("#copyCard").addEventListener("click", async () => {
-  const txt = cardText(true);
-  try { await navigator.clipboard.writeText(txt); toast("Copied — paste it into your hotel email."); }
-  catch { showText({ ja: txt, en: "Press and hold to copy." }); }
+  try { await navigator.clipboard.writeText(HOTEL_NOTE); toast("Copied — paste it into your hotel email."); }
+  catch { openShow({ ja: HOTEL_NOTE, en: "Press and hold to copy." }); }
 });
 
-/* ================= SHOW-TO-STAFF OVERLAY ================= */
+/* ---------------- full-screen card ---------------- */
+async function openFull() {
+  const f = $("#full");
+  $("#fullCard").innerHTML = `<div class="fhead">${esc(cardModel().head.ja)}${enSpan(cardModel().head.en)}</div>` + cardInner(cardModel());
+  f.classList.add("no-en"); $("#fullEn").textContent = "EN";
+  f.hidden = false; document.body.style.overflow = "hidden";
+  $("#awakeMsg").textContent = "";
+  const ok = await awake.on();
+  $("#awakeMsg").textContent = ok ? "☀︎ Screen stays on while this is open" : "Tip: set Auto-Lock to a longer time in Settings";
+}
+function closeFull() {
+  $("#full").hidden = true; document.body.style.overflow = ""; awake.off();
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
+$("#showCard").addEventListener("click", openFull);
+$("#acard").addEventListener("click", openFull);
+$("#acard").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFull(); } });
+$("#fullClose").addEventListener("click", closeFull);
+$("#fullSay").addEventListener("click", () => speak(cardSpeech()));
+$("#fullEn").addEventListener("click", () => { const f = $("#full"); f.classList.toggle("no-en"); $("#fullEn").textContent = f.classList.contains("no-en") ? "EN" : "EN ✓"; });
+
+/* ================= SHOW-A-PHRASE OVERLAY ================= */
 let showing = null, showEn = false;
 function fitSize(len) { return Math.max(24, Math.min(64, Math.round(1500 / Math.max(len, 8)))); }
 function openShow(item) {
   showing = item; showEn = false;
-  const ov = $("#show"), big = $("#showBig");
-  ov.classList.toggle("card-mode", !!item.card);
-  if (item.card) {
-    const parts = cardParts();
-    big.innerHTML = `<span class="lineb" style="color:var(--shu);font-size:1.15em">${CARD_TITLE.ja}</span>` +
-      parts.map(x => `<span class="lineb"${x.type === "allergen" ? ' style="color:var(--avoid)"' : x.type === "ask" ? ' style="color:var(--shu-dark)"' : ""}>${x.type === "allergen" ? "✕ " : ""}${esc(x.ja)}</span>`).join("");
-    big.style.fontSize = "24px";
-    $("#showSub").textContent = "";
-  } else {
-    big.innerHTML = esc(item.ja).replace(/\n/g, "<br>");
-    big.style.fontSize = fitSize(item.ja.length) + "px";
-    $("#showSub").textContent = "";
-  }
-  ov.hidden = false; document.body.style.overflow = "hidden"; keepAwake(true);
+  const big = $("#showBig");
+  big.innerHTML = esc(item.ja).replace(/\n/g, "<br>");
+  big.style.fontSize = (item.ja.length > 120 ? 18 : fitSize(item.ja.length)) + "px";
+  $("#showSub").textContent = "";
+  $("#show").hidden = false; document.body.style.overflow = "hidden"; awake.on();
 }
-function showText(item) { openShow(item); }
-function closeShow() { $("#show").hidden = true; document.body.style.overflow = ""; keepAwake(false); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+function closeShow() { $("#show").hidden = true; document.body.style.overflow = ""; awake.off(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
 $("#showClose").addEventListener("click", closeShow);
-$("#showSay").addEventListener("click", () => showing && speak(showing.card ? CARD_TITLE.ja + "。" + cardParts().map(x => x.ja).join("。") : showing.ja));
-$("#showSlow").addEventListener("click", () => showing && speak(showing.card ? cardParts().map(x => x.ja).join("。") : showing.ja, true));
+$("#showSay").addEventListener("click", () => showing && speak(showing.ja));
+$("#showSlow").addEventListener("click", () => showing && speak(showing.ja, true));
 $("#showEn").addEventListener("click", () => {
   if (!showing) return; showEn = !showEn;
-  const sub = $("#showSub");
-  if (!showEn) { sub.textContent = ""; return; }
-  sub.textContent = showing.card ? CARD_TITLE.en + ". " + cardParts().map(x => x.en).join(" ") : [showing.en, showing.ro].filter(Boolean).join(" — ");
+  $("#showSub").textContent = showEn ? [showing.en, showing.ro].filter(Boolean).join(" — ") : "";
 });
-$("#showCard").addEventListener("click", () => openShow({ card: true }));
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#show").hidden) closeShow(); });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("#full").hidden) closeFull(); else if (!$("#show").hidden) closeShow();
+});
 
 /* ================= PHRASES ================= */
 const PHRASES = [
@@ -531,9 +582,6 @@ document.addEventListener("click", e => {
   const a = e.target.closest("[data-say]"); if (a) { speak(PHRASES[+a.dataset.say].ja); return; }
   const w = e.target.closest("[data-slow]"); if (w) { speak(PHRASES[+w.dataset.slow].ja, true); return; }
 });
-function renderQuick() {
-  $("#quickRow").innerHTML = PHRASES.map((p, i) => p.q ? `<button class="btn sm" data-show="${i}">${esc(p.en.replace(/\.$/, ""))}</button>` : "").join("");
-}
 
 /* ================= FOOD ================= */
 const FOOD = [
@@ -904,7 +952,7 @@ $("#offlineBtn").addEventListener("click", async () => {
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
 
 /* ================= START ================= */
-renderCard(); renderQuick();
+renderCard();
 renderPhraseCats(); renderPhrases();
 renderFoodCats(); renderFood();
 renderCityChips(); renderPlaces();
