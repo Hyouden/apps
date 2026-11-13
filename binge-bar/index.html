@@ -1,0 +1,237 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Binge Bar</title>
+<meta name="theme-color" content="#0e1a1f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Binge Bar">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* Layout: marquee header, "Pick for tonight" button, the bar (two sliders), filter chips, then show cards with status buttons. Single dark theme by choice. */
+:root {
+  --bg: #0e1a1f;
+  --panel: #16272e;
+  --panel2: #1e343c;
+  --ink: #f4efe2;
+  --muted: #93a7ad;
+  --line: #2a444d;
+  --amber: #ffbe46;
+  --mint: #78dcc8;
+  --miss: #ff8a6b;
+  --font-display: "Bebas Neue", "Arial Narrow", sans-serif;
+  --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--font-body); -webkit-tap-highlight-color: transparent; }
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 14px;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 40px) max(16px, env(safe-area-inset-left, 0px)); }
+button, input { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+h1 { font: 400 2.4rem/1 var(--font-display); letter-spacing: .04em; margin: 0; color: var(--amber); }
+.sub { color: var(--muted); font-size: .85rem; text-align: right; }
+.btn { min-height: 48px; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel2); cursor: pointer; font-weight: 700; }
+.btn.primary { background: var(--amber); color: #2b1c00; border-color: transparent; font-size: 1.05rem; }
+.btn.small { min-height: 44px; font-size: .88rem; font-weight: 500; }
+.newbar { background: #173a36; border: 1px solid #2b6b62; color: var(--mint); border-radius: 12px; padding: 10px 12px; font-size: .92rem; text-align: left; cursor: pointer; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 10px; }
+.bar h2 { margin: 0; font: 400 1.35rem var(--font-display); letter-spacing: .04em; display: flex; justify-content: space-between; align-items: baseline; }
+.bar h2 button { background: none; border: 0; color: var(--muted); font: 500 .85rem var(--font-body); cursor: pointer; min-height: 44px; padding: 0 4px; text-decoration: underline; }
+.slide { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; font-size: .9rem; color: var(--muted); }
+.slide b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.slide input { grid-column: 1 / -1; width: 100%; height: 32px; accent-color: var(--amber); }
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-weight: 500; font-size: .92rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: transparent; font-weight: 700; }
+.count { color: var(--muted); font-size: .88rem; margin: 0; }
+.list { display: grid; gap: 10px; }
+.show { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+.show.seen { opacity: .6; }
+.show .top { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
+.show h3 { margin: 0; font: 700 1.1rem/1.25 var(--font-body); overflow-wrap: anywhere; }
+.tag { display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; margin-left: 6px; vertical-align: 2px; }
+.tag.new { background: var(--mint); color: #06302a; }
+.tag.miss { background: transparent; border: 1px solid var(--miss); color: var(--miss); }
+.scores { display: flex; gap: 6px; font-variant-numeric: tabular-nums; }
+.score { text-align: center; background: var(--panel2); border-radius: 8px; padding: 4px 8px; min-width: 52px; }
+.score b { display: block; font: 400 1.35rem/1 var(--font-display); letter-spacing: .03em; }
+.score span { font-size: .65rem; color: var(--muted); letter-spacing: .05em; }
+.score.low b { color: var(--miss); }
+.meta { margin: 0; color: var(--muted); font-size: .85rem; }
+.blurb { margin: 0; font-size: .95rem; }
+.note { margin: 0; font-size: .85rem; color: var(--amber); }
+.acts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.act { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: .8rem; font-weight: 500; padding: 2px; }
+.act[aria-pressed="true"] { background: var(--mint); color: #06302a; border-color: transparent; font-weight: 700; }
+.find { color: var(--muted); font-size: .85rem; }
+.empty { color: var(--muted); margin: 0; }
+.foot { color: var(--muted); font-size: .82rem; margin: 0; line-height: 1.5; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.scrim { position: fixed; inset: 0; background: rgba(4,10,12,.8); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.modal { background: var(--panel); border: 2px solid var(--amber); border-radius: 18px; padding: 20px; width: 100%; max-width: 380px; display: grid; gap: 10px; text-align: center; }
+.modal small { color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-size: .75rem; }
+.modal h2 { margin: 0; font: 400 2.2rem/1.05 var(--font-display); letter-spacing: .03em; color: var(--amber); text-wrap: balance; }
+.modal p { margin: 0; }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--line); padding: 10px 16px; border-radius: 12px; font-size: .92rem; z-index: 20; width: max-content; max-width: 92vw; }
+@media (prefers-reduced-motion: no-preference) { .modal { animation: pop .3s cubic-bezier(.2,1.4,.4,1); } @keyframes pop { from { transform: scale(.85); opacity: .4; } } }
+</style>
+</head><body>
+<div class="wrap">
+  <header><h1>Binge Bar</h1><span class="sub" id="updated"></span></header>
+
+  <button class="btn primary" id="tonight" type="button">🎬 Pick for tonight</button>
+  <button class="newbar" id="newbar" type="button" hidden></button>
+
+  <section class="card bar" aria-label="Your ratings bar">
+    <h2>Your bar <button id="reset" type="button">Reset to 8.0 and 90%</button></h2>
+    <label class="slide" for="imdb"><span>IMDb at least</span><b id="imdbv"></b><input type="range" id="imdb" min="7" max="9" step="0.1"></label>
+    <label class="slide" for="rt"><span>Rotten Tomatoes critics at least</span><b id="rtv"></b><input type="range" id="rt" min="75" max="100" step="1"></label>
+  </section>
+
+  <div class="chips" id="chips" role="group" aria-label="Filter"></div>
+  <p class="count" id="count"></p>
+  <div class="list" id="list"><p class="empty">Loading the list…</p></div>
+
+  <section class="card">
+    <p class="foot">Scores are IMDb and Rotten Tomatoes critics, for shows on Netflix in the US. The list is rechecked every week and new releases that come close to your bar are added. Scores drift, so a show can cross the bar either way.</p>
+    <p class="foot">Your statuses and bar live on this phone. Back up now and then.</p>
+    <div class="row2"><button class="btn small" id="backup" type="button">Back up</button><button class="btn small" id="restore" type="button">Restore</button></div>
+    <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+  </section>
+</div>
+<div class="scrim" id="scrim" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const KEY = "binge-bar-v1"; // every app on this site shares one browser storage
+const $ = id => document.getElementById(id);
+const CATS = { crime: "Crime & thriller", drama: "Drama", doc: "Documentary" };
+const FILTERS = [["all", "All"], ["want", "My list"], ["new", "New"], ["short", "Short binge"], ["crime", "Crime & thriller"], ["drama", "Drama"], ["doc", "Docs"], ["seen", "Seen"], ["skip", "Hidden"]];
+const ACTS = [["want", "Want"], ["watching", "Watching"], ["seen", "Seen"], ["skip", "Not for me"]];
+let SHOWS = [], filter = "all";
+let state = { status: {}, imdb: 8.0, rt: 90, known: [] };
+
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.status) state = Object.assign(state, s); } catch {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
+function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+const st = s => state.status[s.id] || "";
+const passes = s => s.imdb >= state.imdb - 1e-9 && s.rt >= state.rt;
+const isNew = s => s.added && (Date.now() - new Date(s.added + "T12:00:00").getTime()) / 864e5 < 15;
+
+function visible() {
+  let list = SHOWS;
+  if (filter === "skip") return list.filter(s => st(s) === "skip");
+  if (filter === "seen") return list.filter(s => st(s) === "seen");
+  if (filter === "want") return list.filter(s => st(s) === "want" || st(s) === "watching");
+  list = list.filter(s => st(s) !== "skip" && passes(s));
+  if (filter === "new") list = list.filter(isNew);
+  if (filter === "short") list = list.filter(s => s.short);
+  if (CATS[filter]) list = list.filter(s => s.cat === filter);
+  return list;
+}
+function sortKey(s) { const o = { watching: 0, want: 1, "": 2, seen: 3, skip: 4 }[st(s)]; return [o, isNew(s) ? 0 : 1, -(s.imdb * 10 + s.rt / 10)]; }
+function cmp(a, b) { const x = sortKey(a), y = sortKey(b); for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] - y[i]; return 0; }
+
+function renderChips() {
+  const box = $("chips"); box.innerHTML = "";
+  for (const [k, label] of FILTERS) {
+    const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = label;
+    b.setAttribute("aria-pressed", String(filter === k)); b.onclick = () => { filter = k; render(); }; box.append(b);
+  }
+}
+function card(s) {
+  const el = document.createElement("article"); el.className = "show" + (st(s) === "seen" ? " seen" : "");
+  const top = document.createElement("div"); top.className = "top";
+  const h = document.createElement("h3"); h.textContent = s.title;
+  if (isNew(s)) { const t = document.createElement("span"); t.className = "tag new"; t.textContent = "New"; h.append(t); }
+  if (!passes(s)) { const t = document.createElement("span"); t.className = "tag miss"; t.textContent = "Below bar"; h.append(t); }
+  const sc = document.createElement("div"); sc.className = "scores";
+  sc.innerHTML = '<div class="score"><b></b><span>IMDb</span></div><div class="score"><b></b><span>CRITICS</span></div>';
+  const [a, b] = sc.children; a.querySelector("b").textContent = s.imdb.toFixed(1); b.querySelector("b").textContent = s.rt + "%";
+  if (s.imdb < state.imdb - 1e-9) a.classList.add("low"); if (s.rt < state.rt) b.classList.add("low");
+  top.append(h, sc);
+  const meta = document.createElement("p"); meta.className = "meta"; meta.textContent = [CATS[s.cat], s.len, s.short ? "short binge" : ""].filter(Boolean).join(" · ");
+  const bl = document.createElement("p"); bl.className = "blurb"; bl.textContent = s.blurb;
+  el.append(top, meta, bl);
+  if (s.note) { const n = document.createElement("p"); n.className = "note"; n.textContent = s.note; el.append(n); }
+  const acts = document.createElement("div"); acts.className = "acts";
+  for (const [k, label] of ACTS) {
+    const btn = document.createElement("button"); btn.className = "act"; btn.type = "button"; btn.textContent = label;
+    btn.setAttribute("aria-pressed", String(st(s) === k));
+    btn.onclick = () => { if (st(s) === k) delete state.status[s.id]; else state.status[s.id] = k; save(); render(); if (k === "skip" && st(s) === "skip") toast("Hidden. Find it under Hidden."); };
+    acts.append(btn);
+  }
+  const f = document.createElement("a"); f.className = "find"; f.href = "https://www.netflix.com/search?q=" + encodeURIComponent(s.title); f.target = "_blank"; f.rel = "noopener"; f.textContent = "Find it on Netflix ↗";
+  el.append(acts, f);
+  return el;
+}
+function render() {
+  renderChips();
+  $("imdb").value = state.imdb; $("rt").value = state.rt; $("imdbv").textContent = Number(state.imdb).toFixed(1); $("rtv").textContent = state.rt + "%";
+  const list = visible().sort(cmp), box = $("list"); box.innerHTML = "";
+  const total = SHOWS.filter(s => passes(s) && st(s) !== "skip").length;
+  $("count").textContent = total + " of " + SHOWS.length + " shows clear your bar" + (filter !== "all" ? " · showing " + list.length : "");
+  if (!list.length) { const p = document.createElement("p"); p.className = "empty"; p.textContent = { want: "Nothing on your list yet. Tap Want on a show.", new: "Nothing new clears your bar right now.", seen: "Mark shows as Seen and they collect here.", skip: "Nothing hidden." }[filter] || "Nothing clears this bar. Try lowering it a notch."; box.append(p); return; }
+  for (const s of list) box.append(card(s));
+}
+$("imdb").oninput = () => { state.imdb = parseFloat($("imdb").value); save(); render(); };
+$("rt").oninput = () => { state.rt = parseInt($("rt").value, 10); save(); render(); };
+$("reset").onclick = () => { state.imdb = 8.0; state.rt = 90; save(); render(); };
+
+function tonight() {
+  let pool = SHOWS.filter(s => passes(s) && !["seen", "skip"].includes(st(s)));
+  if (CATS[filter]) pool = pool.filter(s => s.cat === filter); if (filter === "short") pool = pool.filter(s => s.short);
+  const mine = pool.filter(s => st(s) === "watching" || st(s) === "want"), from = mine.length && Math.random() < .7 ? mine : pool;
+  const m = $("modal");
+  if (!from.length) { m.innerHTML = '<h2>Nothing left</h2><p>You have seen or hidden everything that clears your bar.</p><button class="btn" id="mclose" type="button">Close</button>'; }
+  else {
+    const s = from[Math.floor(Math.random() * from.length)];
+    m.innerHTML = '<small>Tonight you are watching</small><h2></h2><p class="meta"></p><p></p><div class="row2"><button class="btn" id="again" type="button">Spin again</button><button class="btn primary" id="go" type="button">I\'m in</button></div><button class="btn small" id="mclose" type="button">Close</button>';
+    m.querySelector("h2").textContent = s.title;
+    m.querySelector(".meta").textContent = s.imdb.toFixed(1) + " IMDb · " + s.rt + "% critics · " + s.len;
+    m.querySelectorAll("p")[1].textContent = s.blurb;
+    $("again").onclick = tonight;
+    $("go").onclick = () => { state.status[s.id] = "watching"; save(); $("scrim").hidden = true; render(); toast("Marked as Watching"); };
+  }
+  $("mclose").onclick = () => $("scrim").hidden = true; $("scrim").hidden = false;
+}
+$("tonight").onclick = tonight;
+$("scrim").onclick = e => { if (e.target === $("scrim")) $("scrim").hidden = true; };
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("scrim").hidden = true; });
+
+$("backup").onclick = () => {
+  const name = "binge-bar-backup-" + new Date().toLocaleDateString("en-CA") + ".json", blob = new Blob([JSON.stringify({ app: "binge-bar", state }, null, 1)], { type: "application/json" }), file = new File([blob], name, { type: "application/json" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Binge Bar backup" }).catch(() => {}); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("Backup saved");
+};
+$("restore").onclick = () => { $("restoreFile").value = ""; $("restoreFile").click(); };
+$("restoreFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const d = JSON.parse(await f.text()); if (!d || d.app !== "binge-bar" || !d.state || !d.state.status) throw 0; state = Object.assign(state, d.state); save(); render(); toast("Restored"); }
+  catch { toast("That isn't a Binge Bar backup"); }
+};
+
+async function start() {
+  load();
+  let updated = "";
+  try { const r = await fetch("shows.json", { cache: "no-cache" }); const d = await r.json(); SHOWS = (d.shows || []).filter(s => s && s.id && s.title && typeof s.imdb === "number" && typeof s.rt === "number"); updated = d.updated || ""; } catch {}
+  if (!SHOWS.length) { $("list").innerHTML = '<p class="empty">The list didn\'t load. Connect to the internet and open the app again. After that it works offline.</p>'; return; }
+  if (updated) $("updated").textContent = "Checked " + new Date(updated + "T12:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const fresh = state.known.length ? SHOWS.filter(s => !state.known.includes(s.id) && passes(s)) : [];
+  if (fresh.length) { const b = $("newbar"); b.textContent = fresh.length + " new show" + (fresh.length === 1 ? "" : "s") + " cleared your bar: " + fresh.map(s => s.title).slice(0, 3).join(", ") + (fresh.length > 3 ? "…" : "") + ". Tap to see."; b.hidden = false; b.onclick = () => { filter = "new"; b.hidden = true; render(); }; }
+  state.known = SHOWS.map(s => s.id); save();
+  render();
+}
+start();
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>

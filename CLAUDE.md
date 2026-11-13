@@ -41,3 +41,7 @@ The owner plans goals in chat and asks Claude to "add to dungeon" (or similar). 
 - `history`: past weeks as `{start, focus}`. Before replacing `week`, append the old one here. Progress lives on the phone, so Claude can't see what's done: assume past focus steps are done unless the owner says otherwise.
 - **Never change or reuse an existing `id`.** Progress on each phone is stored by step id, so a changed id loses that step's progress. Append new steps and floors with new ids. Removing a step is fine.
 - This file is public. Keep steps free of addresses, money amounts, names of other people, employer details and travel dates.
+
+## Binge Bar: show list
+
+`binge-bar/shows.json` is `{version, updated, region, shows[]}`. Each show: `{id, title, cat (crime | drama | doc), imdb (number), rt (critics %, integer), len, short (bool: one season of about 10 episodes or fewer), note, blurb (own words, under 20 words), added (YYYY-MM-DD)}`. The app filters by the owner's bar on the phone (default IMDb 8.0 and critics 90%), so the file also holds near misses down to IMDb 7.0 and critics 75%. Never change an `id`: statuses on the phone are stored by id. Every score must come from a source checked that day, never from memory.
