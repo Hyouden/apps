@@ -30,6 +30,7 @@ const APPS = [
   { folder: "method", name: "Method", blurb: "Trail-style mobility flows and two strength days a week" },
   { folder: "safe-eats-japan", name: "Sydney Eats Japan", blurb: "Gluten, dairy & soy-free allergy card, phrases and safe restaurants" },
   { folder: "kibun", name: "Kibun", blurb: "Kyoto & Nara temple stamps with crowd estimates, plus a mood-based day planner for Japan" },
+  { folder: "solo-saga", url: "https://claude.ai/artifact/P8zhcjam9MWThfefZQPvUN", name: "Solo Saga", blurb: "Solo D&D with Claude as your Dungeon Master (opens in Claude)" },
   { folder: "quest-log", name: "Quest Log", blurb: "8-bit dungeon crawler where your real goals are the dungeons" },
   { folder: "us-weekly", name: "Weekly Us", blurb: "Couples check-in: honest, deep, fun, funny and spicy questions every week" },
   { folder: "idea-card", name: "Daily Idea Card", blurb: "Deep, steady, funny, mind-bending and motivating ideas, one card a day" },
@@ -38,7 +39,7 @@ const APPS = [
 const grid = document.getElementById("grid");
 for (const a of APPS) {
   const el = document.createElement("a");
-  el.className = "app"; el.href = a.folder + "/";
+  el.className = "app"; el.href = a.url || a.folder + "/"; // url = app hosted elsewhere; folder still holds its icon
   const img = document.createElement("img"); img.src = a.folder + "/icons/icon-192.png"; img.alt = "";
   const t = document.createElement("div"); const b = document.createElement("b"); b.textContent = a.name;
   const s = document.createElement("span"); s.textContent = a.blurb; t.append(b, s);
