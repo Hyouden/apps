@@ -1,1 +1,30 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Solo Saga</title><meta http-equiv="refresh" content="0;url=https://claude.ai/artifact/P8zhcjam9MWThfefZQPvUN"></head><body style="background:#12141c;color:#efe6d2;font-family:system-ui;padding:24px"><p>Solo Saga runs inside Claude. <a style="color:#f0b24a" href="https://claude.ai/artifact/P8zhcjam9MWThfefZQPvUN">Open the game</a></p></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Solo Saga</title>
+<meta name="theme-color" content="#12141c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Solo Saga">
+<style>
+html,body{margin:0;height:100%;background:#12141c;color:#efe6d2;font:17px/1.5 system-ui,sans-serif}
+main{min-height:100%;display:grid;place-content:center;gap:16px;text-align:center;padding:24px}
+img{width:96px;height:96px;margin:0 auto;border-radius:22px}
+h1{margin:0;font:700 2rem Georgia,serif;color:#f0b24a}
+p{margin:0;color:#a39d8c;max-width:30ch}
+a{display:inline-block;background:#f0b24a;color:#2a1a00;font-weight:700;text-decoration:none;padding:14px 22px;border-radius:12px;min-height:48px}
+</style></head><body><main>
+<img src="icons/icon-192.png" alt="">
+<h1>Solo Saga</h1>
+<p>Your campaigns are saved in Claude. Tap to continue the adventure.</p>
+<a href="https://claude.ai/artifact/P8zhcjam9MWThfefZQPvUN">Open the game</a>
+<p id="tip" style="font-size:.85rem"></p>
+</main>
+<script>
+// Installed to the home screen: show the button (a tap keeps it working in every browser). Opened from the shelf: go straight in.
+const installed = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+if (!installed) location.replace("https://claude.ai/artifact/P8zhcjam9MWThfefZQPvUN");
+else document.getElementById("tip").textContent = "Tip: sign in to Claude in your browser once so the game opens straight to your saves.";
+</script>
+</body></html>
