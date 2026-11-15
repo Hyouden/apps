@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "updated": "2026-11-15",
+  "recipes": [
+    { "id": "r001", "title": "Chicken", "url": "https://www.instagram.com/reel/DclkjgkhCtV/", "tags": ["chicken"], "note": "", "added": "2026-09-15" },
+    { "id": "r002", "title": "Chicken (2nd reel)", "url": "https://www.instagram.com/reel/DalcF8qPKGA/", "tags": ["chicken"], "note": "", "added": "2026-09-15" },
+    { "id": "r003", "title": "Eggs", "url": "https://www.instagram.com/reel/DbWQLfUBwdu/", "tags": ["eggs", "breakfast"], "note": "", "added": "2026-09-14" },
+    { "id": "r004", "title": "Cake", "url": "https://youtube.com/shorts/_a7xTgfSBXI", "tags": ["dessert"], "note": "", "added": "2026-09-12" },
+    { "id": "r005", "title": "Rice paper toast", "url": "https://www.instagram.com/reel/DckIhktTYMg/", "tags": ["breakfast", "quick"], "note": "", "added": "2026-09-02" },
+    { "id": "r006", "title": "Protein mac & cheese meal prep", "url": "https://youtube.com/shorts/nsGo2IslFN4", "tags": ["meal prep", "pasta", "high protein"], "note": "From @Nikitafair", "added": "2026-03-03" },
+    { "id": "r007", "title": "Fried rice", "url": "https://www.youtube.com/watch?v=eC8gqjQRj1I", "tags": ["rice"], "note": "", "added": "2026-02-26" },
+    { "id": "r008", "title": "The best butter chicken", "url": "https://youtube.com/shorts/18gdBoDT0Rk", "tags": ["chicken", "curry"], "note": "", "added": "2024-09-13" },
+    { "id": "r009", "title": "Dave's hot chicken at home", "url": "https://youtube.com/shorts/rRT5C9o2tOc", "tags": ["chicken", "fried"], "note": "", "added": "2024-07-09" },
+    { "id": "r010", "title": "A Korean fried this", "url": "https://youtube.com/shorts/6MjruhkgF0Y", "tags": ["fried"], "note": "", "added": "2024-07-01" },
+    { "id": "r011", "title": "Basic curry sauce", "url": "https://hebbarskitchen.com/curry-base-recipe-basic-curry-sauce/", "tags": ["curry", "sauce"], "note": "Curry base for lots of dishes", "added": "2022-07-11" }
+  ]
+}

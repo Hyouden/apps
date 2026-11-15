@@ -45,3 +45,12 @@ The owner plans goals in chat and asks Claude to "add to dungeon" (or similar). 
 ## Binge Bar: show list
 
 `binge-bar/shows.json` is `{version, updated, region, shows[]}`. Each show: `{id, title, cat (crime | drama | doc), imdb (number), rt (critics %, integer), len, short (bool: one season of about 10 episodes or fewer), note, blurb (own words, under 20 words), added (YYYY-MM-DD)}`. The app filters by the owner's bar on the phone (default IMDb 8.0 and critics 90%), so the file also holds near misses down to IMDb 7.0 and critics 75%. Never change an `id`: statuses on the phone are stored by id. Every score must come from a source checked that day, never from memory.
+
+## Recipe Box: "add to my recipe box" requests
+
+The owner saves recipes on the phone, and can also ask Claude to "add this to my recipe box". Do that by appending to `recipe-box/recipes.json` and pushing; the app loads it network-first.
+
+- `recipes[]`: `{id, title, url, tags[], note, added (YYYY-MM-DD)}`. New ids continue the pattern `r012`, `r013`, … **Never change or reuse an `id`**: favorites, "made it" counts, edits and removals on the phone are stored by id.
+- Tags are lowercase and short, reusing existing ones where they fit (chicken, eggs, rice, curry, dessert, breakfast, quick, meal prep, high protein, fried, sauce, pasta…).
+- Strip tracking params (`igsh`, `igshid`, `stkn`, `si`, `utm_*`) from links. Keep notes free of personal details: this file is public.
+- Recipes added on the phone live only in that phone's storage (backed up with the app's Back up button), so Claude can't see them.

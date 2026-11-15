@@ -1,0 +1,377 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Recipe Box</title>
+<meta name="theme-color" content="#C8553D">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recipes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBF6EE;--card:#FFFFFF;--fg:#2B2118;--muted:#7A6A5B;--line:#EADFCF;--accent:#C8553D;--accent2:#E9A23B;--soft:#F4E9DA;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:10px;max-width:640px;margin:0 auto}
+h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:28px;margin:0;flex:1;letter-spacing:-.5px}
+h1 span{color:var(--accent)}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;font-size:20px}
+.search{max-width:640px;margin:10px auto 0;position:relative}
+.search input{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 14px 0 38px;outline:none}
+.search input:focus{border-color:var(--accent)}
+.search::before{content:"⌕";position:absolute;left:13px;top:8px;font-size:20px;color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;max-width:640px;margin:10px auto 0;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:14px;white-space:nowrap}
+.chip.on{background:var(--fg);color:#fff;border-color:var(--fg)}
+main{max-width:640px;margin:0 auto;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 110px) max(16px,env(safe-area-inset-left,0px))}
+.count{font-size:13px;color:var(--muted);margin:0 2px 10px;display:flex;justify-content:space-between;align-items:center}
+.count button{border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;padding:8px 0;min-height:36px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column;position:relative}
+.thumb{aspect-ratio:4/3;background:var(--soft);display:grid;place-items:center;font-size:44px;position:relative;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.src{position:absolute;left:8px;bottom:8px;font-size:11px;font-weight:700;letter-spacing:.3px;background:rgba(43,33,24,.82);color:#fff;padding:3px 8px;border-radius:999px}
+.fav{position:absolute;right:8px;top:8px;font-size:16px;background:rgba(255,255,255,.92);border-radius:999px;width:28px;height:28px;display:grid;place-items:center}
+.made{position:absolute;right:8px;bottom:8px;font-size:11px;font-weight:700;background:#2F7D68;color:#fff;padding:3px 8px;border-radius:999px}
+.body{padding:10px 12px 12px}
+.ttl{font-weight:650;font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tags{font-size:12px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;color:var(--muted);padding:48px 16px}
+.empty b{display:block;color:var(--fg);font-size:18px;margin-bottom:6px}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);height:56px;padding:0 26px;border-radius:999px;border:0;background:var(--accent);color:#fff;font-weight:700;font-size:17px;box-shadow:0 8px 24px rgba(200,85,61,.35);display:flex;align-items:center;gap:8px;z-index:6}
+dialog{border:0;padding:0;border-radius:22px 22px 0 0;width:100%;max-width:640px;margin:auto auto 0;max-height:92vh;background:var(--bg);color:var(--fg)}
+dialog::backdrop{background:rgba(43,33,24,.45)}
+.sheet{padding:18px 18px calc(env(safe-area-inset-bottom,0px) + 18px);overflow:auto;max-height:92vh}
+.sheet h2{font-family:Fraunces,Georgia,serif;font-size:22px;margin:0 0 14px;display:flex;justify-content:space-between;align-items:center}
+.close{border:0;background:var(--soft);width:36px;height:36px;border-radius:999px;font-size:18px}
+label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:14px 0 6px}
+.field{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:10px 12px;outline:none}
+.field:focus{border-color:var(--accent)}
+textarea.field{min-height:84px;resize:vertical}
+.row{display:flex;gap:8px}
+.row .field{flex:1;min-width:0}
+.btn{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:var(--fg)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.dark{background:var(--fg);color:#fff;border-color:var(--fg)}
+.btn.wide{width:100%;margin-top:18px}
+.btn.danger{color:#A33A26}
+.paste{width:100%;min-height:58px;font-size:17px;border-style:dashed;border-color:var(--accent);color:var(--accent);background:#FFF8F4}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.warn{font-size:13px;color:#A33A26;margin-top:8px}
+.tagpick{display:flex;flex-wrap:wrap;gap:8px}
+.tagpick .chip{height:38px}
+.preview{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--soft);aspect-ratio:16/9;display:grid;place-items:center;font-size:56px;margin-bottom:4px}
+.preview img{width:100%;height:100%;object-fit:cover}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.actions .full{grid-column:1/-1}
+.menu a,.menu button{display:flex;width:100%;min-height:52px;align-items:center;gap:12px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;padding:0 4px;font-size:16px;text-decoration:none;color:var(--fg)}
+.how{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px}
+.how b{display:block;margin-bottom:4px}
+.how ol{margin:6px 0 0;padding-left:20px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 86px);background:var(--fg);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.pick{background:linear-gradient(135deg,#C8553D,#E9A23B);color:#fff;border:0}
+</style>
+</head><body>
+<header>
+  <div class="top">
+    <h1>Recipe <span>Box</span></h1>
+    <button class="iconbtn pick" id="randomBtn" aria-label="Pick something to cook" title="What should I cook?">🎲</button>
+    <button class="iconbtn" id="menuBtn" aria-label="Menu">☰</button>
+  </div>
+  <div class="search"><input id="q" type="search" placeholder="Search recipes, tags, notes" autocomplete="off"></div>
+  <div class="chips" id="chips"></div>
+</header>
+<main>
+  <div class="count"><span id="count"></span><button id="clearBtn" hidden>Clear filters</button></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden><b>Nothing here yet</b>Tap <i>Add recipe</i> and paste a link from Instagram, TikTok, YouTube or any recipe site.</div>
+</main>
+<button class="fab" id="addBtn"><span style="font-size:22px;line-height:1">＋</span> Add recipe</button>
+<div class="toast" id="toast"></div>
+
+<!-- Add sheet -->
+<dialog id="addDlg"><div class="sheet">
+  <h2>Add a recipe <button class="close" data-close aria-label="Close">✕</button></h2>
+  <button class="btn paste" id="pasteBtn">📋 Paste copied link</button>
+  <label for="aUrl">Link</label>
+  <input class="field" id="aUrl" type="url" inputmode="url" placeholder="https://www.instagram.com/reel/…" autocomplete="off">
+  <div class="warn" id="aDup" hidden>This link is already in your box.</div>
+  <label for="aTitle">Name</label>
+  <input class="field" id="aTitle" placeholder="e.g. Crispy garlic chicken" autocomplete="off">
+  <div class="hint" id="aTitleHint" hidden>Looking up the name…</div>
+  <label>Tags</label>
+  <div class="tagpick" id="aTags"></div>
+  <div class="row" style="margin-top:8px"><input class="field" id="aNewTag" placeholder="Add your own tag" autocomplete="off"><button class="btn" id="aAddTag">Add</button></div>
+  <label for="aNote">Notes</label>
+  <textarea class="field" id="aNote" placeholder="Swaps, what to buy, who loved it…"></textarea>
+  <button class="btn primary wide" id="aSave">Save to Recipe Box</button>
+</div></dialog>
+
+<!-- Detail sheet -->
+<dialog id="detDlg"><div class="sheet">
+  <h2><span id="dSrc" style="font-family:system-ui;font-size:13px;color:var(--muted);font-weight:600"></span><button class="close" data-close aria-label="Close">✕</button></h2>
+  <div class="preview" id="dPrev"></div>
+  <label for="dTitle">Name</label>
+  <input class="field" id="dTitle" autocomplete="off">
+  <div class="actions">
+    <a class="btn dark full" id="dOpen" target="_blank" rel="noopener">Open recipe ↗</a>
+    <button class="btn" id="dFav">☆ Favorite</button>
+    <button class="btn" id="dMade">✓ I made this</button>
+  </div>
+  <div class="hint" id="dMadeInfo"></div>
+  <label>Tags</label>
+  <div class="tagpick" id="dTags"></div>
+  <div class="row" style="margin-top:8px"><input class="field" id="dNewTag" placeholder="Add your own tag" autocomplete="off"><button class="btn" id="dAddTag">Add</button></div>
+  <label for="dNote">Notes</label>
+  <textarea class="field" id="dNote" placeholder="Swaps, what to buy, who loved it…"></textarea>
+  <div class="actions"><button class="btn" id="dCopy">Copy link</button><button class="btn danger" id="dDel">Remove</button></div>
+</div></dialog>
+
+<!-- Menu sheet -->
+<dialog id="menuDlg"><div class="sheet menu">
+  <h2>Recipe Box <button class="close" data-close aria-label="Close">✕</button></h2>
+  <button id="mBackup">💾 Back up my recipes</button>
+  <button id="mRestore">📂 Restore from a backup</button>
+  <button id="mRestoreHidden">↩︎ Bring back removed recipes</button>
+  <a href="../">🗂️ Back to the App Shelf</a>
+  <div class="how"><b>Fastest way to save from social media</b>
+    <ol><li>In Instagram, TikTok or YouTube, tap <b>Share</b> → <b>Copy link</b>.</li>
+    <li>Open Recipe Box and tap <b>Add recipe</b> → <b>Paste copied link</b>.</li>
+    <li>Name it, tap a tag or two, save.</li></ol>
+  </div>
+  <div class="how"><b>On Android</b>Once Recipe Box is installed from Chrome, it shows up right in the Share menu: tap Share → Recipe Box.</div>
+  <div class="how"><b>Ask Claude</b>Say "add this to my recipe box" with a link in chat, and it shows up here next time you open the app.</div>
+  <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+</div></dialog>
+
+<script>
+const KEY = "recipe-box-v1"; // unique per app: every app on this site shares one browser storage
+const BASE_TAGS = ["chicken","beef","pork","seafood","veggie","eggs","pasta","rice","curry","soup","breakfast","dessert","snack","fried","sauce","quick","meal prep","high protein"];
+const EMOJI = [["dessert","🍰"],["cake","🍰"],["egg","🍳"],["breakfast","🥞"],["chicken","🍗"],["beef","🥩"],["pork","🥓"],["seafood","🍤"],["fish","🐟"],["shrimp","🍤"],["curry","🍛"],["rice","🍚"],["pasta","🍝"],["noodle","🍜"],["soup","🍲"],["veggie","🥗"],["salad","🥗"],["toast","🍞"],["fried","🍟"],["sauce","🥫"],["snack","🥨"],["taco","🌮"],["pizza","🍕"]];
+const GUESS = {chicken:/chicken|wings?\b|thigh/i,beef:/beef|steak|burger|brisket/i,pork:/pork|bacon|ham\b|carnitas/i,seafood:/shrimp|salmon|fish|tuna|crab|seafood/i,eggs:/\beggs?\b|omelet|frittata/i,pasta:/pasta|mac|spaghetti|noodle|ramen|lasagna/i,rice:/rice|risotto|bibimbap/i,curry:/curry|masala|tikka|korma/i,soup:/soup|stew|chili|broth/i,breakfast:/breakfast|pancake|waffle|oat|toast|egg/i,dessert:/cake|cookie|brownie|dessert|pie\b|ice cream|sweet/i,fried:/fried|crispy|air ?fry/i,"high protein":/protein/i,"meal prep":/meal ?prep/i,quick:/quick|easy|\d+ ?min/i};
+
+let seed = [];
+let st = load();
+let filter = {tag:null, q:"", fav:false, notMade:false};
+let current = null; // id in detail view
+let aTagSel = new Set();
+
+function load(){ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.added) return Object.assign({added:[],hidden:[],meta:{},customTags:[]}, s); } catch(e){} return {added:[],hidden:[],meta:{},customTags:[]}; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){ toast("Couldn't save on this phone"); } }
+const $ = id => document.getElementById(id);
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),1800); }
+
+function all(){
+  const hidden = new Set(st.hidden);
+  return [...seed.filter(r=>!hidden.has(r.id)), ...st.added]
+    .map(r => Object.assign({}, r, st.meta[r.id] || {}))
+    .sort((a,b) => (b.added||"").localeCompare(a.added||""));
+}
+function byId(id){ return all().find(r=>r.id===id); }
+function normUrl(u){ try { const x=new URL(u.trim()); return (x.hostname.replace(/^www\.|^m\./,"")+x.pathname).replace(/\/$/,"").toLowerCase(); } catch(e){ return (u||"").trim().toLowerCase(); } }
+function source(u){
+  let h=""; try { h=new URL(u).hostname.replace(/^www\.|^m\./,""); } catch(e){ return "Link"; }
+  if (/instagram\./.test(h)) return "Instagram";
+  if (/tiktok\./.test(h)) return "TikTok";
+  if (/youtube\.|youtu\.be/.test(h)) return "YouTube";
+  if (/pinterest\.|pin\.it/.test(h)) return "Pinterest";
+  if (/facebook\.|fb\.watch/.test(h)) return "Facebook";
+  if (/reddit\./.test(h)) return "Reddit";
+  return h.split(".").slice(-2,-1)[0] ? h : "Link";
+}
+function ytId(u){ const m=(u||"").match(/(?:youtu\.be\/|shorts\/|[?&]v=|embed\/)([\w-]{11})/); return m?m[1]:null; }
+function emoji(r){ const s=((r.tags||[]).join(" ")+" "+(r.title||"")).toLowerCase(); for (const [k,e] of EMOJI) if (s.includes(k)) return e; return "🍽️"; }
+function thumbHTML(r){ const id=ytId(r.url); return id ? `<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" onerror="this.replaceWith(document.createTextNode('${emoji(r)}'))">` : emoji(r); }
+function esc(s){ return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function allTags(){ const set=new Set(); all().forEach(r=>(r.tags||[]).forEach(t=>set.add(t))); return [...set].sort(); }
+
+function renderChips(){
+  const tags = allTags();
+  const c = $("chips"); c.innerHTML="";
+  const mk=(label,on,fn)=>{ const b=document.createElement("button"); b.className="chip"+(on?" on":""); b.textContent=label; b.onclick=fn; c.append(b); };
+  mk("All", !filter.tag && !filter.fav && !filter.notMade, ()=>{ filter.tag=null; filter.fav=false; filter.notMade=false; render(); });
+  mk("★ Favorites", filter.fav, ()=>{ filter.fav=!filter.fav; render(); });
+  mk("Haven't made", filter.notMade, ()=>{ filter.notMade=!filter.notMade; render(); });
+  tags.forEach(t=>mk(t, filter.tag===t, ()=>{ filter.tag = filter.tag===t?null:t; render(); }));
+}
+function filtered(){
+  const q=filter.q.trim().toLowerCase();
+  return all().filter(r=>{
+    if (filter.tag && !(r.tags||[]).includes(filter.tag)) return false;
+    if (filter.fav && !r.fav) return false;
+    if (filter.notMade && r.made) return false;
+    if (q && !((r.title||"")+" "+(r.tags||[]).join(" ")+" "+(r.note||"")+" "+source(r.url)).toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function render(){
+  renderChips();
+  const list = filtered(), total = all().length;
+  const g=$("grid"); g.innerHTML="";
+  for (const r of list){
+    const b=document.createElement("button"); b.className="card";
+    b.innerHTML = `<div class="thumb">${thumbHTML(r)}<span class="src">${esc(source(r.url))}</span>${r.fav?'<span class="fav">★</span>':''}${r.made?`<span class="made">Made${r.made>1?" ×"+r.made:""}</span>`:''}</div>
+      <div class="body"><div class="ttl">${esc(r.title||"Untitled")}</div><div class="tags">${esc((r.tags||[]).join(" · ")||"no tags")}</div></div>`;
+    b.onclick=()=>openDetail(r.id);
+    g.append(b);
+  }
+  const filt = filter.tag||filter.fav||filter.notMade||filter.q;
+  $("count").textContent = filt ? `${list.length} of ${total} recipes` : `${total} recipe${total===1?"":"s"}`;
+  $("clearBtn").hidden = !filt;
+  $("empty").hidden = list.length>0;
+  if (!list.length && total) $("empty").innerHTML = "<b>No matches</b>Try a different tag or search.";
+}
+
+/* ---------- Tag pickers ---------- */
+function tagPicker(el, sel, extra){
+  const tags=[...new Set([...BASE_TAGS, ...st.customTags, ...allTags(), ...sel])];
+  el.innerHTML="";
+  tags.forEach(t=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"+(sel.has(t)?" on":""); b.textContent=t;
+    b.onclick=()=>{ sel.has(t)?sel.delete(t):sel.add(t); b.classList.toggle("on"); extra&&extra(); }; el.append(b); });
+}
+function addCustomTag(input, sel, el, extra){
+  const t=input.value.trim().toLowerCase(); if(!t) return;
+  if(!st.customTags.includes(t) && !BASE_TAGS.includes(t)) { st.customTags.push(t); save(); }
+  sel.add(t); input.value=""; tagPicker(el, sel, extra); extra&&extra();
+}
+
+/* ---------- Add ---------- */
+function extractUrl(s){ const m=(s||"").match(/https?:\/\/[^\s<>"']+/); return m?m[0].replace(/[),.]+$/,""):""; }
+function cleanUrl(u){ try { const x=new URL(u); ["igsh","igshid","stkn","si","is","utm_source","utm_medium","utm_campaign","feature"].forEach(p=>x.searchParams.delete(p)); return x.toString(); } catch(e){ return u; } }
+function guessTags(title){ Object.entries(GUESS).forEach(([t,re])=>{ if(re.test(title)) aTagSel.add(t); }); tagPicker($("aTags"), aTagSel); }
+function checkDup(){ const n=normUrl($("aUrl").value); $("aDup").hidden = !n || !all().some(r=>normUrl(r.url)===n); }
+let lookupFor="";
+async function lookupTitle(u){
+  if (!u || $("aTitle").value.trim() || lookupFor===u) return;
+  lookupFor=u; $("aTitleHint").hidden=false;
+  try {
+    const res = await fetch("https://noembed.com/embed?url="+encodeURIComponent(u));
+    const j = await res.json();
+    if (j && j.title && !$("aTitle").value.trim() && $("aUrl").value.trim()===u){
+      const t = j.title.replace(/#\S+/g,"").replace(/\s+/g," ").trim().slice(0,90);
+      $("aTitle").value = t; guessTags(t);
+    }
+  } catch(e){}
+  $("aTitleHint").hidden=true;
+}
+function openAdd(pre={}){
+  aTagSel = new Set();
+  $("aUrl").value = pre.url||""; $("aTitle").value = pre.title||""; $("aNote").value = pre.note||"";
+  tagPicker($("aTags"), aTagSel);
+  if (pre.title) guessTags(pre.title);
+  checkDup();
+  $("addDlg").showModal();
+  if (pre.url) lookupTitle(pre.url);
+}
+$("addBtn").onclick=()=>openAdd();
+$("pasteBtn").onclick=async()=>{
+  try {
+    const txt = await navigator.clipboard.readText();
+    const u = extractUrl(txt);
+    if (!u) { toast("No link found on your clipboard"); return; }
+    $("aUrl").value = cleanUrl(u); checkDup(); lookupTitle($("aUrl").value);
+    if (!$("aTitle").value) $("aTitle").focus();
+  } catch(e){ toast("Long-press the Link box and tap Paste"); $("aUrl").focus(); }
+};
+$("aUrl").addEventListener("input",()=>{ checkDup(); });
+$("aUrl").addEventListener("change",()=>{ const u=extractUrl($("aUrl").value)||$("aUrl").value; $("aUrl").value=cleanUrl(u.trim()); checkDup(); lookupTitle($("aUrl").value); });
+$("aTitle").addEventListener("blur",()=>guessTags($("aTitle").value));
+$("aAddTag").onclick=()=>addCustomTag($("aNewTag"), aTagSel, $("aTags"));
+$("aNewTag").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); $("aAddTag").click(); } });
+$("aSave").onclick=()=>{
+  let url = cleanUrl((extractUrl($("aUrl").value)||$("aUrl").value).trim());
+  const title = $("aTitle").value.trim();
+  if (!url && !title){ toast("Paste a link or type a name"); return; }
+  if (url && !/^https?:\/\//.test(url)) url = "https://"+url;
+  if (url && all().some(r=>normUrl(r.url)===normUrl(url))){ toast("Already in your box"); return; }
+  const r = { id:"u"+Date.now().toString(36), title: title || (source(url)+" recipe"), url, tags:[...aTagSel], note:$("aNote").value.trim(), added:new Date().toISOString().slice(0,10) };
+  st.added.push(r); save(); $("addDlg").close(); filter={tag:null,q:"",fav:false,notMade:false}; $("q").value=""; render(); toast("Saved 🍽️");
+};
+
+/* ---------- Detail ---------- */
+let dTagSel = new Set();
+function meta(id){ return st.meta[id] || (st.meta[id]={}); }
+function isAdded(id){ return st.added.find(r=>r.id===id); }
+function patch(id, fields){ const a=isAdded(id); if (a) Object.assign(a, fields); else Object.assign(meta(id), fields); save(); }
+function openDetail(id){
+  const r = byId(id); if(!r) return; current=id;
+  $("dSrc").textContent = source(r.url) + (r.added ? " · saved "+new Date(r.added+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "");
+  const yid=ytId(r.url); $("dPrev").innerHTML = yid ? `<img alt="" src="https://i.ytimg.com/vi/${yid}/hqdefault.jpg">` : emoji(r);
+  $("dTitle").value=r.title||""; $("dNote").value=r.note||"";
+  $("dOpen").href = r.url || "#"; $("dOpen").hidden = !r.url;
+  $("dFav").textContent = r.fav ? "★ Favorite" : "☆ Favorite";
+  madeInfo(r);
+  dTagSel = new Set(r.tags||[]);
+  tagPicker($("dTags"), dTagSel, ()=>{ patch(current,{tags:[...dTagSel]}); render(); });
+  $("detDlg").showModal();
+}
+function madeInfo(r){ $("dMadeInfo").textContent = r.made ? `Made ${r.made} time${r.made>1?"s":""}, last on ${new Date(r.lastMade+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}.` : "Not made yet."; }
+$("dTitle").addEventListener("change",()=>{ patch(current,{title:$("dTitle").value.trim()||"Untitled"}); render(); });
+$("dNote").addEventListener("change",()=>{ patch(current,{note:$("dNote").value.trim()}); render(); });
+$("dFav").onclick=()=>{ const r=byId(current); patch(current,{fav:!r.fav}); $("dFav").textContent = !r.fav ? "★ Favorite" : "☆ Favorite"; render(); };
+$("dMade").onclick=()=>{ const r=byId(current); patch(current,{made:(r.made||0)+1,lastMade:new Date().toISOString().slice(0,10)}); madeInfo(byId(current)); render(); toast("Nice! Logged it 👨‍🍳"); };
+$("dAddTag").onclick=()=>addCustomTag($("dNewTag"), dTagSel, $("dTags"), ()=>{ patch(current,{tags:[...dTagSel]}); render(); });
+$("dNewTag").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); $("dAddTag").click(); } });
+$("dCopy").onclick=async()=>{ const r=byId(current); try { await navigator.clipboard.writeText(r.url); toast("Link copied"); } catch(e){ toast("Couldn't copy"); } };
+$("dDel").onclick=()=>{
+  const r=byId(current); if(!confirm(`Remove “${r.title}” from your box?`)) return;
+  if (isAdded(current)) st.added = st.added.filter(x=>x.id!==current); else st.hidden.push(current);
+  save(); $("detDlg").close(); render(); toast("Removed");
+};
+
+/* ---------- Random pick ---------- */
+$("randomBtn").onclick=()=>{
+  let pool = filtered(); if(!pool.length) pool = all(); if(!pool.length) return;
+  const notMade = pool.filter(r=>!r.made); const p = (notMade.length && Math.random()<.6) ? notMade : pool;
+  const r = p[Math.floor(Math.random()*p.length)]; toast("How about this one? 🎲"); openDetail(r.id);
+};
+
+/* ---------- Menu ---------- */
+$("menuBtn").onclick=()=>$("menuDlg").showModal();
+$("mBackup").onclick=()=>{
+  const blob=new Blob([JSON.stringify({app:"recipe-box",saved:new Date().toISOString(),data:st},null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`recipe-box-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+$("mRestore").onclick=()=>$("restoreFile").click();
+$("restoreFile").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try { const j=JSON.parse(await f.text()); const d=j.data||j; if(!d.added) throw 0;
+    if(!confirm("Replace the recipes on this phone with this backup?")) return;
+    st=Object.assign({added:[],hidden:[],meta:{},customTags:[]}, d); save(); render(); $("menuDlg").close(); toast("Backup restored");
+  } catch(err){ toast("That file isn't a Recipe Box backup"); }
+  e.target.value="";
+};
+$("mRestoreHidden").onclick=()=>{ const n=st.hidden.length; st.hidden=[]; save(); render(); $("menuDlg").close(); toast(n?`Brought back ${n}`:"Nothing to bring back"); };
+
+/* ---------- General ---------- */
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
+document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{ if(e.target===d) d.close(); }));
+$("q").addEventListener("input",e=>{ filter.q=e.target.value; render(); });
+$("clearBtn").onclick=()=>{ filter={tag:null,q:"",fav:false,notMade:false}; $("q").value=""; render(); };
+
+async function loadSeed(){
+  try { const res=await fetch("recipes.json",{cache:"no-cache"}); const j=await res.json(); seed=j.recipes||[]; } catch(e){ seed=[]; }
+  render();
+}
+function handleShare(){
+  const p=new URLSearchParams(location.search);
+  if (!p.has("url") && !p.has("text") && !p.has("title")) return;
+  const url = cleanUrl(p.get("url") || extractUrl(p.get("text")) || extractUrl(p.get("title")) || "");
+  let title = (p.get("title")||"").trim(); if (extractUrl(title)) title="";
+  history.replaceState(null,"",location.pathname);
+  openAdd({url, title});
+}
+render();
+loadSeed().then(handleShare);
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>
