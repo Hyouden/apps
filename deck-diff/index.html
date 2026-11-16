@@ -1,0 +1,680 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Deck Diff</title>
+<meta name="description" content="Compare Riftbound decks: how alike they are, which archetypes they fall into, and which cards are core or flex.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0F2730">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deck Diff">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=Saira+Semi+Condensed:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#ECEFF3;--card:#FFFFFF;--ink:#17212B;--muted:#55626F;--line:#D3DAE1;--accent:#0F6E79;--on-accent:#FFFFFF;--bar:#0F2730;--on-bar:#EAF2F4;
+  --h0:#E9EFF1;--h1:#8DC3C8;--h2:#0C5964;--warn:#A4530B;
+  --fury:#D64B35;--calm:#3F9A60;--mind:#3B86D8;--body:#DE8A22;--chaos:#9257CF;--order:#C29E1B;
+  --disp:"Saira Condensed","Arial Narrow",system-ui,sans-serif;--text:"Saira Semi Condensed",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0F161C;--card:#18222B;--ink:#E7EDF2;--muted:#9BA9B6;--line:#2B3844;--accent:#5CC6D0;--on-accent:#06262B;--bar:#0A1116;--on-bar:#E7EDF2;
+  --h0:#1A252E;--h1:#1F6670;--h2:#86E4EC;--warn:#F0A65A;color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 var(--text);-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--disp);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+h2{font-size:1.45rem}
+h3{font-size:1.15rem}
+p{margin:0}
+
+.top{background:var(--bar);color:var(--on-bar);padding-top:env(safe-area-inset-top,0px);position:sticky;top:0;z-index:5}
+.top-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.top h1{font-size:1.6rem;flex:1}
+.top h1 small{font:500 .8rem var(--text);opacity:.75;margin-left:8px;letter-spacing:0}
+.iconbtn{min-width:44px;min-height:44px;border:0;background:transparent;color:inherit;border-radius:10px;font:600 .95rem var(--text)}
+.iconbtn:active{background:rgba(255,255,255,.12)}
+
+main{max-width:720px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(150px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;min-height:44px;padding:0 14px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;min-height:44px;padding:0 14px;text-align:left;line-height:1.15}
+.chip b{display:block;font-weight:600}
+.chip span{font-size:.78rem;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:44px;padding:0 14px;font-weight:600}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5}
+input[type=search],input[type=text],textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{min-height:190px;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+label.field{display:block;font-weight:600;margin-bottom:6px}
+
+.dlist{list-style:none;margin:0;padding:0}
+.dlist li{border-top:1px solid var(--line)}
+.dlist li:first-child{border-top:0}
+.drow{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;min-height:56px;padding:6px 2px;width:100%;border:0;background:transparent;text-align:left}
+.drow input{width:22px;height:22px;accent-color:var(--accent);margin:0}
+.drow .t{min-width:0}
+.drow .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drow .t>span{display:block;font-size:.84rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank{font:700 1.05rem var(--disp);color:var(--muted);min-width:42px;text-align:right}
+.rank.top8{color:var(--accent)}
+.pips{display:inline-flex;gap:3px;vertical-align:middle;margin-right:6px}
+.pip{width:10px;height:10px;border-radius:50%;display:inline-block}
+.pip.fury{background:var(--fury)}.pip.calm{background:var(--calm)}.pip.mind{background:var(--mind)}.pip.body{background:var(--body)}.pip.chaos{background:var(--chaos)}.pip.order{background:var(--order)}
+.num{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 5px;border-radius:7px;background:var(--bar);color:var(--on-bar);font:700 .95rem var(--disp)}
+
+.tray{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:6;pointer-events:none}
+.tray-in{max-width:720px;margin:0 auto;padding:0 max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px))}
+.tray .box{pointer-events:auto;background:var(--bar);color:var(--on-bar);border-radius:14px;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(6,20,26,.28)}
+.tray .box b{font:700 1.15rem var(--disp)}
+.tray .btn{border-color:transparent}
+.tray .ghost{background:transparent;color:inherit;border-color:rgba(255,255,255,.28)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs div{max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr}
+nav.tabs button{border:0;background:transparent;min-height:58px;font:600 1.2rem var(--disp);color:var(--muted);letter-spacing:.02em;border-top:3px solid transparent}
+nav.tabs button[aria-current="page"]{color:var(--accent);border-top-color:var(--accent)}
+
+.heatwrap{overflow:auto;margin:10px -4px 0;padding:0 4px 4px;max-height:70vh}
+.heat{display:grid;gap:2px;width:max-content;min-width:100%}
+.heat .hl{position:sticky;left:0;z-index:2;background:var(--card);display:grid;place-items:center;font:700 .9rem var(--disp);color:var(--muted)}
+.heat .hh{position:sticky;top:0;z-index:1;background:var(--card);display:grid;place-items:center;font:700 .9rem var(--disp);color:var(--muted)}
+.heat .corner{position:sticky;left:0;top:0;z-index:3;background:var(--card)}
+.heat button{border:0;padding:0;border-radius:4px;font:600 .72rem var(--text);aspect-ratio:1;min-width:0}
+.heat button.self{background:transparent;color:var(--muted);cursor:default}
+.heat .gs-l{margin-left:5px}.heat .gs-t{margin-top:5px}
+.scale{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.8rem;color:var(--muted)}
+.scale i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--h0),var(--h1),var(--h2))}
+
+.group{border-left:5px solid var(--gc,var(--accent))}
+.group .gh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.group .gh .pct{font:700 1.45rem var(--disp);margin-left:auto}
+.gdecks{list-style:none;margin:10px 0 0;padding:0}
+.gdecks button{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%;border:0;background:transparent;text-align:left;min-height:44px;padding:4px 0}
+.gdecks .t b{font-weight:600}
+.gdecks .t>span{display:block;font-size:.84rem;color:var(--muted)}
+.cardsec{margin-top:12px}
+.cardsec h4{margin:0 0 4px;font:600 .95rem var(--text)}
+.cl{list-style:none;margin:0;padding:0;columns:2;column-gap:16px;font-size:.92rem}
+.cl li{break-inside:avoid;display:flex;gap:6px;padding:2px 0}
+.cl .q{font:700 .95rem var(--disp);min-width:28px;color:var(--muted)}
+.flex{list-style:none;margin:0;padding:0;font-size:.92rem}
+.flex li{display:grid;grid-template-columns:1fr 74px 44px;gap:8px;align-items:center;padding:3px 0}
+.meter{height:8px;border-radius:4px;background:var(--h0);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent)}
+.flex .f{font:700 .95rem var(--disp);text-align:right;color:var(--muted)}
+details>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";margin-left:auto;font:700 1.3rem var(--disp);color:var(--muted)}
+details[open]>summary::after{content:"\2212"}
+
+dialog{border:0;padding:0;background:var(--paper);color:var(--ink);width:100%;max-width:720px;max-height:100%;height:100%;margin:0 auto}
+dialog::backdrop{background:rgba(6,14,19,.6)}
+.dh{position:sticky;top:0;z-index:2;background:var(--bar);color:var(--on-bar);padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px 16px;display:flex;align-items:center;gap:8px}
+.dh h2{flex:1;font-size:1.3rem}
+.db{padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.vs .side b{display:block;font-weight:600}
+.vs .side span{font-size:.84rem;color:var(--muted)}
+.vs .side.r{text-align:right}
+.vs .big{font:700 2.6rem/1 var(--disp);color:var(--accent);text-align:center}
+.vs .big small{display:block;font:500 .78rem var(--text);color:var(--muted)}
+.diff{list-style:none;margin:0;padding:0;font-size:.95rem}
+.diff li{display:grid;grid-template-columns:30px 1fr 30px;gap:8px;padding:5px 0;border-top:1px solid var(--line);align-items:center}
+.diff li:first-child{border-top:0}
+.diff .a,.diff .b{font:700 1.05rem var(--disp);text-align:center;border-radius:6px;min-height:26px;display:grid;place-items:center}
+.diff .more{background:var(--accent);color:var(--on-accent)}
+.diff .zero{color:var(--muted)}
+.diff .nm{text-align:center}
+.note{border-left:4px solid var(--warn);padding:8px 12px;background:var(--card);border-radius:0 10px 10px 0;font-size:.9rem}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom,0px));background:var(--bar);color:var(--on-bar);padding:10px 16px;border-radius:999px;font-weight:600;z-index:20;box-shadow:0 6px 20px rgba(6,20,26,.3)}
+a{color:var(--accent)}
+@media (max-width:380px){.cl{columns:1}}
+@media (prefers-reduced-motion:no-preference){.tray .box{transition:transform .18s ease-out}}
+</style>
+</head><body>
+<header class="top"><div class="top-in">
+  <h1>Deck Diff<small>Riftbound</small></h1>
+  <button class="iconbtn" id="menuBtn" aria-label="Menu and about">Menu</button>
+</div></header>
+
+<main>
+<!-- Decks -->
+<section id="vDecks">
+  <div class="row" style="margin-bottom:12px">
+    <div class="seg" role="group" aria-label="Deck source">
+      <button id="srcFeed" aria-pressed="true">Tournaments</button>
+      <button id="srcMine" aria-pressed="false">My decks</button>
+    </div>
+  </div>
+
+  <div id="feedBox">
+    <div class="chips" id="evChips" aria-label="Tournament"></div>
+    <div class="row" style="margin:12px 0">
+      <div class="grow"><input type="search" id="q" placeholder="Filter by legend, player or card" aria-label="Filter decks by legend, player or card"></div>
+      <div class="seg" role="group" aria-label="Which decks"><button id="fAll" aria-pressed="true">All</button><button id="f8" aria-pressed="false">Top 8</button></div>
+    </div>
+    <div class="row small" style="margin-bottom:8px">
+      <span class="muted grow" id="feedCount"></span>
+      <button class="btn" id="pickShown">Pick all shown</button>
+    </div>
+    <div class="panel" style="padding:4px 12px"><ul class="dlist" id="feedList"></ul></div>
+    <p class="small muted" id="feedSrc" style="margin-top:10px"></p>
+  </div>
+
+  <div id="mineBox" hidden>
+    <div class="row" style="margin-bottom:12px"><button class="btn pri" id="addBtn">Add decks</button><span class="muted small grow">Paste a deck code or a decklist. Saved on this phone only.</span></div>
+    <div class="panel" id="mineEmpty"><h3>No decks of your own yet</h3><p class="muted" style="margin-top:6px">Copy a deck code from Piltover Archive, or the text export from any deck builder, then tap Add decks. You can paste several lists at once.</p></div>
+    <div class="panel" style="padding:4px 12px" id="minePanel" hidden><ul class="dlist" id="mineList"></ul></div>
+  </div>
+</section>
+
+<!-- Compare -->
+<section id="vCompare" hidden>
+  <div class="panel" id="cmpEmpty"><h2>Pick at least two decks</h2><p class="muted" style="margin:6px 0 12px">Choose decks from a tournament or add your own, then come back here to see how alike they are.</p><button class="btn pri" id="goDecks">Pick decks</button></div>
+  <div id="cmpBody" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="row">
+      <div class="seg" role="group" aria-label="Cards to compare"><button id="scMain" aria-pressed="true">Main deck</button><button id="scAll" aria-pressed="false">With sideboard</button></div>
+    </div>
+    <p id="cmpSummary"></p>
+    <div class="panel">
+      <h2>How alike each pair is</h2>
+      <p class="muted small" style="margin-top:4px">Numbers match the deck list below. Tap a square to see what differs between those two decks.</p>
+      <div class="heatwrap"><div class="heat" id="heat"></div></div>
+      <div class="scale"><span>Nothing shared</span><i></i><span>Identical</span></div>
+    </div>
+    <div class="row">
+      <h2 class="grow">Archetypes</h2>
+      <span class="small muted">Group at</span>
+      <button class="btn" id="thrDown" aria-label="Group decks more loosely">&minus;</button>
+      <b id="thrVal" style="font:700 1.25rem var(--disp);min-width:48px;text-align:center"></b>
+      <button class="btn" id="thrUp" aria-label="Group decks more strictly">+</button>
+    </div>
+    <div id="groups" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="panel">
+      <details id="spreadD"><summary>Every card across these decks</summary><div id="spread"></div></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="tray" id="tray" hidden><div class="tray-in"><div class="box">
+  <b id="trayN" class="grow"></b>
+  <button class="btn ghost" id="trayClear">Clear</button>
+  <button class="btn pri" id="trayGo">Compare</button>
+</div></div></div>
+
+<nav class="tabs" aria-label="Sections"><div>
+  <button id="tabDecks" aria-current="page">Decks</button>
+  <button id="tabCompare">Compare</button>
+</div></nav>
+
+<dialog id="pairDlg" aria-labelledby="pairT"><div class="dh"><h2 id="pairT">Two decks</h2><button class="iconbtn" data-close>Close</button></div><div class="db" id="pairB"></div></dialog>
+<dialog id="deckDlg" aria-labelledby="deckT"><div class="dh"><h2 id="deckT">Deck</h2><button class="iconbtn" data-close>Close</button></div><div class="db" id="deckB"></div></dialog>
+<dialog id="addDlg" aria-labelledby="addT"><div class="dh"><h2 id="addT">Add decks</h2><button class="iconbtn" data-close>Cancel</button></div><div class="db">
+  <div><label class="field" for="addText">Deck code or decklist</label>
+  <textarea id="addText" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste a deck code, or a list like:&#10;&#10;Legend: 1 Kennen, Heart of the Tempest&#10;Champion: 1 Kennen, Storm of Shuriken&#10;Main Deck:&#10;3 Lightning Rush&#10;2 Gust&#10;Sideboard:&#10;2 Salvage"></textarea>
+  <p class="small muted" style="margin-top:6px">For several decks, start each one with its Legend line or a line of dashes.</p></div>
+  <div><label class="field" for="addName">Name, if you want one</label><input type="text" id="addName" maxlength="60" placeholder="My Kennen list"></div>
+  <div id="addPrev"></div>
+  <button class="btn pri" id="addSave" disabled>Save decks</button>
+</div></dialog>
+<dialog id="menuDlg" aria-labelledby="menuT"><div class="dh"><h2 id="menuT">Menu</h2><button class="iconbtn" data-close>Close</button></div><div class="db">
+  <div class="panel"><h3>Your decks</h3><p class="muted small" style="margin:4px 0 10px">Decks you add live only on this phone. Save a backup file before switching phones or clearing browser data.</p>
+    <div class="row"><button class="btn" id="mBackup">Back up my decks</button><button class="btn" id="mRestore">Restore from a backup</button><input type="file" id="restoreFile" accept="application/json,.json" hidden></div></div>
+  <div class="panel"><h3>Card list</h3><p class="muted small" style="margin:4px 0 10px" id="cardInfo"></p><button class="btn" id="mCards">Update card list</button></div>
+  <div class="panel"><h3>How the numbers work</h3><p class="small" style="margin-top:6px">Two decks are compared copy by copy. Three copies of a card in one deck and two in the other count as two shared out of three. 100% means the same 40 cards; 0% means none in common. The Legend, runes and battlefields are left out of the score.</p>
+  <p class="small" style="margin-top:8px">Archetypes are decks that are, on average, at least as alike as the "Group at" setting. Core cards are in every deck of a group; flex cards are in only some.</p></div>
+  <div class="panel"><h3>Where the data comes from</h3><p class="small" style="margin-top:6px">Tournament lists are the ones Riot publishes on <a href="https://playriftbound.com/en-us/news/organizedplay" target="_blank" rel="noopener">playriftbound.com</a> after each major event. "Best-of" lists are the best-finishing pilot of each Legend. Deck codes use the open format from <a href="https://piltoverarchive.com" target="_blank" rel="noopener">Piltover Archive</a>. Card names come from the riftbound-tools dataset, and updates from <a href="https://rifthunt.com" target="_blank" rel="noopener">RiftHunt</a>.</p>
+  <p class="small muted" style="margin-top:8px">Deck Diff is a fan project. It isn't endorsed by Riot Games and doesn't reflect the views of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riftbound and League of Legends are trademarks of Riot Games, Inc.</p></div>
+</div></dialog>
+
+<script>/*! Deck code decoder: @piltoverarchive/riftbound-deck-codes 1.5.0, Copyright 2025 PiltoverArchive, Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0) */
+var RBCodes=(()=>{var z=Object.create;var v=Object.defineProperty;var K=Object.getOwnPropertyDescriptor;var Q=Object.getOwnPropertyNames;var X=Object.getPrototypeOf,Y=Object.prototype.hasOwnProperty;var _=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}},Z=(e,n)=>{for(var t in n)v(e,t,{get:n[t],enumerable:!0})},T=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let r of Q(n))!Y.call(e,r)&&r!==t&&v(e,r,{get:()=>n[r],enumerable:!(s=K(n,r))||s.enumerable});return e};var ee=(e,n,t)=>(t=e!=null?z(X(e)):{},T(n||!e||!e.__esModule?v(t,"default",{value:e,enumerable:!0}):t,e)),te=e=>T(v({},"__esModule",{value:!0}),e);var M=_(w=>{"use strict";Object.defineProperty(w,"__esModule",{value:!0});w.VARIANT_MAP=w.SET_MAP=void 0;w.SET_MAP={OGN:0,OGS:1,ARC:2,SFD:3,UNL:4,VEN:5,RAD:6};w.VARIANT_MAP={"":0,a:1,s:2,"*":2,b:3}});var C=_(x=>{"use strict";Object.defineProperty(x,"__esModule",{value:!0});var $=class e{constructor(n){this.bytes=new Uint8Array(n)}get length(){return this.bytes.length}PopVarint(){if(this.bytes.length===0)throw new Error("No bytes available to read varint");let n=0,t=0,s=0;for(let r=0;r<this.bytes.length;r++){s++;let c=this.bytes[r]&e.AllButMSB;if(n|=c<<t,(this.bytes[r]&e.JustMSB)!==e.JustMSB)return this.bytes=this.bytes.slice(s),n;t+=7}throw new Error("Byte array did not contain valid varints.")}sliceAndSet(n,t){this.bytes=this.bytes.slice(n,t)}get(n){if(n<0||n>=this.bytes.length)throw new Error(`Index out of bounds: ${n}`);return this.bytes[n]}static GetVarint(n){let t=new Uint8Array(10),s=0;if(n===0)return new Uint8Array([0]);for(;n!==0;){let r=n&this.AllButMSB;n>>>=7,n!==0&&(r|=this.JustMSB),t[s++]=r}return t.slice(0,s)}};$.AllButMSB=127;$.JustMSB=128;x.default=$});var W=_(P=>{"use strict";var ne=P&&P.__importDefault||function(e){return e&&e.__esModule?e:{default:e}};Object.defineProperty(P,"__esModule",{value:!0});P.getCodeFromDeck=oe;P.getDeckFromCode=ie;var V=M(),l=ne(C()),I=1,R=6,N="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";function re(e){let n="",t=0,s=0;for(let r of e)for(t=t<<8|r,s+=8;s>=5;)s-=5,n+=N[t>>s&31];return s>0&&(t<<=5-s,n+=N[t&31]),n}function se(e){let n=[],t=0,s=0;for(let r of e){let c=N.indexOf(r.toUpperCase());if(c===-1)throw new Error(`Invalid character in deck code: '${r}'`);for(t=t<<5|c,s+=5;s>=8;)s-=8,n.push(t>>s&255)}return new Uint8Array(n)}function y(e){var c,a;let n=e.split("-");if(n.length!==2)throw new Error(`Invalid card code format: ${e}. Expected format: SET-NUMBERvariant`);let t=n[0],s=n[1];if(!t||!s)throw new Error(`Invalid card code format: ${e}. Missing set or card number.`);let r=s.match(/^((?:R|SP)?\d+)([a-z*]?)$/);if(!r)throw new Error(`Invalid card code format: ${e}. Expected format: SET-NUMBERvariant`);return{set:t,number:(c=r[1])!=null?c:"",variant:(a=r[2])!=null?a:""}}function k(e,n,t){var r;if(e===2)return n;let s=(r=Object.entries(V.VARIANT_MAP).find(([c,a])=>a===e))==null?void 0:r[0];if(s===void 0)throw new Error(`Unknown variant code${t?` in ${t}`:""}: ${e}`);return s}function F(e){let n=new Map;for(let t of e){let{set:s,number:r,variant:c}=y(t.cardCode),a=`${s}-${c}`;if(!n.has(a)){let o=V.SET_MAP[s];if(o===void 0)throw new Error(`Unknown set: ${s}. Valid sets: ${Object.keys(V.SET_MAP).join(", ")}`);let u=V.VARIANT_MAP[c];if(u===void 0)throw new Error(`Unknown variant: '${c}'. Valid variants: ${Object.keys(V.VARIANT_MAP).join(", ")}`);n.set(a,{set:o,variant:u,cardNumbers:[]})}n.get(a).cardNumbers.push(r)}return Array.from(n.values()).sort((t,s)=>t.set!==s.set?t.set-s.set:t.variant!==s.variant?t.variant-s.variant:0).map(t=>({...t,cardNumbers:t.cardNumbers.sort((s,r)=>s.localeCompare(r,void 0,{numeric:!0}))}))}function G(e,n=12,t=4){let s=[];for(let r=n;r>=1;r--){let c=e.filter(o=>o.count===r),a=F(c);s.push(...l.default.GetVarint(a.length));for(let o of a){s.push(...l.default.GetVarint(o.cardNumbers.length)),s.push(o.set),s.push(o.variant);for(let u of o.cardNumbers)t>=4?u.startsWith("R")?(s.push(1),s.push(...l.default.GetVarint(parseInt(u.slice(1))))):(s.push(0),s.push(...l.default.GetVarint(parseInt(u)))):s.push(...l.default.GetVarint(parseInt(u)))}}return s}function j(e,n=12,t="s",s=4){var c;let r=[];for(let a=n;a>=1;a--){let o=e.PopVarint();for(let u=0;u<o;u++){let A=e.PopVarint(),p=e.get(0),h=e.get(1);e.sliceAndSet(2);let m=(c=Object.entries(V.SET_MAP).find(([f,i])=>i===p))==null?void 0:c[0];if(!m)throw new Error(`Unknown set code: ${p}`);let S=k(h,t);for(let f=0;f<A;f++){let i;if(s>=4){let d=e.get(0);e.sliceAndSet(1);let b=e.PopVarint();d===1?i=`R${b.toString().padStart(2,"0")}`:i=b.toString().padStart(3,"0")}else i=e.PopVarint().toString().padStart(3,"0");r.push({cardCode:`${m}-${i}${S}`,count:a})}}}return r}function O(e,n){let t=[],s=Array.from(new Set(e.filter(r=>r.count>=1).map(r=>r.count))).sort((r,c)=>c-r);t.push(...l.default.GetVarint(s.length));for(let r of s){t.push(...l.default.GetVarint(r));let c=e.filter(o=>o.count===r),a=F(c);t.push(...l.default.GetVarint(a.length));for(let o of a){t.push(...l.default.GetVarint(o.cardNumbers.length)),t.push(o.set),t.push(o.variant);for(let u of o.cardNumbers)n?u.startsWith("SP")?(t.push(2),t.push(...l.default.GetVarint(parseInt(u.slice(2))))):u.startsWith("R")?(t.push(1),t.push(...l.default.GetVarint(parseInt(u.slice(1))))):(t.push(0),t.push(...l.default.GetVarint(parseInt(u)))):t.push(...l.default.GetVarint(parseInt(u)))}}return t}function U(e,n="s",t=!0){var c;let s=[],r=e.PopVarint();for(let a=0;a<r;a++){let o=e.PopVarint(),u=e.PopVarint();for(let A=0;A<u;A++){let p=e.PopVarint(),h=e.get(0),m=e.get(1);e.sliceAndSet(2);let S=(c=Object.entries(V.SET_MAP).find(([i,d])=>d===h))==null?void 0:c[0];if(!S)throw new Error(`Unknown set code: ${h}`);let f=k(m,n);for(let i=0;i<p;i++){let d;if(!t){d=e.PopVarint().toString().padStart(3,"0"),s.push({cardCode:`${S}-${d}${f}`,count:o});continue}let b=e.get(0);e.sliceAndSet(1);let E=e.PopVarint();if(b===2)d=`SP${E}`;else if(b===1)d=`R${E.toString().padStart(2,"0")}`;else if(b===0)d=E.toString().padStart(3,"0");else throw new Error(`Unknown number-prefix flag: ${b}`);s.push({cardCode:`${S}-${d}${f}`,count:o})}}}return s}function D(e,n,t){let{set:s,number:r,variant:c}=y(e),a=V.SET_MAP[s];if(a===void 0)throw new Error(`Unknown set in ${t}: ${s}. Valid sets: ${Object.keys(V.SET_MAP).join(", ")}`);let o=V.VARIANT_MAP[c];if(o===void 0)throw new Error(`Unknown variant in ${t}: '${c}'. Valid variants: ${Object.keys(V.VARIANT_MAP).join(", ")}`);let u=[a,o];return n&&r.startsWith("SP")?(u.push(2),u.push(...l.default.GetVarint(parseInt(r.slice(2))))):n&&r.startsWith("R")?(u.push(1),u.push(...l.default.GetVarint(parseInt(r.slice(1))))):n?(u.push(0),u.push(...l.default.GetVarint(parseInt(r)))):u.push(...l.default.GetVarint(parseInt(r))),u}function B(e,n,t,s){var A;let r=e.get(0),c=e.get(1);e.sliceAndSet(2);let a;if(n){let p=e.get(0);e.sliceAndSet(1);let h=e.PopVarint();if(p===2)a=`SP${h}`;else if(p===1)a=`R${h.toString().padStart(2,"0")}`;else if(p===0)a=h.toString().padStart(3,"0");else throw new Error(`Unknown number-prefix flag in ${s}: ${p}`)}else a=e.PopVarint().toString().padStart(3,"0");let o=(A=Object.entries(V.SET_MAP).find(([p,h])=>h===r))==null?void 0:A[0];if(!o)throw new Error(`Unknown set code in ${s}: ${r}`);let u=k(c,t,s);return`${o}-${a}${u}`}function oe(e,n=[],t,s=[]){for(let i of[...e,...n])if(!Number.isSafeInteger(i.count)||i.count<1)throw new Error(`Invalid card count for ${i.cardCode}: ${i.count}. Count must be a positive integer.`);for(let i of s)if(typeof i!="string"||i.length===0)throw new Error(`Invalid additional legend: ${i}. Expected a card code string.`);let r=i=>{let{number:d}=y(i);return d.startsWith("R")},c=i=>{let{number:d}=y(i);return d.startsWith("SP")},a=e.some(i=>r(i.cardCode))||n.some(i=>r(i.cardCode))||t!==void 0&&r(t)||s.some(r),o=e.reduce((i,d)=>Math.max(i,d.count),0),u=n.reduce((i,d)=>Math.max(i,d.count),0),A=o>12||u>3,p=e.some(i=>c(i.cardCode))||n.some(i=>c(i.cardCode))||t!==void 0&&c(t)||s.some(c),m=s.length>0?6:A||p?5:a?4:3,S=a||p,f=[];if(f.push(I<<4|m),m>=5?(f.push(S?1:0),f.push(...O(e,S)),f.push(...O(n,S))):(f.push(...G(e,12,m)),f.push(...G(n,3,m))),t?(f.push(1),f.push(...D(t,S,"chosen champion"))):f.push(0),m>=6){f.push(...l.default.GetVarint(s.length));for(let i of s)f.push(...D(i,S,"additional legend"))}return re(new Uint8Array(f))}function ie(e,n){var S;let t=(S=n==null?void 0:n.signedSuffix)!=null?S:"s",s=se(e),r=new l.default(s),c=r.get(0);r.sliceAndSet(1);let a=c>>4&15,o=c&15;if(a!==I)throw new Error(`Unsupported format: ${a}. Expected format: ${I}`);if(o>R)throw new Error(`Unsupported version: ${o}. Maximum supported version: ${R}`);let u;if(o>=5){let f=r.get(0);if(r.sliceAndSet(1),f>1)throw new Error(`Unsupported deck prefix flag: ${f}`);u=f===1}else u=o>=4;let A,p=[];o>=5?(A=U(r,t,u),p=U(r,t,u)):(A=j(r,12,t,o),o>=2&&(p=j(r,3,t,o)));let h;if(o>=3){let f=r.get(0);r.sliceAndSet(1),f===1&&(h=B(r,u,t,"champion"))}let m;if(o>=6){let f=r.PopVarint();m=[];for(let i=0;i<f;i++)m.push(B(r,u,t,"additional legend"))}return{mainDeck:A,sideboard:p,chosenChampion:h,additionalLegends:m}}});var H=_(g=>{"use strict";var ue=g&&g.__importDefault||function(e){return e&&e.__esModule?e:{default:e}};Object.defineProperty(g,"__esModule",{value:!0});g.VarintTranslator=g.VARIANT_MAP=g.SET_MAP=g.getDeckFromCode=g.getCodeFromDeck=void 0;var q=W();Object.defineProperty(g,"getCodeFromDeck",{enumerable:!0,get:function(){return q.getCodeFromDeck}});Object.defineProperty(g,"getDeckFromCode",{enumerable:!0,get:function(){return q.getDeckFromCode}});var J=M();Object.defineProperty(g,"SET_MAP",{enumerable:!0,get:function(){return J.SET_MAP}});Object.defineProperty(g,"VARIANT_MAP",{enumerable:!0,get:function(){return J.VARIANT_MAP}});var ce=C();Object.defineProperty(g,"VarintTranslator",{enumerable:!0,get:function(){return ue(ce).default}})});var ae={};Z(ae,{getDeckFromCode:()=>L.getDeckFromCode});var L=ee(H());return te(ae);})();</script>
+<script>
+"use strict";
+const STORE_KEY = "deck-diff-v1";          // every app on this site shares one browser storage
+const CARDS_KEY = "deck-diff-cards-v1";
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const norm = s => String(s).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+const DOMAINS = ["fury", "calm", "mind", "body", "chaos", "order"];
+
+let st = { mine: [], sel: [], scope: "main", thr: 40, tab: "decks", src: "feed", ev: null, only8: false, seeded: false };
+let FEED = { events: [], decks: [] };
+let DECKS = new Map();      // id -> deck
+let CODES = new Map();      // "OGN-001" -> {n,t}
+let NAMES = new Map();      // norm(name) -> {n,t}
+let LEGENDS = new Map();    // norm(epithet) -> full legend name
+let cardSource = "";
+
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (s && typeof s === "object") st = Object.assign(st, s); } catch (e) {}
+  if (!Array.isArray(st.mine)) st.mine = [];
+  if (!Array.isArray(st.sel)) st.sel = [];
+}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(st)); } catch (e) {} }
+let toastT;
+function toast(msg) { let t = document.querySelector(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.append(t); } t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2200); }
+
+/* ---------- decks ---------- */
+function parseList(s) { const out = []; for (const p of String(s || "").split("|")) { const m = p.trim().match(/^(\d+)\s+(.+)$/); if (m) out.push([+m[1], m[2].trim()]); } return out; }
+function fromFeed(r) {
+  return { id: r.id, src: "feed", event: r.event, player: r.player, overall: r.overall, legendRank: r.legendRank, top8: !!r.top8, legend: r.legend || "", champion: r.champion || "",
+    z: { main: parseList(r.main), side: parseList(r.side), bf: parseList(r.battlefields), runes: parseList(r.runes) } };
+}
+function legendKey(name) { const i = name.lastIndexOf(", "); return norm(i >= 0 ? name.slice(i + 2) : name); }
+function legendFull(name) { return name.includes(",") ? name : (LEGENDS.get(norm(name)) || name); }
+function shortLegend(d) { const f = legendFull(d.legend || ""); return f ? f.split(",")[0] : (d.champion ? d.champion.split(",")[0] : "Deck"); }
+function domainsOf(d) { const out = []; for (const [, n] of d.z.runes) { const k = n.toLowerCase().split(" ")[0]; if (DOMAINS.includes(k) && !out.includes(k)) out.push(k); } return out; }
+function pips(d) { return `<span class="pips" aria-hidden="true">${domainsOf(d).map(x => `<i class="pip ${x}"></i>`).join("")}</span>`; }
+function evOf(d) { return FEED.events.find(e => e.id === d.event); }
+function who(d) { return d.src === "feed" ? d.player : (d.name || "My deck"); }
+function where(d) { if (d.src !== "feed") return "My deck"; const e = evOf(d); return (e ? e.city : "") + (d.top8 ? ", Top 8" : ""); }
+function rankText(d) { return d.src === "feed" ? "#" + d.overall : ""; }
+function rebuild() {
+  DECKS = new Map(); LEGENDS = new Map();
+  for (const r of FEED.decks) { const d = fromFeed(r); DECKS.set(d.id, d); if (d.legend.includes(",")) LEGENDS.set(legendKey(d.legend), d.legend); }
+  for (const d of st.mine) DECKS.set(d.id, d);
+  st.sel = st.sel.filter(id => DECKS.has(id));
+}
+
+/* ---------- comparing ---------- */
+function vector(d, scope) {
+  const v = new Map();
+  const add = (n, name) => { const k = norm(name); if (!k) return; const e = v.get(k); if (e) e.n += n; else v.set(k, { n, name }); };
+  for (const [n, name] of d.z.main) add(n, name);
+  if (d.champion) add(1, d.champion);
+  if (scope === "all") for (const [n, name] of d.z.side) add(n, name);
+  return v;
+}
+function overlap(a, b) { let mn = 0, mx = 0; for (const [k, e] of a) { const o = b.get(k); const y = o ? o.n : 0; mn += Math.min(e.n, y); mx += Math.max(e.n, y); } for (const [k, e] of b) if (!a.has(k)) mx += e.n; return { shared: mn, sim: mx ? mn / mx : 0 }; }
+function analyse(ids, scope, thr) {
+  const decks = ids.map(id => DECKS.get(id)).filter(Boolean);
+  const n = decks.length, V = decks.map(d => vector(d, scope));
+  const S = Array.from({ length: n }, () => new Float64Array(n));
+  for (let i = 0; i < n; i++) { S[i][i] = 1; for (let j = i + 1; j < n; j++) S[i][j] = S[j][i] = overlap(V[i], V[j]).sim; }
+  // average-linkage grouping
+  const D = S.map(r => Float64Array.from(r)); let cl = decks.map((_, i) => [i]); const alive = decks.map(() => true);
+  for (;;) {
+    let bi = -1, bj = -1, best = thr / 100 - 1e-9;
+    for (let i = 0; i < n; i++) if (alive[i]) for (let j = i + 1; j < n; j++) if (alive[j] && D[i][j] > best) { best = D[i][j]; bi = i; bj = j; }
+    if (bi < 0) break;
+    const si = cl[bi].length, sj = cl[bj].length;
+    for (let k = 0; k < n; k++) if (alive[k] && k !== bi && k !== bj) D[bi][k] = D[k][bi] = (D[bi][k] * si + D[bj][k] * sj) / (si + sj);
+    cl[bi] = cl[bi].concat(cl[bj]); alive[bj] = false;
+  }
+  let groups = cl.filter((_, i) => alive[i]).map(m => {
+    m.sort((a, b) => (decks[a].overall || 1e9) - (decks[b].overall || 1e9));
+    let s = 0, c = 0; for (let x = 0; x < m.length; x++) for (let y = x + 1; y < m.length; y++) { s += S[m[x]][m[y]]; c++; }
+    return { m, avg: c ? s / c : null };
+  });
+  groups.sort((a, b) => b.m.length - a.m.length || (decks[a.m[0]].overall || 1e9) - (decks[b.m[0]].overall || 1e9));
+  const order = groups.flatMap(g => g.m), pos = new Map(order.map((ix, p) => [ix, p]));
+  return { decks, V, S, groups, order, pos };
+}
+function groupCards(A, g) {
+  const n = g.m.length, tally = new Map();
+  for (const ix of g.m) for (const [k, e] of A.V[ix]) { let t = tally.get(k); if (!t) tally.set(k, t = { name: e.name, decks: 0, sum: 0, min: 99, max: 0 }); t.decks++; t.sum += e.n; t.min = Math.min(t.min, e.n); t.max = Math.max(t.max, e.n); }
+  const all = [...tally.values()];
+  const core = all.filter(t => t.decks === n).sort((a, b) => b.min - a.min || a.name.localeCompare(b.name));
+  const flex = all.filter(t => t.decks < n).sort((a, b) => b.decks - a.decks || b.sum - a.sum || a.name.localeCompare(b.name));
+  return { core, flex };
+}
+function heatColor(s) {
+  const cs = getComputedStyle(document.documentElement), hex = k => cs.getPropertyValue(k).trim();
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const a = rgb(hex("--h0")), b = rgb(hex("--h1")), c = rgb(hex("--h2"));
+  const t = Math.pow(s, 0.8), lo = t < .5 ? a : b, hi = t < .5 ? b : c, u = t < .5 ? t * 2 : (t - .5) * 2;
+  const mix = lo.map((x, i) => Math.round(x + (hi[i] - x) * u));
+  const lum = (0.299 * mix[0] + 0.587 * mix[1] + 0.114 * mix[2]) / 255;
+  return { bg: `rgb(${mix.join(",")})`, fg: lum > 0.55 ? "#12202A" : "#F2F7F9" };
+}
+const pct = s => Math.round(s * 100) + "%";
+
+/* ---------- reading pasted decks ---------- */
+const SEC = [[/^legends?$/, "legend"], [/^(chosen ?)?champions?$/, "champion"], [/^(main ?deck|main|deck|mainboard)$/, "main"], [/^battlefields?$/, "bf"], [/^(runes?|rune ?pool|rune ?deck)$/, "runes"], [/^(side ?board|side|sideboard cards)$/, "side"]];
+function lookupCode(code) { const c = code.toUpperCase(); return CODES.get(c) || CODES.get(c.replace(/^([A-Z]{3}-(?:R|SP|T)?\d+)[A-Z*]$/, "$1")) || null; }
+function cleanEntry(raw) {
+  let s = raw.trim().replace(/^[-•*]\s+/, ""); if (!s) return null;
+  let n = 1, m, counted = true;
+  if ((m = s.match(/^(\d+)\s*[x×]?\s+(.+)$/i))) { n = +m[1]; s = m[2]; } else if ((m = s.match(/^(.+?)\s+[x×]\s*(\d+)$/i))) { n = +m[2]; s = m[1]; } else counted = false;
+  let code = null;
+  if ((m = s.match(/\s*[\[(]?\b([A-Za-z]{3}-(?:R|SP|T)?\d{1,3}[a-z*]?)\b[\])]?\s*$/))) { code = m[1]; s = s.slice(0, m.index).trim(); }
+  s = s.replace(/\s*[\[(][A-Za-z]{3}[\])]\s*\d*\s*$/, "").trim();
+  if (!s && code) { const c = lookupCode(code); s = c ? c.n : code.toUpperCase(); }
+  if (!s || n < 1 || n > 99) return null;
+  return counted || code ? [n, s] : [n, s, false];
+}
+function blankDeck() { return { legend: "", champion: "", z: { main: [], side: [], bf: [], runes: [] }, warn: [], name: "" }; }
+function hasCards(d) { return d.z.main.length + d.z.side.length + d.z.runes.length + d.z.bf.length > 0 || d.legend; }
+function fromCode(code) {
+  const d = blankDeck(); let r;
+  try { r = RBCodes.getDeckFromCode(code); } catch (e) { return null; }
+  let unknown = 0; const champ = r.chosenChampion ? lookupCode(r.chosenChampion) : null;
+  if (r.chosenChampion) d.champion = champ ? champ.n : r.chosenChampion;
+  for (const { cardCode, count } of r.mainDeck || []) {
+    const c = lookupCode(cardCode), name = c ? c.n : cardCode; if (!c) unknown++;
+    if (c && c.t === "L") { if (!d.legend) d.legend = name; continue; }
+    if ((c && c.t === "R") || /-R\d+/i.test(cardCode)) d.z.runes.push([count, name]);
+    else if (c && c.t === "B") d.z.bf.push([count, name]);
+    else { const k = (r.chosenChampion && cardCode === r.chosenChampion) ? count - 1 : count; if (k > 0) d.z.main.push([k, name]); }
+  }
+  for (const { cardCode, count } of r.sideboard || []) { const c = lookupCode(cardCode); if (!c) unknown++; d.z.side.push([count, c ? c.n : cardCode]); }
+  if (unknown) d.warn.push(unknown + (unknown === 1 ? " card isn't" : " cards aren't") + " in the card list yet, so " + (unknown === 1 ? "it shows" : "they show") + " as a code. Try Update card list in the menu.");
+  return d;
+}
+function parseDecks(text) {
+  const out = []; let d = blankDeck(), sec = null, sawHeader = false;
+  const push = () => { if (hasCards(d)) { if (!sawHeader) classify(d); out.push(d); } d = blankDeck(); sec = null; sawHeader = false; };
+  const put = (where, e) => {
+    if (e.length === 3) { e.pop(); if (where !== "legend" && where !== "champion" && !NAMES.has(norm(e[1]))) return; }   // no count: only keep names we recognise
+    if (where === "legend") { if (!d.legend) d.legend = e[1]; }
+    else if (where === "champion") { if (!d.champion) d.champion = e[1]; else d.z.main.push(e); }
+    else d.z[where].push(e);
+  };
+  for (let raw of String(text).replace(/\r/g, "").split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (/^[-=_*]{3,}$/.test(line)) { push(); continue; }
+    if (/^#{1,6}\s*/.test(line)) { push(); d.name = line.replace(/^#+\s*/, "").split("||")[0].trim().slice(0, 60); continue; }
+    if (/^[A-Z2-7]{24,}$/.test(line.replace(/\s+/g, "")) && !/\s\d/.test(line)) {
+      push(); const c = fromCode(line.replace(/\s+/g, ""));
+      if (c) out.push(c); else out.push(Object.assign(blankDeck(), { warn: ["That deck code couldn't be read. Check it was copied in full."], bad: true }));
+      continue;
+    }
+    const hm = line.match(/^([A-Za-z ]{3,18}?)\s*(?:\(\d+\))?\s*:\s*(.*)$/) || line.match(/^([A-Za-z ]{3,18})$/);
+    const key = hm ? hm[1].trim().toLowerCase() : null, hit = key ? SEC.find(([re]) => re.test(key)) : null;
+    if (hit) {
+      if (hit[1] === "legend" && (d.legend || d.z.main.length)) push();
+      sec = hit[1]; sawHeader = true;
+      const rest = (hm[2] || "").trim();
+      if (rest) for (const part of rest.split("|")) { const e = cleanEntry(part); if (e) put(sec, e); }
+      continue;
+    }
+    for (const part of line.split("|")) { const e = cleanEntry(part); if (e) put(sec || "main", e); }
+  }
+  push();
+  for (const x of out) check(x);
+  return out;
+}
+function classify(d) {       // list with no section headings: sort cards by what they are
+  const main = [];
+  for (const e of d.z.main) {
+    const c = NAMES.get(norm(e[1])), isRune = /^(fury|calm|mind|body|chaos|order) rune$/i.test(e[1]);
+    if (isRune || (c && c.t === "R")) d.z.runes.push(e);
+    else if (c && c.t === "B") d.z.bf.push(e);
+    else if (c && c.t === "L" && !d.legend) d.legend = e[1];
+    else main.push(e);
+  }
+  d.z.main = main;
+}
+function count(z) { return z.reduce((s, e) => s + e[0], 0); }
+function check(d) {
+  if (d.bad) return;
+  const m = count(d.z.main) + (d.champion ? 1 : 0);
+  if (m !== 40) d.warn.push(`Main deck has ${m} cards. A full Riftbound main deck is 40, counting the chosen champion.`);
+}
+
+/* ---------- views ---------- */
+function setTab(tab) {
+  st.tab = tab; save();
+  $("vDecks").hidden = tab !== "decks"; $("vCompare").hidden = tab !== "compare";
+  for (const [id, t] of [["tabDecks", "decks"], ["tabCompare", "compare"]]) { if (t === tab) $(id).setAttribute("aria-current", "page"); else $(id).removeAttribute("aria-current"); }
+  if (location.hash !== "#" + tab) history.replaceState(null, "", "#" + tab);
+  if (tab === "compare") renderCompare();
+  renderTray(); window.scrollTo(0, 0);
+}
+function renderTray() {
+  const n = st.sel.length; $("tray").hidden = n === 0 || st.tab !== "decks";
+  $("trayN").textContent = n + (n === 1 ? " deck picked" : " decks picked");
+  $("trayGo").disabled = n < 2;
+  $("tabCompare").textContent = n ? `Compare (${n})` : "Compare";
+}
+function toggleSel(id, on) { const has = st.sel.includes(id); if (on && !has) st.sel.push(id); if (!on && has) st.sel = st.sel.filter(x => x !== id); save(); renderTray(); }
+function deckRow(d, extra) {
+  const on = st.sel.includes(d.id);
+  return `<li><label class="drow"><input type="checkbox" data-id="${esc(d.id)}" ${on ? "checked" : ""} aria-label="Pick ${esc(shortLegend(d))}, ${esc(who(d))}">
+    <span class="t"><b>${pips(d)}${esc(legendFull(d.legend) || shortLegend(d))}</b><span>${esc(who(d))}${d.src === "feed" && d.top8 ? ", Top 8" : ""}${extra || ""}</span></span>
+    <span class="rank ${d.top8 ? "top8" : ""}">${esc(rankText(d))}</span></label></li>`;
+}
+function feedShown() {
+  const q = norm($("q").value);
+  return [...DECKS.values()].filter(d => d.src === "feed" && d.event === st.ev && (!st.only8 || d.top8) && (!q ||
+    norm(d.legend + " " + d.player).includes(q) || d.z.main.concat(d.z.side).some(e => norm(e[1]).includes(q)) || norm(d.champion).includes(q)))
+    .sort((a, b) => a.overall - b.overall);
+}
+function renderFeed() {
+  $("evChips").innerHTML = FEED.events.map(e => `<button class="chip" data-ev="${esc(e.id)}" aria-pressed="${e.id === st.ev}"><b>${esc(e.city)}</b><span>${esc(e.name)}</span></button>`).join("");
+  const list = feedShown(), e = FEED.events.find(x => x.id === st.ev);
+  $("feedList").innerHTML = list.map(d => deckRow(d)).join("") || `<li style="padding:14px 2px" class="muted">No decks match that filter. Clear the filter or try another tournament.</li>`;
+  $("feedCount").textContent = list.length + (list.length === 1 ? " deck" : " decks");
+  $("pickShown").disabled = !list.length;
+  $("pickShown").textContent = list.length && list.every(d => st.sel.includes(d.id)) ? "Unpick all shown" : "Pick all shown";
+  $("fAll").setAttribute("aria-pressed", !st.only8); $("f8").setAttribute("aria-pressed", st.only8);
+  $("feedSrc").innerHTML = e ? `Lists published by Riot on ${esc(e.published)}. Rank is the pilot's overall finish. <a href="${esc(e.source)}" target="_blank" rel="noopener">Read the article</a>` : (FEED.events.length ? "" : "Tournament decks couldn't be loaded. Check your connection and reopen the app.");
+}
+function renderMine() {
+  $("mineEmpty").hidden = st.mine.length > 0; $("minePanel").hidden = st.mine.length === 0;
+  $("mineList").innerHTML = st.mine.map(d => `<li style="display:grid;grid-template-columns:1fr auto;align-items:center"><ul class="dlist" style="min-width:0">${deckRow(d).replace(/^<li>|<\/li>$/g, m => m === "<li>" ? '<li style="border:0">' : "</li>")}</ul><button class="btn" data-del="${esc(d.id)}" aria-label="Delete ${esc(who(d))}">Delete</button></li>`).join("");
+}
+function renderDecks() {
+  $("srcFeed").setAttribute("aria-pressed", st.src === "feed"); $("srcMine").setAttribute("aria-pressed", st.src === "mine");
+  $("feedBox").hidden = st.src !== "feed"; $("mineBox").hidden = st.src !== "mine";
+  renderFeed(); renderMine(); renderTray();
+}
+
+let A = null;   // current analysis
+const GROUP_COLORS = ["#0F6E79", "#DE8A22", "#9257CF", "#3F9A60", "#D64B35", "#3B86D8", "#C29E1B", "#6B7A88"];
+function groupTitle(g) { const names = []; for (const ix of g.m) { const s = shortLegend(A.decks[ix]); if (!names.includes(s)) names.push(s); } return names.slice(0, 3).join(" / ") + (names.length > 3 ? " +" + (names.length - 3) : ""); }
+function renderCompare() {
+  const ids = st.sel.filter(id => DECKS.has(id)), ok = ids.length >= 2;
+  $("cmpEmpty").hidden = ok; $("cmpBody").hidden = !ok; if (!ok) { $("cmpBody").style.display = "none"; return; }
+  $("cmpBody").style.display = "flex";
+  $("scMain").setAttribute("aria-pressed", st.scope === "main"); $("scAll").setAttribute("aria-pressed", st.scope === "all");
+  $("thrVal").textContent = st.thr + "%";
+  A = analyse(ids, st.scope, st.thr);
+  const n = A.decks.length;
+  // summary
+  let hi = { s: -1 }, lo = { s: 2 };
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const s = A.S[i][j]; if (s > hi.s) hi = { s, i, j }; if (s < lo.s) lo = { s, i, j }; }
+  const nm = ix => `${esc(shortLegend(A.decks[ix]))} (${esc(who(A.decks[ix]))})`;
+  const multi = A.groups.filter(g => g.m.length > 1).length, solo = A.groups.length - multi;
+  $("cmpSummary").innerHTML = `<b>${n} decks</b> fall into <b>${multi} ${multi === 1 ? "archetype" : "archetypes"}</b>${solo ? ` with <b>${solo}</b> on ${solo === 1 ? "its" : "their"} own` : ""}. Most alike: ${nm(hi.i)} and ${nm(hi.j)} at <b>${pct(hi.s)}</b>.${n > 2 ? ` Least alike: ${nm(lo.i)} and ${nm(lo.j)} at <b>${pct(lo.s)}</b>.` : ""}`;
+  // heatmap
+  const cell = n <= 9 ? Math.floor((Math.min(innerWidth, 720) - 32 - 30 - 30 - (n * 2)) / n) : (n <= 30 ? 30 : 18), show = cell >= 28;
+  const heat = $("heat"); heat.style.gridTemplateColumns = `30px repeat(${n}, ${cell}px)`;
+  const gstart = new Set(); let acc = 0; for (const g of A.groups) { if (acc) gstart.add(acc); acc += g.m.length; }
+  let h = `<span class="corner"></span>` + A.order.map((_, p) => `<span class="hh ${gstart.has(p) ? "gs-l" : ""}" style="height:24px">${p + 1}</span>`).join("");
+  A.order.forEach((ix, p) => {
+    h += `<span class="hl ${gstart.has(p) ? "gs-t" : ""}">${p + 1}</span>`;
+    A.order.forEach((jx, q) => {
+      const cls = (gstart.has(q) ? "gs-l " : "") + (gstart.has(p) ? "gs-t" : "");
+      if (ix === jx) { h += `<button class="self ${cls}" tabindex="-1" aria-hidden="true">&middot;</button>`; return; }
+      const s = A.S[ix][jx], c = heatColor(s);
+      h += `<button class="${cls}" data-a="${ix}" data-b="${jx}" style="background:${c.bg};color:${c.fg}" aria-label="Deck ${p + 1} and deck ${q + 1}: ${pct(s)} alike">${show ? Math.round(s * 100) : ""}</button>`;
+    });
+  });
+  heat.innerHTML = h;
+  // groups
+  $("groups").innerHTML = A.groups.map((g, gi) => {
+    const col = GROUP_COLORS[gi % GROUP_COLORS.length], many = g.m.length > 1;
+    const rows = g.m.map(ix => { const d = A.decks[ix]; return `<li><button data-deck="${ix}"><span class="num">${A.pos.get(ix) + 1}</span><span class="t"><b>${pips(d)}${esc(shortLegend(d))}</b><span>${esc(who(d))}${where(d) ? ", " + esc(where(d)) : ""}</span></span><span class="rank ${d.top8 ? "top8" : ""}">${esc(rankText(d))}</span></button></li>`; }).join("");
+    let body = "";
+    if (many) {
+      const { core, flex } = groupCards(A, g), nd = g.m.length, coreN = core.reduce((s, t) => s + t.min, 0);
+      body = `<div class="cardsec"><h4>Core: ${coreN} cards in every deck</h4>${core.length ? `<ul class="cl">${core.map(t => `<li><span class="q">${t.min === t.max ? t.min : t.min + "&ndash;" + t.max}</span><span>${esc(t.name)}</span></li>`).join("")}</ul>` : `<p class="muted small">No card is in every one of these decks.</p>`}</div>
+      <div class="cardsec"><details><summary>Flex: ${flex.length} cards in only some decks</summary><ul class="flex">${flex.map(t => `<li><span>${esc(t.name)}</span><span class="meter" aria-hidden="true"><i style="width:${Math.round(t.decks / nd * 100)}%"></i></span><span class="f">${t.decks}/${nd}</span></li>`).join("")}</ul></details></div>`;
+    } else {
+      const ix = g.m[0]; let best = -1, bj = -1; for (let j = 0; j < n; j++) if (j !== ix && A.S[ix][j] > best) { best = A.S[ix][j]; bj = j; }
+      body = `<p class="small muted" style="margin-top:8px">Closest match is deck ${A.pos.get(bj) + 1}, ${esc(shortLegend(A.decks[bj]))}, at ${pct(best)}. <button class="btn" data-a="${ix}" data-b="${bj}" style="margin-left:6px">See what differs</button></p>`;
+    }
+    return `<div class="panel group" style="--gc:${col}"><div class="gh"><h3>${esc(groupTitle(g))}</h3><span class="muted small">${many ? g.m.length + " decks" : "On its own"}</span>${many ? `<span class="pct" title="Average likeness inside this group">${pct(g.avg)}</span>` : ""}</div><ul class="gdecks">${rows}</ul>${body}</div>`;
+  }).join("");
+  // spread
+  const all = groupCards(A, { m: A.decks.map((_, i) => i) }), rows = all.core.concat(all.flex);
+  $("spread").innerHTML = `<ul class="flex">${rows.map(t => `<li><span>${esc(t.name)}</span><span class="meter" aria-hidden="true"><i style="width:${Math.round(t.decks / n * 100)}%"></i></span><span class="f">${t.decks}/${n}</span></li>`).join("")}</ul>`;
+}
+function zoneDiff(za, zb) {
+  const m = new Map(); const add = (z, side) => { for (const [n, name] of z) { const k = norm(name); let e = m.get(k); if (!e) m.set(k, e = { name, a: 0, b: 0 }); e[side] += n; } };
+  add(za, "a"); add(zb, "b"); const rows = [...m.values()];
+  return { diff: rows.filter(r => r.a !== r.b).sort((x, y) => (y.a - y.b) - (x.a - x.b) || x.name.localeCompare(y.name)), same: rows.filter(r => r.a === r.b).sort((x, y) => y.a - x.a || x.name.localeCompare(y.name)) };
+}
+function diffList(rows) { return `<ul class="diff">${rows.map(r => `<li><span class="a ${r.a > r.b ? "more" : ""} ${r.a ? "" : "zero"}">${r.a || "&ndash;"}</span><span class="nm">${esc(r.name)}</span><span class="b ${r.b > r.a ? "more" : ""} ${r.b ? "" : "zero"}">${r.b || "&ndash;"}</span></li>`).join("")}</ul>`; }
+function openPair(i, j) {
+  const a = A.decks[i], b = A.decks[j], o = overlap(vector(a, "main"), vector(b, "main")), os = overlap(vector(a, "all"), vector(b, "all"));
+  const withChamp = d => d.champion ? d.z.main.concat([[1, d.champion]]) : d.z.main;
+  const zones = [["Main deck", withChamp(a), withChamp(b)], ["Sideboard", a.z.side, b.z.side], ["Battlefields", a.z.bf, b.z.bf], ["Runes", a.z.runes, b.z.runes]];
+  $("pairT").textContent = `Deck ${A.pos.get(i) + 1} and deck ${A.pos.get(j) + 1}`;
+  $("pairB").innerHTML = `<div class="panel"><div class="vs">
+      <div class="side"><b>${pips(a)}${esc(shortLegend(a))}</b><span>${esc(who(a))}${where(a) ? ", " + esc(where(a)) : ""}</span></div>
+      <div class="big">${pct(o.sim)}<small>main deck alike</small></div>
+      <div class="side r"><b>${esc(shortLegend(b))}</b><span>${esc(who(b))}${where(b) ? ", " + esc(where(b)) : ""}</span></div></div>
+      <p class="small muted" style="margin-top:10px;text-align:center">${o.shared} main-deck cards shared. With sideboards, ${pct(os.sim)} alike.</p></div>` +
+    zones.map(([title, za, zb]) => { const z = zoneDiff(za, zb); if (!z.diff.length && !z.same.length) return "";
+      return `<div class="panel"><h3>${title}</h3>${z.diff.length ? `<p class="small muted" style="margin:4px 0 6px">Copies in each deck, left and right. The higher count is filled in.</p>${diffList(z.diff)}` : `<p class="muted small" style="margin-top:4px">No differences.</p>`}
+      ${z.same.length ? `<details><summary>${z.same.reduce((s, r) => s + r.a, 0)} cards the same in both</summary>${diffList(z.same)}</details>` : ""}</div>`; }).join("");
+  $("pairDlg").showModal(); $("pairDlg").scrollTop = 0;
+}
+function openDeck(ix) {
+  const d = A.decks[ix], n = A.decks.length;
+  const near = A.decks.map((_, j) => j).filter(j => j !== ix).sort((x, y) => A.S[ix][y] - A.S[ix][x]).slice(0, 5);
+  const zl = (title, z) => z.length ? `<div class="cardsec"><h4>${title}: ${count(z)}</h4><ul class="cl">${z.map(e => `<li><span class="q">${e[0]}</span><span>${esc(e[1])}</span></li>`).join("")}</ul></div>` : "";
+  $("deckT").textContent = `Deck ${A.pos.get(ix) + 1}: ${shortLegend(d)}`;
+  $("deckB").innerHTML = `<div class="panel"><h3>${pips(d)}${esc(legendFull(d.legend) || shortLegend(d))}</h3><p class="muted small" style="margin-top:4px">${esc(who(d))}${where(d) ? ", " + esc(where(d)) : ""}${d.src === "feed" ? `, finished #${d.overall}, Legend rank ${esc(d.legendRank)}` : ""}</p>
+    ${d.champion ? `<p class="small" style="margin-top:8px">Chosen champion: <b>${esc(d.champion)}</b></p>` : ""}
+    ${zl("Main deck", d.z.main)}${zl("Battlefields", d.z.bf)}${zl("Runes", d.z.runes)}${zl("Sideboard", d.z.side)}</div>
+    <div class="panel"><h3>Most alike in this comparison</h3><ul class="gdecks">${near.map(j => { const o = A.decks[j]; return `<li><button data-a="${ix}" data-b="${j}"><span class="num">${A.pos.get(j) + 1}</span><span class="t"><b>${pips(o)}${esc(shortLegend(o))}</b><span>${esc(who(o))}</span></span><span class="rank top8">${pct(A.S[ix][j])}</span></button></li>`; }).join("")}</ul></div>`;
+  $("deckDlg").showModal(); $("deckDlg").scrollTop = 0;
+}
+
+/* ---------- adding decks ---------- */
+let pending = [];
+function previewAdd() {
+  const text = $("addText").value; pending = text.trim() ? parseDecks(text) : [];
+  const good = pending.filter(d => !d.bad && count(d.z.main) > 0);
+  $("addSave").disabled = !good.length; $("addSave").textContent = good.length > 1 ? `Save ${good.length} decks` : "Save deck";
+  $("addName").parentElement.hidden = good.length > 1;
+  $("addPrev").innerHTML = !text.trim() ? "" : (pending.length ? pending.map(d => d.bad ? `<p class="note">${esc(d.warn[0])}</p>` :
+    `<div class="panel" style="margin-bottom:8px"><b>${esc(legendFull(d.legend) || d.name || "Deck without a Legend line")}</b><p class="small muted">${count(d.z.main) + (d.champion ? 1 : 0)} main, ${count(d.z.side)} sideboard, ${count(d.z.runes)} runes, ${count(d.z.bf)} battlefields</p>${d.warn.map(w => `<p class="note" style="margin-top:8px">${esc(w)}</p>`).join("")}</div>`).join("")
+    : `<p class="note">No cards found yet. Each card needs its own line with a count, like "3 Lightning Rush".</p>`);
+}
+function saveAdd() {
+  const good = pending.filter(d => !d.bad && count(d.z.main) > 0), typed = $("addName").value.trim(); let k = 0;
+  for (const p of good) {
+    const id = "m" + Date.now().toString(36) + (k++) + Math.random().toString(36).slice(2, 5);
+    const d = { id, src: "mine", name: (good.length === 1 && typed) || p.name || ((legendFull(p.legend) || "Deck").split(",")[0] + " list " + (st.mine.length + 1)), legend: p.legend, champion: p.champion, z: p.z, added: new Date().toISOString().slice(0, 10) };
+    st.mine.push(d); DECKS.set(id, d); st.sel.push(id);
+  }
+  save(); $("addDlg").close(); $("addText").value = ""; $("addName").value = ""; pending = []; previewAdd();
+  st.src = "mine"; renderDecks(); toast(good.length > 1 ? `Saved ${good.length} decks` : "Saved deck");
+}
+
+/* ---------- card list ---------- */
+function setCards(rows, source) {
+  CODES = new Map(); NAMES = new Map();
+  for (const r of rows) { const c = { n: r[1], t: r[2] }; CODES.set(String(r[0]).toUpperCase(), c); const k = norm(r[1]); if (!NAMES.has(k)) NAMES.set(k, c); }
+  cardSource = source; $("cardInfo").textContent = `${CODES.size} cards known, from ${source}. Deck codes need this list to turn card numbers into names. Update it after a new set comes out.`;
+}
+async function updateCards() {
+  const btn = $("mCards"); btn.disabled = true; btn.textContent = "Updating...";
+  try {
+    const res = await fetch("https://api.rifthunt.com/bulk/cards", { cache: "no-store" }); if (!res.ok) throw new Error("http " + res.status);
+    const data = await res.json(), list = Array.isArray(data) ? data : (data.cards || data.data || []);
+    const T = { legend: "L", rune: "R", battlefield: "B", unit: "U", spell: "S", gear: "G" }, rows = [];
+    for (const c of list) {
+      const name = c.oracleName || c.oracle_name || c.name, set = c.set || c.setCode || c.set_code || c.setId, num = c.collectorNumber || c.collector_number || c.number, type = String(c.type || c.cardType || "").toLowerCase();
+      if (typeof name !== "string" || typeof set !== "string" || num == null) continue;
+      const code = (set + "-" + String(num)).toUpperCase(); if (!/^[A-Z]{3}-[A-Z]{0,2}\d{1,3}[A-Z*]?$/.test(code)) continue;
+      rows.push([code, name.replace(/\s*\((Metal|Alternate|Signature|Overnumbered)[^)]*\)\s*$/i, ""), T[type] || "U"]);
+    }
+    if (rows.length < 300) throw new Error("unexpected shape");
+    const merged = new Map([...CODES].map(([k, v]) => [k, [k, v.n, v.t]])); for (const r of rows) if (!merged.has(r[0])) merged.set(r[0], r);
+    const out = [...merged.values()]; try { localStorage.setItem(CARDS_KEY, JSON.stringify({ at: Date.now(), rows: out })); } catch (e) {}
+    setCards(out, "the built-in list plus RiftHunt"); toast(`Card list updated: ${out.length} cards`);
+  } catch (e) { toast("Couldn't update the card list. The built-in list still works."); }
+  btn.disabled = false; btn.textContent = "Update card list";
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button,[data-close]"); if (!t) return;
+  if (t.hasAttribute("data-close")) { t.closest("dialog").close(); return; }
+  if (t.dataset.ev) { st.ev = t.dataset.ev; save(); renderFeed(); return; }
+  if (t.dataset.del) { const d = DECKS.get(t.dataset.del); if (t.dataset.sure) { st.mine = st.mine.filter(x => x.id !== d.id); DECKS.delete(d.id); st.sel = st.sel.filter(x => x !== d.id); save(); renderDecks(); toast("Deleted " + who(d)); } else { t.dataset.sure = "1"; t.textContent = "Tap again to delete"; setTimeout(() => { if (t.isConnected) { delete t.dataset.sure; t.textContent = "Delete"; } }, 3000); } return; }
+  if (t.dataset.a != null && t.dataset.b != null) { if ($("deckDlg").open) $("deckDlg").close(); openPair(+t.dataset.a, +t.dataset.b); return; }
+  if (t.dataset.deck != null) { openDeck(+t.dataset.deck); return; }
+});
+document.addEventListener("change", e => { const t = e.target; if (t.matches('input[type=checkbox][data-id]')) { toggleSel(t.dataset.id, t.checked); if (st.src === "feed") renderFeed(); } });
+$("q").addEventListener("input", renderFeed);
+$("fAll").onclick = () => { st.only8 = false; save(); renderFeed(); };
+$("f8").onclick = () => { st.only8 = true; save(); renderFeed(); };
+$("pickShown").onclick = () => { const list = feedShown(), all = list.every(d => st.sel.includes(d.id)); for (const d of list) { const has = st.sel.includes(d.id); if (all && has) st.sel = st.sel.filter(x => x !== d.id); if (!all && !has) st.sel.push(d.id); } save(); renderFeed(); renderTray(); };
+$("srcFeed").onclick = () => { st.src = "feed"; save(); renderDecks(); };
+$("srcMine").onclick = () => { st.src = "mine"; save(); renderDecks(); };
+$("trayClear").onclick = () => { st.sel = []; save(); renderDecks(); toast("Cleared your picks"); };
+$("trayGo").onclick = () => setTab("compare");
+$("goDecks").onclick = () => setTab("decks");
+$("tabDecks").onclick = () => { setTab("decks"); renderDecks(); };
+$("tabCompare").onclick = () => setTab("compare");
+$("scMain").onclick = () => { st.scope = "main"; save(); renderCompare(); };
+$("scAll").onclick = () => { st.scope = "all"; save(); renderCompare(); };
+$("thrDown").onclick = () => { st.thr = Math.max(10, st.thr - 5); save(); renderCompare(); };
+$("thrUp").onclick = () => { st.thr = Math.min(95, st.thr + 5); save(); renderCompare(); };
+$("addBtn").onclick = () => { $("addDlg").showModal(); previewAdd(); };
+let addT; $("addText").addEventListener("input", () => { clearTimeout(addT); addT = setTimeout(previewAdd, 200); });
+$("addSave").onclick = saveAdd;
+$("menuBtn").onclick = () => $("menuDlg").showModal();
+$("mCards").onclick = updateCards;
+$("mBackup").onclick = () => {
+  if (!st.mine.length) { toast("No decks of your own to back up yet"); return; }
+  const blob = new Blob([JSON.stringify({ app: "deck-diff", version: 1, saved: new Date().toISOString(), decks: st.mine }, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "deck-diff-backup-" + new Date().toISOString().slice(0, 10) + ".json"; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast(`Backed up ${st.mine.length} decks`);
+};
+$("mRestore").onclick = () => $("restoreFile").click();
+$("restoreFile").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text()); if (data.app !== "deck-diff" || !Array.isArray(data.decks)) throw 0;
+    let n = 0; for (const d of data.decks) { if (!d || !d.id || !d.z || !Array.isArray(d.z.main) || st.mine.some(x => x.id === d.id)) continue; st.mine.push({ id: String(d.id), src: "mine", name: String(d.name || "My deck").slice(0, 60), legend: String(d.legend || ""), champion: String(d.champion || ""), z: { main: d.z.main, side: d.z.side || [], bf: d.z.bf || [], runes: d.z.runes || [] }, added: d.added }); n++; }
+    save(); rebuild(); renderDecks(); toast(n ? `Restored ${n} decks` : "Those decks are already here");
+  } catch (err) { toast("That file isn't a Deck Diff backup"); }
+};
+addEventListener("hashchange", () => { const h = location.hash.slice(1); if ((h === "decks" || h === "compare") && h !== st.tab) setTab(h); });
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (st.tab === "compare") renderCompare(); }, 200); });
+
+async function getJson(url) { const r = await fetch(url, { cache: "no-cache" }); if (!r.ok) throw new Error(url); return r.json(); }
+(async function start() {
+  load();
+  const [feed, cards] = await Promise.all([getJson("decks.json").catch(() => null), getJson("cards.json").catch(() => null)]);
+  if (feed && Array.isArray(feed.decks)) FEED = feed;
+  let rows = cards && Array.isArray(cards.cards) ? cards.cards : [], source = "the built-in list";
+  try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; } } catch (e) {}
+  setCards(rows, source);
+  rebuild();
+  if (!FEED.events.some(e => e.id === st.ev)) st.ev = FEED.events.length ? FEED.events[0].id : null;
+  if (!st.seeded && FEED.events.length) { st.seeded = true; st.sel = FEED.decks.filter(d => d.event === FEED.events[0].id && d.top8).map(d => d.id); }
+  save();
+  const h = location.hash.slice(1); if (h === "decks" || h === "compare") st.tab = h;
+  renderDecks(); setTab(st.tab);
+})();
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body></html>

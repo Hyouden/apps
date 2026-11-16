@@ -54,3 +54,14 @@ The owner saves recipes on the phone, and can also ask Claude to "add this to my
 - Tags are lowercase and short, reusing existing ones where they fit (chicken, eggs, rice, curry, dessert, breakfast, quick, meal prep, high protein, fried, sauce, pasta…).
 - Strip tracking params (`igsh`, `igshid`, `stkn`, `si`, `utm_*`) from links. Keep notes free of personal details: this file is public.
 - Recipes added on the phone live only in that phone's storage (backed up with the app's Back up button), so Claude can't see them.
+
+## Deck Diff: "add the decks from <tournament>" requests
+
+`deck-diff/decks.json` is the tournament feed the app loads network-first. Add an event by appending to it and pushing; nothing is typed on the phone.
+
+- `events[]`: `{id, name, city, published (YYYY-MM-DD), source (article URL)}`. Newest event first: the app opens on `events[0]`.
+- `decks[]`: `{id, event, player, overall (finishing place, integer), legendRank ("1/45"), top8 (bool), legend, champion, main, battlefields, runes, side}`. The four card fields are one string each, `"3 Card Name | 2 Other Card"`. `main` leaves out the chosen champion (39 cards).
+- Source: the decklist articles Riot posts at playriftbound.com/en-us/news/organizedplay after each major event. Copy lists exactly; never fill in a card from memory.
+- Check every deck before pushing: main 39 + champion, 12 runes, 3 battlefields, 10 sideboard, no card over 3 copies across main and sideboard.
+- **Never change or reuse a deck `id`**: picks on each phone are stored by id. Ids follow `<event prefix>-<player slug>`, e.g. `rce26-sonecon`.
+- `deck-diff/cards.json` maps card codes to names for pasted deck codes (`[code, name, type letter, domains, energy]`). It only covers sets up to Unleashed; add rows when a newer dataset is available.
