@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-12",
+ "updated": "2026-11-15",
  "cards": [
   {
    "id": "q001",
@@ -785,6 +785,134 @@
    "title": "Hug",
    "q": "Give me a twenty-second hug and tell me what you're thinking during it.",
    "added": "2026-10-01"
+  },
+  {
+   "id": "q099",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Weekend wish",
+   "q": "What would make this coming weekend feel restful or fun for you?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q100",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Social plans",
+   "q": "How do you feel about our social plans lately: too many, too few, or just right?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q101",
+   "kind": "reflect",
+   "rarity": 1,
+   "title": "Repair",
+   "q": "Think about our last disagreement. What helped us come back together, and what would make the next repair easier?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q102",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Worth it",
+   "q": "What's one thing we spent time on this week that was totally worth it, and one we could skip next time?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q103",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Growing old",
+   "q": "What are you most looking forward to about growing old together, and what part of it scares you a little?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q104",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Real apology",
+   "q": "What does a real apology look like to you? What do you need to hear or see from me?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q105",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Powder or lights",
+   "q": "Would you rather ride first chair on a powder day, or night-ride under the lights with hot cocoa after? Defend your pick.",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q106",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Skate date",
+   "q": "Plan a skate date: where we go, what's on the playlist, and the one trick we each have to land.",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q107",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Warning label",
+   "q": "If I came with a warning label, what would it say?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q108",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Wipeout replay",
+   "q": "Replay my most dramatic wipeout or stumble, sports-commentator style. Slow motion encouraged.",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q109",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Cabin night",
+   "q": "We're snowed in at a cabin, just the two of us. Walk me through the evening after the fire's lit.",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q110",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Strangers again",
+   "q": "Pretend we're strangers meeting at a bar tonight. What's your opening line, and how do I win you over?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q111",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "In the moment",
+   "q": "Would you like us to check in more during intimate moments, about pace, pressure or how something feels?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q112",
+   "kind": "intimate",
+   "rarity": 1,
+   "title": "Not tonight",
+   "q": "How can we say 'not tonight' to each other in a way that feels kind and never like rejection?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q113",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Your favorite me",
+   "q": "Which version of me do you love most: sleepy-morning me, adventure me, or cozy-night me? Tell me why.",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "q114",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Closing toast",
+   "q": "Raise a mug or a glass and give a ten-second toast to us and the week ahead.",
+   "added": "2026-11-15"
   }
  ]
 }
