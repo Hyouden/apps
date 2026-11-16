@@ -1,0 +1,38 @@
+name: Deck Diff - TopDeck.gg decks
+
+# Pulls Riftbound tournament decklists from TopDeck.gg for the Deck Diff app.
+# Needs a repository secret named TOPDECK_API_KEY (free key from topdeck.gg/developers).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "deck-diff/tools/**"
+      - ".github/workflows/deck-diff-topdeck.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deck-diff-topdeck
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch from TopDeck.gg
+        env:
+          TOPDECK_API_KEY: ${{ secrets.TOPDECK_API_KEY }}
+        run: node deck-diff/tools/topdeck.mjs
+      - name: Save results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deck-diff/topdeck-status.json deck-diff/topdeck-sample.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "Deck Diff: TopDeck.gg refresh" && git pull --rebase origin main && git push)
