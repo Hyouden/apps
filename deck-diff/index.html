@@ -58,6 +58,8 @@ main{max-width:720px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-rig
 .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;min-height:44px;padding:0 14px;text-align:left;line-height:1.15}
 .chip b{display:block;font-weight:600}
 .chip span{font-size:.78rem;color:var(--muted)}
+.chip.ev{max-width:250px}
+.chip.ev b,.chip.ev span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .chip.leg{min-height:44px;display:inline-flex;align-items:center;gap:6px;font-weight:600}
 .chip.leg span{font:700 1rem var(--disp)}
 .chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -245,7 +247,7 @@ a{color:var(--accent)}
   <div class="panel"><h3>Card list</h3><p class="muted small" style="margin:4px 0 10px" id="cardInfo"></p><button class="btn" id="mCards">Update card list</button></div>
   <div class="panel"><h3>How the numbers work</h3><p class="small" style="margin-top:6px">Two decks are compared copy by copy. Three copies of a card in one deck and two in the other count as two shared out of three. 100% means the same 40 cards; 0% means none in common. The Legend, runes and battlefields are left out of the score.</p>
   <p class="small" style="margin-top:8px">Archetypes are decks that are, on average, at least as alike as the "Group at" setting. Core cards are in every deck of a group; flex cards are in only some.</p></div>
-  <div class="panel"><h3>Where the data comes from</h3><p class="small" style="margin-top:6px">Tournament lists are the ones Riot publishes on <a href="https://playriftbound.com/en-us/news/organizedplay" target="_blank" rel="noopener">playriftbound.com</a> after each major event. "Best-of" lists are the best-finishing pilot of each Legend. Deck codes use the open format from <a href="https://piltoverarchive.com" target="_blank" rel="noopener">Piltover Archive</a>. Card names come from the riftbound-tools dataset, and updates from <a href="https://rifthunt.com" target="_blank" rel="noopener">RiftHunt</a>.</p>
+  <div class="panel"><h3>Where the data comes from</h3><p class="small" style="margin-top:6px">Full-event decklists come from <a href="https://topdeck.gg" target="_blank" rel="noopener">TopDeck.gg</a> and refresh daily. Lists for Riot's own championships are the ones Riot publishes on <a href="https://playriftbound.com/en-us/news/organizedplay" target="_blank" rel="noopener">playriftbound.com</a>: the Top 8 plus the best-finishing pilot of each Legend. Deck codes use the open format from <a href="https://piltoverarchive.com" target="_blank" rel="noopener">Piltover Archive</a>. Card names come from the riftbound-tools dataset, and updates from <a href="https://rifthunt.com" target="_blank" rel="noopener">RiftHunt</a>.</p>
   <p class="small muted" style="margin-top:8px">Deck Diff is a fan project. It isn't endorsed by Riot Games and doesn't reflect the views of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riftbound and League of Legends are trademarks of Riot Games, Inc.</p></div>
 </div></dialog>
 
@@ -279,6 +281,12 @@ function toast(msg) { let t = document.querySelector(".toast"); if (!t) { t = do
 
 /* ---------- decks ---------- */
 function parseList(s) { const out = []; for (const p of String(s || "").split("|")) { const m = p.trim().match(/^(\d+)\s+(.+)$/); if (m) out.push([+m[1], m[2].trim()]); } return out; }
+const MAX_PICK = 60;
+function unpack(a, cards) { const out = []; for (let i = 0; i + 1 < (a || []).length; i += 2) out.push([a[i + 1], cards[a[i]]]); return out; }
+function fromTopdeck(r, cards) {
+  return { id: r.id, src: "feed", event: r.event, player: r.player, overall: r.overall, rec: r.rec, top8: r.overall <= 8, legend: r.legend || "", champion: r.champion || "",
+    z: { main: unpack(r.m, cards), side: unpack(r.s, cards), bf: unpack(r.b, cards), runes: unpack(r.r, cards) } };
+}
 function fromFeed(r) {
   return { id: r.id, src: "feed", event: r.event, player: r.player, overall: r.overall, legendRank: r.legendRank, top8: !!r.top8, legend: r.legend || "", champion: r.champion || "",
     z: { main: parseList(r.main), side: parseList(r.side), bf: parseList(r.battlefields), runes: parseList(r.runes) } };
@@ -290,11 +298,12 @@ function domainsOf(d) { const out = []; for (const [, n] of d.z.runes) { const k
 function pips(d) { return `<span class="pips" aria-hidden="true">${domainsOf(d).map(x => `<i class="pip ${x}"></i>`).join("")}</span>`; }
 function evOf(d) { return FEED.events.find(e => e.id === d.event); }
 function who(d) { return d.src === "feed" ? d.player : (d.name || "My deck"); }
-function where(d) { if (d.src !== "feed") return "My deck"; const e = evOf(d); return (e ? e.city : "") + (d.top8 ? ", Top 8" : ""); }
+function evShort(e) { return e ? (e.from === "topdeck" ? e.name : e.city) : ""; }
+function where(d) { if (d.src !== "feed") return "My deck"; return evShort(evOf(d)) + (d.top8 ? ", Top 8" : ""); }
 function rankText(d) { return d.src === "feed" ? "#" + d.overall : ""; }
 function rebuild() {
   DECKS = new Map(); LEGENDS = new Map();
-  for (const r of FEED.decks) { const d = fromFeed(r); DECKS.set(d.id, d); if (d.legend.includes(",")) LEGENDS.set(legendKey(d.legend), d.legend); }
+  for (const r of FEED.decks) { const d = r.m ? fromTopdeck(r, FEED.tdCards) : fromFeed(r); DECKS.set(d.id, d); if (d.legend.includes(",")) LEGENDS.set(legendKey(d.legend), d.legend); }
   for (const d of st.mine) DECKS.set(d.id, d);
   st.sel = st.sel.filter(id => DECKS.has(id));
 }
@@ -451,7 +460,7 @@ function renderTray() {
   $("trayGo").disabled = n < 2;
   $("tabCompare").textContent = n ? `Compare (${n})` : "Compare";
 }
-function toggleSel(id, on) { const has = st.sel.includes(id); if (on && !has) st.sel.push(id); if (!on && has) st.sel = st.sel.filter(x => x !== id); save(); renderTray(); }
+function toggleSel(id, on) { const has = st.sel.includes(id); if (on && !has && st.sel.length >= MAX_PICK) { toast(`You can compare up to ${MAX_PICK} decks at once`); renderFeed(); return; } if (on && !has) st.sel.push(id); if (!on && has) st.sel = st.sel.filter(x => x !== id); save(); renderTray(); }
 function deckRow(d, extra) {
   const on = st.sel.includes(d.id);
   return `<li><label class="drow"><input type="checkbox" data-id="${esc(d.id)}" ${on ? "checked" : ""} aria-label="Pick ${esc(shortLegend(d))}, ${esc(who(d))}">
@@ -469,14 +478,15 @@ function renderFeed() {
   const tally = new Map(); for (const d of feedScope()) { const k = legendKey(d.legend); const t = tally.get(k) || { k, name: shortLegend(d), n: 0 }; t.n++; tally.set(k, t); }
   if (st.leg && !tally.has(st.leg)) st.leg = null;
   $("legChips").innerHTML = [...tally.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).map(t => `<button class="chip leg" data-leg="${esc(t.k)}" aria-pressed="${t.k === st.leg}" aria-label="${esc(t.name)}, ${t.n} decks">${esc(t.name)} <span>${t.n}</span></button>`).join("");
-  $("evChips").innerHTML = `<button class="chip" data-ev="all" aria-pressed="${st.ev === "all"}"><b>All events</b><span>Every list, by legend</span></button>` + FEED.events.map(e => `<button class="chip" data-ev="${esc(e.id)}" aria-pressed="${e.id === st.ev}"><b>${esc(e.city)}</b><span>${esc(e.name)}</span></button>`).join("");
+  $("evChips").innerHTML = `<button class="chip" data-ev="all" aria-pressed="${st.ev === "all"}"><b>All events</b><span>Every list, by legend</span></button>` + FEED.events.map(e => `<button class="chip ev" data-ev="${esc(e.id)}" aria-pressed="${e.id === st.ev}"><b>${esc(e.from === "topdeck" ? e.name : e.city + ": " + e.name)}</b><span>${e.n} decks, ${esc(e.date)}${e.city && e.from === "topdeck" ? ", " + esc(e.city) : ""}</span></button>`).join("");
   const list = feedShown(), e = FEED.events.find(x => x.id === st.ev);
-  $("feedList").innerHTML = list.map(d => deckRow(d, st.ev === "all" && evOf(d) ? ", " + esc(evOf(d).city) : "")).join("") || `<li style="padding:14px 2px" class="muted">No decks match that filter. Clear the filter or try another tournament.</li>`;
+  const CAP = 120, more = list.length > CAP ? `<li style="padding:14px 2px" class="muted">Showing the top ${CAP} of ${list.length}. Tap a legend above or type in the filter to narrow it down.</li>` : "";
+  $("feedList").innerHTML = list.slice(0, CAP).map(d => deckRow(d, st.ev === "all" && evOf(d) ? ", " + esc(evShort(evOf(d))) : "")).join("") + more || `<li style="padding:14px 2px" class="muted">No decks match that filter. Clear the filter or try another tournament.</li>`;
   $("feedCount").textContent = list.length + (list.length === 1 ? " deck" : " decks");
   $("pickShown").disabled = !list.length;
-  $("pickShown").textContent = list.length && list.every(d => st.sel.includes(d.id)) ? "Unpick all shown" : "Pick all shown";
+  $("pickShown").textContent = list.length && list.every(d => st.sel.includes(d.id)) ? "Unpick all shown" : (list.length > MAX_PICK ? `Pick top ${MAX_PICK}` : "Pick all shown");
   $("fAll").setAttribute("aria-pressed", !st.only8); $("f8").setAttribute("aria-pressed", st.only8);
-  $("feedSrc").innerHTML = st.ev === "all" ? "Lists published by Riot after each event: the Top 8 plus the best-finishing pilot of each legend. Pick a legend above to line up the same deck across events." : e ? `Lists published by Riot on ${esc(e.published)}. Rank is the pilot's overall finish. <a href="${esc(e.source)}" target="_blank" rel="noopener">Read the article</a>` : (FEED.events.length ? "" : "Tournament decks couldn't be loaded. Check your connection and reopen the app.");
+  $("feedSrc").innerHTML = st.ev === "all" ? "Every event together. Tap a legend above to line up the same deck across events." : e && e.from === "topdeck" ? `${e.n} public decklists out of ${e.players} players, from <a href="https://topdeck.gg" target="_blank" rel="noopener">TopDeck.gg</a>. Rank is the final standing.` : e ? `Riot published these lists on ${esc(e.published)}: the Top 8 plus the best-finishing pilot of each legend. <a href="${esc(e.source)}" target="_blank" rel="noopener">Read the article</a>` : (FEED.events.length ? "" : "Tournament decks couldn't be loaded. Check your connection and reopen the app.");
 }
 function renderMine() {
   $("mineEmpty").hidden = st.mine.length > 0; $("minePanel").hidden = st.mine.length === 0;
@@ -565,7 +575,7 @@ function openDeck(ix) {
   const near = A.decks.map((_, j) => j).filter(j => j !== ix).sort((x, y) => A.S[ix][y] - A.S[ix][x]).slice(0, 5);
   const zl = (title, z) => z.length ? `<div class="cardsec"><h4>${title}: ${count(z)}</h4><ul class="cl">${z.map(e => `<li><span class="q">${e[0]}</span><span>${esc(e[1])}</span></li>`).join("")}</ul></div>` : "";
   $("deckT").textContent = `Deck ${A.pos.get(ix) + 1}: ${shortLegend(d)}`;
-  $("deckB").innerHTML = `<div class="panel"><h3>${pips(d)}${esc(legendFull(d.legend) || shortLegend(d))}</h3><p class="muted small" style="margin-top:4px">${esc(who(d))}${where(d) ? ", " + esc(where(d)) : ""}${d.src === "feed" ? `, finished #${d.overall}, Legend rank ${esc(d.legendRank)}` : ""}</p>
+  $("deckB").innerHTML = `<div class="panel"><h3>${pips(d)}${esc(legendFull(d.legend) || shortLegend(d))}</h3><p class="muted small" style="margin-top:4px">${esc(who(d))}${where(d) ? ", " + esc(where(d)) : ""}${d.src === "feed" ? `, finished #${d.overall}` + (d.rec ? `, record ${d.rec[0]}-${d.rec[1]}-${d.rec[2]} (wins, losses, draws)` : `, Legend rank ${esc(d.legendRank)}`) : ""}</p>
     ${d.champion ? `<p class="small" style="margin-top:8px">Chosen champion: <b>${esc(d.champion)}</b></p>` : ""}
     ${zl("Main deck", d.z.main)}${zl("Battlefields", d.z.bf)}${zl("Runes", d.z.runes)}${zl("Sideboard", d.z.side)}</div>
     <div class="panel"><h3>Most alike in this comparison</h3><ul class="gdecks">${near.map(j => { const o = A.decks[j]; return `<li><button data-a="${ix}" data-b="${j}"><span class="num">${A.pos.get(j) + 1}</span><span class="t"><b>${pips(o)}${esc(shortLegend(o))}</b><span>${esc(who(o))}</span></span><span class="rank top8">${pct(A.S[ix][j])}</span></button></li>`; }).join("")}</ul></div>`;
@@ -634,7 +644,7 @@ document.addEventListener("change", e => { const t = e.target; if (t.matches('in
 $("q").addEventListener("input", renderFeed);
 $("fAll").onclick = () => { st.only8 = false; save(); renderFeed(); };
 $("f8").onclick = () => { st.only8 = true; save(); renderFeed(); };
-$("pickShown").onclick = () => { const list = feedShown(), all = list.every(d => st.sel.includes(d.id)); for (const d of list) { const has = st.sel.includes(d.id); if (all && has) st.sel = st.sel.filter(x => x !== d.id); if (!all && !has) st.sel.push(d.id); } save(); renderFeed(); renderTray(); };
+$("pickShown").onclick = () => { const list = feedShown(), all = list.every(d => st.sel.includes(d.id)); let full = false; for (const d of list) { const has = st.sel.includes(d.id); if (all && has) st.sel = st.sel.filter(x => x !== d.id); if (!all && !has) { if (st.sel.length >= MAX_PICK) { full = true; break; } st.sel.push(d.id); } } save(); renderFeed(); renderTray(); if (full) toast(`Picked the top ${MAX_PICK}. That's the most you can compare at once`); };
 $("srcFeed").onclick = () => { st.src = "feed"; save(); renderDecks(); };
 $("srcMine").onclick = () => { st.src = "mine"; save(); renderDecks(); };
 $("trayClear").onclick = () => { st.sel = []; save(); renderDecks(); toast("Cleared your picks"); };
@@ -671,15 +681,21 @@ let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() 
 async function getJson(url) { const r = await fetch(url, { cache: "no-cache" }); if (!r.ok) throw new Error(url); return r.json(); }
 (async function start() {
   load();
-  const [feed, cards] = await Promise.all([getJson("decks.json").catch(() => null), getJson("cards.json").catch(() => null)]);
+  const [feed, cards, td] = await Promise.all([getJson("decks.json").catch(() => null), getJson("cards.json").catch(() => null), getJson("topdeck.json").catch(() => null)]);
   if (feed && Array.isArray(feed.decks)) FEED = feed;
+  for (const e of FEED.events) e.date = e.date || e.published;
+  FEED.tdCards = [];
+  if (td && Array.isArray(td.decks) && Array.isArray(td.cards)) { FEED.tdCards = td.cards; FEED.events = FEED.events.concat(td.events); FEED.decks = FEED.decks.concat(td.decks); }
+  const perEvent = new Map(); for (const d of FEED.decks) perEvent.set(d.event, (perEvent.get(d.event) || 0) + 1);
+  for (const e of FEED.events) e.n = perEvent.get(e.id) || 0;
+  FEED.events.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.n - a.n));
   let rows = cards && Array.isArray(cards.cards) ? cards.cards : [], source = "the built-in list";
   let cardsAt = 0;
   try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; cardsAt = extra.at || 0; } } catch (e) {}
   setCards(rows, source);
   rebuild();
   if (st.ev !== "all" && !FEED.events.some(e => e.id === st.ev)) st.ev = FEED.events.length ? FEED.events[0].id : null;
-  if (!st.seeded && FEED.events.length) { st.seeded = true; st.sel = FEED.decks.filter(d => d.event === FEED.events[0].id && d.top8).map(d => d.id); }
+  if (!st.seeded && FEED.events.length) { st.seeded = true; st.sel = [...DECKS.values()].filter(d => d.event === FEED.events[0].id && d.top8).map(d => d.id); }
   save();
   const h = location.hash.slice(1); if (h === "decks" || h === "compare") st.tab = h;
   renderDecks(); setTab(st.tab);
