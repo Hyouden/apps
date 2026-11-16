@@ -591,25 +591,25 @@ function saveAdd() {
 function setCards(rows, source) {
   CODES = new Map(); NAMES = new Map();
   for (const r of rows) { const c = { n: r[1], t: r[2] }; CODES.set(String(r[0]).toUpperCase(), c); const k = norm(r[1]); if (!NAMES.has(k)) NAMES.set(k, c); }
-  cardSource = source; $("cardInfo").textContent = `${CODES.size} cards known, from ${source}. Deck codes need this list to turn card numbers into names. Update it after a new set comes out.`;
+  cardSource = source; $("cardInfo").textContent = `${CODES.size} cards known, from ${source}. Deck codes need this list to turn card numbers into names. It refreshes itself about once a week.`;
 }
-async function updateCards() {
+async function updateCards(quiet) {
   const btn = $("mCards"); btn.disabled = true; btn.textContent = "Updating...";
   try {
     const res = await fetch("https://api.rifthunt.com/bulk/cards", { cache: "no-store" }); if (!res.ok) throw new Error("http " + res.status);
-    const data = await res.json(), list = Array.isArray(data) ? data : (data.cards || data.data || []);
+    const data = await res.json(), list = data && Array.isArray(data.cards) ? data.cards : [];
     const T = { legend: "L", rune: "R", battlefield: "B", unit: "U", spell: "S", gear: "G" }, rows = [];
     for (const c of list) {
-      const name = c.oracleName || c.oracle_name || c.name, set = c.set || c.setCode || c.set_code || c.setId, num = c.collectorNumber || c.collector_number || c.number, type = String(c.type || c.cardType || "").toLowerCase();
-      if (typeof name !== "string" || typeof set !== "string" || num == null) continue;
-      const code = (set + "-" + String(num)).toUpperCase(); if (!/^[A-Z]{3}-[A-Z]{0,2}\d{1,3}[A-Z*]?$/.test(code)) continue;
-      rows.push([code, name.replace(/\s*\((Metal|Alternate|Signature|Overnumbered)[^)]*\)\s*$/i, ""), T[type] || "U"]);
+      const id = String(c.riftboundId || c.id || "").split("-"), name = c.cleanName || c.name;
+      if (id.length < 2 || typeof name !== "string" || c.supertype === "Token") continue;
+      const code = (id[0] + "-" + id[1]).toUpperCase(); if (!/^[A-Z]{2,3}-(R|SP)?\d{1,3}[A-Z*]?$/.test(code)) continue;
+      rows.push([code, name.replace(/\s*\((Alternate Art|Signature|Overnumbered)\)\s*$/i, ""), T[String(c.type || "").toLowerCase()] || "U"]);
     }
     if (rows.length < 300) throw new Error("unexpected shape");
-    const merged = new Map([...CODES].map(([k, v]) => [k, [k, v.n, v.t]])); for (const r of rows) if (!merged.has(r[0])) merged.set(r[0], r);
+    const merged = new Map([...CODES].map(([k, v]) => [k, [k, v.n, v.t]])); for (const r of rows) merged.set(r[0], r);   // RiftHunt is newer, so it wins
     const out = [...merged.values()]; try { localStorage.setItem(CARDS_KEY, JSON.stringify({ at: Date.now(), rows: out })); } catch (e) {}
-    setCards(out, "the built-in list plus RiftHunt"); toast(`Card list updated: ${out.length} cards`);
-  } catch (e) { toast("Couldn't update the card list. The built-in list still works."); }
+    setCards(out, "the built-in list plus RiftHunt"); if (!quiet) toast(`Card list updated: ${out.length} cards`);
+  } catch (e) { if (!quiet) toast("Couldn't update the card list. The built-in list still works."); }
   btn.disabled = false; btn.textContent = "Update card list";
 }
 
@@ -666,7 +666,8 @@ async function getJson(url) { const r = await fetch(url, { cache: "no-cache" });
   const [feed, cards] = await Promise.all([getJson("decks.json").catch(() => null), getJson("cards.json").catch(() => null)]);
   if (feed && Array.isArray(feed.decks)) FEED = feed;
   let rows = cards && Array.isArray(cards.cards) ? cards.cards : [], source = "the built-in list";
-  try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; } } catch (e) {}
+  let cardsAt = 0;
+  try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; cardsAt = extra.at || 0; } } catch (e) {}
   setCards(rows, source);
   rebuild();
   if (!FEED.events.some(e => e.id === st.ev)) st.ev = FEED.events.length ? FEED.events[0].id : null;
@@ -674,6 +675,7 @@ async function getJson(url) { const r = await fetch(url, { cache: "no-cache" });
   save();
   const h = location.hash.slice(1); if (h === "decks" || h === "compare") st.tab = h;
   renderDecks(); setTab(st.tab);
+  if (navigator.onLine && Date.now() - cardsAt > 7 * 864e5) updateCards(true);   // weekly, so new sets work in deck codes
 })();
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
 </script>
