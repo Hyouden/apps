@@ -147,6 +147,21 @@ dialog::backdrop{background:rgba(6,14,19,.6)}
 .diff .more{background:var(--accent);color:var(--on-accent)}
 .diff .zero{color:var(--muted)}
 .diff .nm{text-align:center}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:6px}
+.ct{position:relative;aspect-ratio:744/1039;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--h0);padding:0;display:block;width:100%}
+.ct.land{grid-column:span 2;aspect-ratio:1039/744}
+.ct .cn{position:absolute;inset:0;display:grid;place-items:center;padding:6px 6px 26px;text-align:center;font-size:.78rem;line-height:1.2;color:var(--ink)}
+.ct img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.ct .bd{position:absolute;z-index:2;left:4px;right:4px;bottom:4px;display:flex;justify-content:space-between;gap:4px;pointer-events:none}
+.ct .bd span{min-width:26px;height:24px;padding:0 6px;border-radius:7px;display:grid;place-items:center;font:700 .95rem var(--disp);background:rgba(10,20,26,.82);color:#F2F7F9}
+.ct .bd .hi{background:var(--accent);color:var(--on-accent)}
+.ct .bd .z{opacity:.75}
+.ct .bd.one{justify-content:flex-start}
+.ct .bd.wide span{flex:1}
+.tilehead{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted);margin-top:8px}
+#cardDlg{background:rgba(6,14,19,.92);color:#F2F7F9}
+#cardDlg .db{align-items:center}
+#cardBig{max-width:min(100%,420px);max-height:72vh;border-radius:14px;display:block}
 .note{border-left:4px solid var(--warn);padding:8px 12px;background:var(--card);border-radius:0 10px 10px 0;font-size:.9rem}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom,0px));background:var(--bar);color:var(--on-bar);padding:10px 16px;border-radius:999px;font-weight:600;z-index:20;box-shadow:0 6px 20px rgba(6,20,26,.3)}
 a{color:var(--accent)}
@@ -197,6 +212,7 @@ a{color:var(--accent)}
   <div id="cmpBody" hidden style="display:flex;flex-direction:column;gap:16px">
     <div class="row">
       <div class="seg" role="group" aria-label="Cards to compare"><button id="scMain" aria-pressed="true">Main deck</button><button id="scAll" aria-pressed="false">With sideboard</button></div>
+      <div class="seg" role="group" aria-label="Show cards as"><button id="vwCards" aria-pressed="true">Pictures</button><button id="vwText" aria-pressed="false">Text</button></div>
     </div>
     <p id="cmpSummary"></p>
     <div class="panel">
@@ -233,6 +249,7 @@ a{color:var(--accent)}
 
 <dialog id="pairDlg" aria-labelledby="pairT"><div class="dh"><h2 id="pairT">Two decks</h2><button class="iconbtn" data-close>Close</button></div><div class="db" id="pairB"></div></dialog>
 <dialog id="deckDlg" aria-labelledby="deckT"><div class="dh"><h2 id="deckT">Deck</h2><button class="iconbtn" data-close>Close</button></div><div class="db" id="deckB"></div></dialog>
+<dialog id="cardDlg" aria-labelledby="cardT"><div class="dh"><h2 id="cardT">Card</h2><button class="iconbtn" data-close>Close</button></div><div class="db"><img id="cardBig" alt=""><p id="cardMiss" class="small" hidden>No picture for this card yet.</p></div></dialog>
 <dialog id="addDlg" aria-labelledby="addT"><div class="dh"><h2 id="addT">Add decks</h2><button class="iconbtn" data-close>Cancel</button></div><div class="db">
   <div><label class="field" for="addText">Deck code or decklist</label>
   <textarea id="addText" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste a deck code, or a list like:&#10;&#10;Legend: 1 Kennen, Heart of the Tempest&#10;Champion: 1 Kennen, Storm of Shuriken&#10;Main Deck:&#10;3 Lightning Rush&#10;2 Gust&#10;Sideboard:&#10;2 Salvage"></textarea>
@@ -247,7 +264,7 @@ a{color:var(--accent)}
   <div class="panel"><h3>Card list</h3><p class="muted small" style="margin:4px 0 10px" id="cardInfo"></p><button class="btn" id="mCards">Update card list</button></div>
   <div class="panel"><h3>How the numbers work</h3><p class="small" style="margin-top:6px">Two decks are compared copy by copy. Three copies of a card in one deck and two in the other count as two shared out of three. 100% means the same 40 cards; 0% means none in common. The Legend, runes and battlefields are left out of the score.</p>
   <p class="small" style="margin-top:8px">Archetypes are decks that are, on average, at least as alike as the "Group at" setting. Core cards are in every deck of a group; flex cards are in only some.</p></div>
-  <div class="panel"><h3>Where the data comes from</h3><p class="small" style="margin-top:6px">Full-event decklists come from <a href="https://topdeck.gg" target="_blank" rel="noopener">TopDeck.gg</a> and refresh daily. Lists for Riot's own championships are the ones Riot publishes on <a href="https://playriftbound.com/en-us/news/organizedplay" target="_blank" rel="noopener">playriftbound.com</a>: the Top 8 plus the best-finishing pilot of each Legend. Deck codes use the open format from <a href="https://piltoverarchive.com" target="_blank" rel="noopener">Piltover Archive</a>. Card names come from the riftbound-tools dataset, and updates from <a href="https://rifthunt.com" target="_blank" rel="noopener">RiftHunt</a>.</p>
+  <div class="panel"><h3>Where the data comes from</h3><p class="small" style="margin-top:6px">Full-event decklists come from <a href="https://topdeck.gg" target="_blank" rel="noopener">TopDeck.gg</a> and refresh daily. Lists for Riot's own championships are the ones Riot publishes on <a href="https://playriftbound.com/en-us/news/organizedplay" target="_blank" rel="noopener">playriftbound.com</a>: the Top 8 plus the best-finishing pilot of each Legend. Deck codes use the open format from <a href="https://piltoverarchive.com" target="_blank" rel="noopener">Piltover Archive</a>. Card names come from the riftbound-tools dataset. Card pictures are Riot's, loaded from Riot's own site, with updates from <a href="https://rifthunt.com" target="_blank" rel="noopener">RiftHunt</a>.</p>
   <p class="small muted" style="margin-top:8px">Deck Diff is a fan project. It isn't endorsed by Riot Games and doesn't reflect the views of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riftbound and League of Legends are trademarks of Riot Games, Inc.</p></div>
 </div></dialog>
 
@@ -256,19 +273,21 @@ var RBCodes=(()=>{var z=Object.create;var v=Object.defineProperty;var K=Object.g
 <script>
 "use strict";
 const STORE_KEY = "deck-diff-v1";          // every app on this site shares one browser storage
-const CARDS_KEY = "deck-diff-cards-v1";
+const CARDS_KEY = "deck-diff-cards-v2";
+const IMG_BASE = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const norm = s => String(s).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 const DOMAINS = ["fury", "calm", "mind", "body", "chaos", "order"];
 
-let st = { mine: [], sel: [], scope: "main", thr: 40, tab: "decks", src: "feed", ev: null, leg: null, only8: false, seeded: false };
+let st = { mine: [], sel: [], scope: "main", view: "cards", thr: 40, tab: "decks", src: "feed", ev: null, leg: null, only8: false, seeded: false };
 let FEED = { events: [], decks: [] };
 let DECKS = new Map();      // id -> deck
 let CODES = new Map();      // "OGN-001" -> {n,t}
 let NAMES = new Map();      // norm(name) -> {n,t}
 let LEGENDS = new Map();    // norm(epithet) -> full legend name
 let cardSource = "";
+let IMG = new Map();        // norm(name) -> image file (Riot CDN) or full URL
 
 function load() {
   try { const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (s && typeof s === "object") st = Object.assign(st, s); } catch (e) {}
@@ -360,6 +379,15 @@ function heatColor(s) {
   return { bg: `rgb(${mix.join(",")})`, fg: lum > 0.55 ? "#12202A" : "#F2F7F9" };
 }
 const pct = s => Math.round(s * 100) + "%";
+function imgEntry(name) { return IMG.get(norm(name)) || IMG.get(legendKey(name)) || null; }
+function imgFor(name, w) { const e = imgEntry(name); if (!e) return ""; return /^https?:/.test(e) ? e : IMG_BASE + e + "?accountingTag=RB&auto=format&w=" + w; }
+function isLand(name) { const e = imgEntry(name), m = e && e.match(/-(\d+)x(\d+)\.\w+$/); return !!m && +m[1] > +m[2]; }
+function tile(name, badge) {
+  const u = imgFor(name, 240);
+  return `<button class="ct ${isLand(name) ? "land" : ""}" data-card="${esc(name)}" aria-label="${esc(name)}"><span class="cn">${esc(name)}</span>${u ? `<img loading="lazy" decoding="async" alt="" src="${esc(u)}" onerror="this.remove()">` : ""}${badge || ""}</button>`;
+}
+const one = t => `<span class="bd one"><span>${t}</span></span>`;
+const pictures = () => st.view !== "text";
 
 /* ---------- reading pasted decks ---------- */
 const SEC = [[/^legends?$/, "legend"], [/^(chosen ?)?champions?$/, "champion"], [/^(main ?deck|main|deck|mainboard)$/, "main"], [/^battlefields?$/, "bf"], [/^(runes?|rune ?pool|rune ?deck)$/, "runes"], [/^(side ?board|side|sideboard cards)$/, "side"]];
@@ -507,6 +535,7 @@ function renderCompare() {
   $("cmpBody").style.display = "flex";
   $("scMain").setAttribute("aria-pressed", st.scope === "main"); $("scAll").setAttribute("aria-pressed", st.scope === "all");
   $("thrVal").textContent = st.thr + "%";
+  $("vwCards").setAttribute("aria-pressed", pictures()); $("vwText").setAttribute("aria-pressed", !pictures());
   A = analyse(ids, st.scope, st.thr);
   const n = A.decks.length;
   // summary
@@ -537,8 +566,8 @@ function renderCompare() {
     let body = "";
     if (many) {
       const { core, flex } = groupCards(A, g), nd = g.m.length, coreN = core.reduce((s, t) => s + t.min, 0);
-      body = `<div class="cardsec"><h4>Core: ${coreN} cards in every deck</h4>${core.length ? `<ul class="cl">${core.map(t => `<li><span class="q">${t.min === t.max ? t.min : t.min + "&ndash;" + t.max}</span><span>${esc(t.name)}</span></li>`).join("")}</ul>` : `<p class="muted small">No card is in every one of these decks.</p>`}</div>
-      <div class="cardsec"><details><summary>Flex: ${flex.length} cards in only some decks</summary><ul class="flex">${flex.map(t => `<li><span>${esc(t.name)}</span><span class="meter" aria-hidden="true"><i style="width:${Math.round(t.decks / nd * 100)}%"></i></span><span class="f">${t.decks}/${nd}</span></li>`).join("")}</ul></details></div>`;
+      body = `<div class="cardsec"><h4>Core: ${coreN} cards in every deck</h4>${core.length ? (pictures() ? `<div class="tiles">${core.map(t => tile(t.name, one(t.min === t.max ? "&times;" + t.min : t.min + "&ndash;" + t.max))).join("")}</div>` : `<ul class="cl">${core.map(t => `<li><span class="q">${t.min === t.max ? t.min : t.min + "&ndash;" + t.max}</span><span>${esc(t.name)}</span></li>`).join("")}</ul>`) : `<p class="muted small">No card is in every one of these decks.</p>`}</div>
+      <div class="cardsec"><details><summary>Flex: ${flex.length} cards in only some decks</summary>${pictures() ? `<p class="small muted">The number is how many of the ${nd} decks play the card.</p><div class="tiles">${flex.map(t => tile(t.name, `<span class="bd wide"><span class="${t.decks * 2 >= nd ? "hi" : ""}">${t.decks} of ${nd}</span></span>`)).join("")}</div>` : `<ul class="flex">${flex.map(t => `<li><span>${esc(t.name)}</span><span class="meter" aria-hidden="true"><i style="width:${Math.round(t.decks / nd * 100)}%"></i></span><span class="f">${t.decks}/${nd}</span></li>`).join("")}</ul>`}</details></div>`;
     } else {
       const ix = g.m[0]; let best = -1, bj = -1; for (let j = 0; j < n; j++) if (j !== ix && A.S[ix][j] > best) { best = A.S[ix][j]; bj = j; }
       body = `<p class="small muted" style="margin-top:8px">Closest match is deck ${A.pos.get(bj) + 1}, ${esc(shortLegend(A.decks[bj]))}, at ${pct(best)}. <button class="btn" data-a="${ix}" data-b="${bj}" style="margin-left:6px">See what differs</button></p>`;
@@ -554,6 +583,8 @@ function zoneDiff(za, zb) {
   add(za, "a"); add(zb, "b"); const rows = [...m.values()];
   return { diff: rows.filter(r => r.a !== r.b).sort((x, y) => (y.a - y.b) - (x.a - x.b) || x.name.localeCompare(y.name)), same: rows.filter(r => r.a === r.b).sort((x, y) => y.a - x.a || x.name.localeCompare(y.name)) };
 }
+function diffTiles(rows) { return `<div class="tiles">${rows.map(r => tile(r.name, `<span class="bd"><span class="${r.a > r.b ? "hi" : ""} ${r.a ? "" : "z"}">${r.a || "&ndash;"}</span><span class="${r.b > r.a ? "hi" : ""} ${r.b ? "" : "z"}">${r.b || "&ndash;"}</span></span>`)).join("")}</div>`; }
+function diffAny(rows) { return pictures() ? diffTiles(rows) : diffList(rows); }
 function diffList(rows) { return `<ul class="diff">${rows.map(r => `<li><span class="a ${r.a > r.b ? "more" : ""} ${r.a ? "" : "zero"}">${r.a || "&ndash;"}</span><span class="nm">${esc(r.name)}</span><span class="b ${r.b > r.a ? "more" : ""} ${r.b ? "" : "zero"}">${r.b || "&ndash;"}</span></li>`).join("")}</ul>`; }
 function openPair(i, j) {
   const a = A.decks[i], b = A.decks[j], o = overlap(vector(a, "main"), vector(b, "main")), os = overlap(vector(a, "all"), vector(b, "all"));
@@ -561,19 +592,19 @@ function openPair(i, j) {
   const zones = [["Main deck", withChamp(a), withChamp(b)], ["Sideboard", a.z.side, b.z.side], ["Battlefields", a.z.bf, b.z.bf], ["Runes", a.z.runes, b.z.runes]];
   $("pairT").textContent = `Deck ${A.pos.get(i) + 1} and deck ${A.pos.get(j) + 1}`;
   $("pairB").innerHTML = `<div class="panel"><div class="vs">
-      <div class="side"><b>${pips(a)}${esc(shortLegend(a))}</b><span>${esc(who(a))}${where(a) ? ", " + esc(where(a)) : ""}</span></div>
+      <div class="side"><b>${pips(a)}${esc(shortLegend(a))}</b><span>${esc(who(a))}${rankText(a) ? ", finished " + esc(rankText(a)) : ""}</span></div>
       <div class="big">${pct(o.sim)}<small>main deck alike</small></div>
-      <div class="side r"><b>${esc(shortLegend(b))}</b><span>${esc(who(b))}${where(b) ? ", " + esc(where(b)) : ""}</span></div></div>
+      <div class="side r"><b>${esc(shortLegend(b))}</b><span>${esc(who(b))}${rankText(b) ? ", finished " + esc(rankText(b)) : ""}</span></div></div>
       <p class="small muted" style="margin-top:10px;text-align:center">${o.shared} main-deck cards shared. With sideboards, ${pct(os.sim)} alike.</p></div>` +
     zones.map(([title, za, zb]) => { const z = zoneDiff(za, zb); if (!z.diff.length && !z.same.length) return "";
-      return `<div class="panel"><h3>${title}</h3>${z.diff.length ? `<p class="small muted" style="margin:4px 0 6px">Copies in each deck, left and right. The higher count is filled in.</p>${diffList(z.diff)}` : `<p class="muted small" style="margin-top:4px">No differences.</p>`}
-      ${z.same.length ? `<details><summary>${z.same.reduce((s, r) => s + r.a, 0)} cards the same in both</summary>${diffList(z.same)}</details>` : ""}</div>`; }).join("");
+      return `<div class="panel"><h3>${title}</h3>${z.diff.length ? `<p class="small muted" style="margin:4px 0 6px">Copies in each deck: left number is ${esc(shortLegend(a))} (${esc(who(a))}), right is ${esc(shortLegend(b))} (${esc(who(b))}). The higher count is filled in.</p>${diffAny(z.diff)}` : `<p class="muted small" style="margin-top:4px">No differences.</p>`}
+      ${z.same.length ? `<details><summary>${z.same.reduce((s, r) => s + r.a, 0)} cards the same in both</summary>${pictures() ? `<div class="tiles">${z.same.map(r => tile(r.name, one("&times;" + r.a))).join("")}</div>` : diffList(z.same)}</details>` : ""}</div>`; }).join("");
   $("pairDlg").showModal(); $("pairDlg").scrollTop = 0;
 }
 function openDeck(ix) {
   const d = A.decks[ix], n = A.decks.length;
   const near = A.decks.map((_, j) => j).filter(j => j !== ix).sort((x, y) => A.S[ix][y] - A.S[ix][x]).slice(0, 5);
-  const zl = (title, z) => z.length ? `<div class="cardsec"><h4>${title}: ${count(z)}</h4><ul class="cl">${z.map(e => `<li><span class="q">${e[0]}</span><span>${esc(e[1])}</span></li>`).join("")}</ul></div>` : "";
+  const zl = (title, z) => z.length ? `<div class="cardsec"><h4>${title}: ${count(z)}</h4>${pictures() ? `<div class="tiles">${z.map(e => tile(e[1], one("&times;" + e[0]))).join("")}</div>` : `<ul class="cl">${z.map(e => `<li><span class="q">${e[0]}</span><span>${esc(e[1])}</span></li>`).join("")}</ul>`}</div>` : "";
   $("deckT").textContent = `Deck ${A.pos.get(ix) + 1}: ${shortLegend(d)}`;
   $("deckB").innerHTML = `<div class="panel"><h3>${pips(d)}${esc(legendFull(d.legend) || shortLegend(d))}</h3><p class="muted small" style="margin-top:4px">${esc(who(d))}${where(d) ? ", " + esc(where(d)) : ""}${d.src === "feed" ? `, finished #${d.overall}` + (d.rec ? `, record ${d.rec[0]}-${d.rec[1]}-${d.rec[2]} (wins, losses, draws)` : `, Legend rank ${esc(d.legendRank)}`) : ""}</p>
     ${d.champion ? `<p class="small" style="margin-top:8px">Chosen champion: <b>${esc(d.champion)}</b></p>` : ""}
@@ -615,16 +646,22 @@ async function updateCards(quiet) {
   try {
     const res = await fetch("https://api.rifthunt.com/bulk/cards", { cache: "no-store" }); if (!res.ok) throw new Error("http " + res.status);
     const data = await res.json(), list = data && Array.isArray(data.cards) ? data.cards : [];
-    const T = { legend: "L", rune: "R", battlefield: "B", unit: "U", spell: "S", gear: "G" }, rows = [];
+    const T = { legend: "L", rune: "R", battlefield: "B", unit: "U", spell: "S", gear: "G" }, rows = [], pics = new Map();
     for (const c of list) {
       const id = String(c.riftboundId || c.id || "").split("-"), name = c.cleanName || c.name;
       if (id.length < 2 || typeof name !== "string" || c.supertype === "Token") continue;
       const code = (id[0] + "-" + id[1]).toUpperCase(); if (!/^[A-Z]{2,3}-(R|SP)?\d{1,3}[A-Z*]?$/.test(code)) continue;
-      rows.push([code, name.replace(/\s*\((Alternate Art|Signature|Overnumbered)\)\s*$/i, ""), T[String(c.type || "").toLowerCase()] || "U"]);
+      const clean = name.replace(/\s*\((Alternate Art|Signature|Overnumbered)\)\s*$/i, "");
+      rows.push([code, clean, T[String(c.type || "").toLowerCase()] || "U"]);
+      const url = String(c.imgUrl || ""); if (url) {      // one picture per card name; the plain printing on Riot's site wins
+        const riot = url.startsWith(IMG_BASE), score = (riot ? 4 : 0) + (c.alt || c.sig || c.over ? 0 : 2) + (/^(OGN|OGS|SFD|UNL|VEN|RAD)$/.test(c.set) ? 1 : 0), k = norm(clean), had = pics.get(k);
+        if (!had || score > had[0]) pics.set(k, [score, riot ? url.slice(IMG_BASE.length).split("?")[0] : url]);
+      }
     }
     if (rows.length < 300) throw new Error("unexpected shape");
     const merged = new Map([...CODES].map(([k, v]) => [k, [k, v.n, v.t]])); for (const r of rows) merged.set(r[0], r);   // RiftHunt is newer, so it wins
-    const out = [...merged.values()]; try { localStorage.setItem(CARDS_KEY, JSON.stringify({ at: Date.now(), rows: out })); } catch (e) {}
+    const out = [...merged.values()], imgs = [...pics].map(([k, v]) => [k, v[1]]); try { localStorage.setItem(CARDS_KEY, JSON.stringify({ at: Date.now(), rows: out, imgs })); } catch (e) {}
+    IMG = new Map(imgs); if (st.tab === "compare" && A) renderCompare();
     setCards(out, "the built-in list plus RiftHunt"); if (!quiet) toast(`Card list updated: ${out.length} cards`);
   } catch (e) { if (!quiet) toast("Couldn't update the card list. The built-in list still works."); }
   btn.disabled = false; btn.textContent = "Update card list";
@@ -634,6 +671,7 @@ async function updateCards(quiet) {
 document.addEventListener("click", e => {
   const t = e.target.closest("button,[data-close]"); if (!t) return;
   if (t.hasAttribute("data-close")) { t.closest("dialog").close(); return; }
+  if (t.dataset.card) { const u = imgFor(t.dataset.card, 600); $("cardT").textContent = t.dataset.card; $("cardBig").hidden = !u; $("cardMiss").hidden = !!u; if (u) { $("cardBig").src = u; $("cardBig").alt = t.dataset.card; } $("cardDlg").showModal(); return; }
   if (t.dataset.ev) { st.ev = t.dataset.ev; save(); renderFeed(); return; }
   if (t.dataset.leg) { st.leg = st.leg === t.dataset.leg ? null : t.dataset.leg; save(); renderFeed(); $("legChips").scrollLeft = 0; return; }
   if (t.dataset.del) { const d = DECKS.get(t.dataset.del); if (t.dataset.sure) { st.mine = st.mine.filter(x => x.id !== d.id); DECKS.delete(d.id); st.sel = st.sel.filter(x => x !== d.id); save(); renderDecks(); toast("Deleted " + who(d)); } else { t.dataset.sure = "1"; t.textContent = "Tap again to delete"; setTimeout(() => { if (t.isConnected) { delete t.dataset.sure; t.textContent = "Delete"; } }, 3000); } return; }
@@ -654,6 +692,8 @@ $("tabDecks").onclick = () => { setTab("decks"); renderDecks(); };
 $("tabCompare").onclick = () => setTab("compare");
 $("scMain").onclick = () => { st.scope = "main"; save(); renderCompare(); };
 $("scAll").onclick = () => { st.scope = "all"; save(); renderCompare(); };
+$("vwCards").onclick = () => { st.view = "cards"; save(); renderCompare(); };
+$("vwText").onclick = () => { st.view = "text"; save(); renderCompare(); };
 $("thrDown").onclick = () => { st.thr = Math.max(10, st.thr - 5); save(); renderCompare(); };
 $("thrUp").onclick = () => { st.thr = Math.min(95, st.thr + 5); save(); renderCompare(); };
 $("addBtn").onclick = () => { $("addDlg").showModal(); previewAdd(); };
@@ -691,7 +731,7 @@ async function getJson(url) { const r = await fetch(url, { cache: "no-cache" });
   FEED.events.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.n - a.n));
   let rows = cards && Array.isArray(cards.cards) ? cards.cards : [], source = "the built-in list";
   let cardsAt = 0;
-  try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; cardsAt = extra.at || 0; } } catch (e) {}
+  try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; cardsAt = extra.at || 0; if (Array.isArray(extra.imgs)) IMG = new Map(extra.imgs); } } catch (e) {}
   setCards(rows, source);
   rebuild();
   if (st.ev !== "all" && !FEED.events.some(e => e.id === st.ev)) st.ev = FEED.events.length ? FEED.events[0].id : null;
