@@ -58,6 +58,8 @@ main{max-width:720px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-rig
 .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;min-height:44px;padding:0 14px;text-align:left;line-height:1.15}
 .chip b{display:block;font-weight:600}
 .chip span{font-size:.78rem;color:var(--muted)}
+.chip.leg{min-height:44px;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.chip.leg span{font:700 1rem var(--disp)}
 .chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .btn{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:44px;padding:0 14px;font-weight:600}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
@@ -167,6 +169,7 @@ a{color:var(--accent)}
 
   <div id="feedBox">
     <div class="chips" id="evChips" aria-label="Tournament"></div>
+    <div class="chips" id="legChips" aria-label="Legend" style="margin-top:8px"></div>
     <div class="row" style="margin:12px 0">
       <div class="grow"><input type="search" id="q" placeholder="Filter by legend, player or card" aria-label="Filter decks by legend, player or card"></div>
       <div class="seg" role="group" aria-label="Which decks"><button id="fAll" aria-pressed="true">All</button><button id="f8" aria-pressed="false">Top 8</button></div>
@@ -257,7 +260,7 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&a
 const norm = s => String(s).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 const DOMAINS = ["fury", "calm", "mind", "body", "chaos", "order"];
 
-let st = { mine: [], sel: [], scope: "main", thr: 40, tab: "decks", src: "feed", ev: null, only8: false, seeded: false };
+let st = { mine: [], sel: [], scope: "main", thr: 40, tab: "decks", src: "feed", ev: null, leg: null, only8: false, seeded: false };
 let FEED = { events: [], decks: [] };
 let DECKS = new Map();      // id -> deck
 let CODES = new Map();      // "OGN-001" -> {n,t}
@@ -455,21 +458,25 @@ function deckRow(d, extra) {
     <span class="t"><b>${pips(d)}${esc(legendFull(d.legend) || shortLegend(d))}</b><span>${esc(who(d))}${d.src === "feed" && d.top8 ? ", Top 8" : ""}${extra || ""}</span></span>
     <span class="rank ${d.top8 ? "top8" : ""}">${esc(rankText(d))}</span></label></li>`;
 }
+function feedScope() { return [...DECKS.values()].filter(d => d.src === "feed" && (st.ev === "all" || d.event === st.ev) && (!st.only8 || d.top8)); }
 function feedShown() {
-  const q = norm($("q").value);
-  return [...DECKS.values()].filter(d => d.src === "feed" && d.event === st.ev && (!st.only8 || d.top8) && (!q ||
+  const q = norm($("q").value), evIx = new Map(FEED.events.map((e, i) => [e.id, i]));
+  return feedScope().filter(d => (!st.leg || legendKey(d.legend) === st.leg) && (!q ||
     norm(d.legend + " " + d.player).includes(q) || d.z.main.concat(d.z.side).some(e => norm(e[1]).includes(q)) || norm(d.champion).includes(q)))
-    .sort((a, b) => a.overall - b.overall);
+    .sort((a, b) => (st.ev === "all" ? evIx.get(a.event) - evIx.get(b.event) : 0) || a.overall - b.overall);
 }
 function renderFeed() {
-  $("evChips").innerHTML = FEED.events.map(e => `<button class="chip" data-ev="${esc(e.id)}" aria-pressed="${e.id === st.ev}"><b>${esc(e.city)}</b><span>${esc(e.name)}</span></button>`).join("");
+  const tally = new Map(); for (const d of feedScope()) { const k = legendKey(d.legend); const t = tally.get(k) || { k, name: shortLegend(d), n: 0 }; t.n++; tally.set(k, t); }
+  if (st.leg && !tally.has(st.leg)) st.leg = null;
+  $("legChips").innerHTML = [...tally.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).map(t => `<button class="chip leg" data-leg="${esc(t.k)}" aria-pressed="${t.k === st.leg}" aria-label="${esc(t.name)}, ${t.n} decks">${esc(t.name)} <span>${t.n}</span></button>`).join("");
+  $("evChips").innerHTML = `<button class="chip" data-ev="all" aria-pressed="${st.ev === "all"}"><b>All events</b><span>Every list, by legend</span></button>` + FEED.events.map(e => `<button class="chip" data-ev="${esc(e.id)}" aria-pressed="${e.id === st.ev}"><b>${esc(e.city)}</b><span>${esc(e.name)}</span></button>`).join("");
   const list = feedShown(), e = FEED.events.find(x => x.id === st.ev);
-  $("feedList").innerHTML = list.map(d => deckRow(d)).join("") || `<li style="padding:14px 2px" class="muted">No decks match that filter. Clear the filter or try another tournament.</li>`;
+  $("feedList").innerHTML = list.map(d => deckRow(d, st.ev === "all" && evOf(d) ? ", " + esc(evOf(d).city) : "")).join("") || `<li style="padding:14px 2px" class="muted">No decks match that filter. Clear the filter or try another tournament.</li>`;
   $("feedCount").textContent = list.length + (list.length === 1 ? " deck" : " decks");
   $("pickShown").disabled = !list.length;
   $("pickShown").textContent = list.length && list.every(d => st.sel.includes(d.id)) ? "Unpick all shown" : "Pick all shown";
   $("fAll").setAttribute("aria-pressed", !st.only8); $("f8").setAttribute("aria-pressed", st.only8);
-  $("feedSrc").innerHTML = e ? `Lists published by Riot on ${esc(e.published)}. Rank is the pilot's overall finish. <a href="${esc(e.source)}" target="_blank" rel="noopener">Read the article</a>` : (FEED.events.length ? "" : "Tournament decks couldn't be loaded. Check your connection and reopen the app.");
+  $("feedSrc").innerHTML = st.ev === "all" ? "Lists published by Riot after each event: the Top 8 plus the best-finishing pilot of each legend. Pick a legend above to line up the same deck across events." : e ? `Lists published by Riot on ${esc(e.published)}. Rank is the pilot's overall finish. <a href="${esc(e.source)}" target="_blank" rel="noopener">Read the article</a>` : (FEED.events.length ? "" : "Tournament decks couldn't be loaded. Check your connection and reopen the app.");
 }
 function renderMine() {
   $("mineEmpty").hidden = st.mine.length > 0; $("minePanel").hidden = st.mine.length === 0;
@@ -618,6 +625,7 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button,[data-close]"); if (!t) return;
   if (t.hasAttribute("data-close")) { t.closest("dialog").close(); return; }
   if (t.dataset.ev) { st.ev = t.dataset.ev; save(); renderFeed(); return; }
+  if (t.dataset.leg) { st.leg = st.leg === t.dataset.leg ? null : t.dataset.leg; save(); renderFeed(); $("legChips").scrollLeft = 0; return; }
   if (t.dataset.del) { const d = DECKS.get(t.dataset.del); if (t.dataset.sure) { st.mine = st.mine.filter(x => x.id !== d.id); DECKS.delete(d.id); st.sel = st.sel.filter(x => x !== d.id); save(); renderDecks(); toast("Deleted " + who(d)); } else { t.dataset.sure = "1"; t.textContent = "Tap again to delete"; setTimeout(() => { if (t.isConnected) { delete t.dataset.sure; t.textContent = "Delete"; } }, 3000); } return; }
   if (t.dataset.a != null && t.dataset.b != null) { if ($("deckDlg").open) $("deckDlg").close(); openPair(+t.dataset.a, +t.dataset.b); return; }
   if (t.dataset.deck != null) { openDeck(+t.dataset.deck); return; }
@@ -670,7 +678,7 @@ async function getJson(url) { const r = await fetch(url, { cache: "no-cache" });
   try { const extra = JSON.parse(localStorage.getItem(CARDS_KEY) || "null"); if (extra && Array.isArray(extra.rows) && extra.rows.length > rows.length) { rows = extra.rows; source = "the built-in list plus RiftHunt"; cardsAt = extra.at || 0; } } catch (e) {}
   setCards(rows, source);
   rebuild();
-  if (!FEED.events.some(e => e.id === st.ev)) st.ev = FEED.events.length ? FEED.events[0].id : null;
+  if (st.ev !== "all" && !FEED.events.some(e => e.id === st.ev)) st.ev = FEED.events.length ? FEED.events[0].id : null;
   if (!st.seeded && FEED.events.length) { st.seeded = true; st.sel = FEED.decks.filter(d => d.event === FEED.events[0].id && d.top8).map(d => d.id); }
   save();
   const h = location.hash.slice(1); if (h === "decks" || h === "compare") st.tab = h;
