@@ -4,6 +4,8 @@ name: Deck Diff - TopDeck.gg decks
 # Needs a repository secret named TOPDECK_API_KEY (free key from topdeck.gg/developers).
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "23 10 * * *"   # once a day, about 3am Mountain
   push:
     branches: [main]
     paths:
@@ -30,9 +32,10 @@ jobs:
         env:
           TOPDECK_API_KEY: ${{ secrets.TOPDECK_API_KEY }}
         run: node deck-diff/tools/topdeck.mjs
+        continue-on-error: true
       - name: Save results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add deck-diff/topdeck-status.json deck-diff/topdeck-sample.json 2>/dev/null || true
+          git add deck-diff/topdeck-status.json deck-diff/topdeck.json 2>/dev/null || true
           git diff --cached --quiet || (git commit -m "Deck Diff: TopDeck.gg refresh" && git pull --rebase origin main && git push)
