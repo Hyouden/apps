@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-12",
+ "updated": "2026-11-15",
  "cards": [
   {
    "id": "c001",
@@ -613,6 +613,168 @@
    "body": "In most RPGs you can't max every stat. The strongest builds pick a few skills and pour everything into them, while spreading points evenly makes a hero who's fine at everything and great at nothing.",
    "chew": "If you only had three skill points to spend this year, where would they go?",
    "added": "2026-11-12"
+  },
+  {
+   "id": "c069",
+   "kind": "deep",
+   "rarity": 2,
+   "title": "The farmer's horse",
+   "body": "In an old Chinese tale, a farmer's horse runs off and the neighbors call it bad luck. It returns leading wild horses, his son breaks a leg taming one, and the army drafts the young men but passes over him. Each time the farmer shrugs: good or bad, who knows?",
+   "chew": "What are you calling good or bad right now that's too early to call?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c070",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Existence before essence",
+   "body": "Jean-Paul Sartre noted that a paper knife is designed for a job before it's ever made. People, he argued, are the reverse: you exist first, with no factory-set purpose, and become whatever your choices make you.",
+   "chew": "If nobody handed you a purpose, which one are you choosing by default?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c071",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "The golden mean",
+   "body": "Aristotle saw most virtues as a sweet spot between two extremes. Courage sits between cowardice and recklessness: not frozen at the top of the run, but not hucking a cliff you can't land either.",
+   "chew": "Which of your strengths has drifted toward its extreme lately?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c072",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Goodhart's law",
+   "body": "Once a number becomes a target, people start chasing the number instead of what it was supposed to measure. Reward a team for closing tickets and you'll get plenty of closed tickets, not necessarily solved problems.",
+   "chew": "What number in your life are you hitting while missing the point?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c073",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "The Lindy effect",
+   "body": "For things that don't wear out, like books, ideas and tools, the longer something has already lasted, the longer it's likely to keep going. A book still read after 100 years will probably outlast this year's bestseller.",
+   "chew": "What old skill or idea could you learn that will still matter in 20 years?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c074",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Parkinson's law",
+   "body": "Historian C. Northcote Parkinson joked that work expands to fill the time available for it. Give a task a week and it takes a week; give it an afternoon and it often fits.",
+   "chew": "What task would shrink if you gave it half the time?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c075",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Urgent is not important",
+   "body": "President Eisenhower is credited with sorting tasks by two questions: is it urgent, and is it important? Urgent stuff shouts the loudest, but the important-but-not-urgent stuff, like health, skills and friendships, is what actually shapes your life.",
+   "chew": "What important thing keeps losing to whatever's loudest?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c076",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "Cat track despair",
+   "body": "Snowboarding is the only sport where a slight lack of hill turns you into a one-legged scooter. Skiers glide past on their poles, saying nothing. They don't have to.",
+   "chew": "What's the flat cat track of your workweek?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c077",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "The comeback tour",
+   "body": "Every time you leave, your dog mourns like it's the end of an era. Every time you return, it's the greatest comeback in history. You took the trash out.",
+   "chew": "Who in your life deserves a greeting like that and isn't getting one?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c078",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Per my last email",
+   "body": "'Per my last email' is the office version of slowly drawing a sword. Everyone on the thread hears the metal. 'Just circling back' means the knight has returned to finish the job.",
+   "chew": "What's your go-to polite phrase that's secretly a threat?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c079",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Knee-high fence",
+   "body": "Video game heroes survive dragon fire, falls off castle walls and explosions to the face. But put a knee-high fence in their path and it might as well be a mountain.",
+   "chew": "What tiny obstacle stops you cold even though you've beaten way bigger ones?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c080",
+   "kind": "bender",
+   "rarity": 2,
+   "title": "The twin paradox",
+   "body": "Einstein's relativity says the faster you move, the slower your clock ticks. If one twin rockets off near light speed and comes back, she'll be younger than the twin who stayed home. It's measurable: atomic clocks flown around the world on airliners came back out of sync by billionths of a second.",
+   "chew": "Would you take a one-year rocket ride if 20 years passed back home?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c081",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "The stopped clock",
+   "body": "Bertrand Russell's puzzle: you glance at a clock reading 3:00 and believe it. It's right, but only because the clock stopped exactly twelve hours ago. You had a good reason and a true belief, so did you actually know the time?",
+   "chew": "What do you believe for the right answer but maybe the wrong reason?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c082",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "Zeno's halfway problem",
+   "body": "To cross a room, you first walk halfway, then half of what's left, then half of that, forever. Zeno of Elea argued that infinitely many steps can never be finished, so motion is impossible. Math later showed endless shrinking pieces can add up to a finite total.",
+   "chew": "What finish line keeps feeling only halfway closer no matter how much you do?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c083",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "Back to the starter zone",
+   "body": "In RPGs you rarely notice yourself getting stronger. Then you wander back to the first zone and flatten monsters that used to wreck you. Growth is hard to see from inside it, so look back at where you started.",
+   "chew": "What used to scare you that's easy now?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c084",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Practice the short putts",
+   "body": "Most disc golfers practice big drives because they're fun, but missed short putts are where the strokes pile up. Researchers call the fix deliberate practice: aiming your reps at the specific thing you're worst at.",
+   "chew": "What's the 'short putt' in your work that you keep skipping in practice?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c085",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Lean downhill",
+   "body": "On a steep run, every instinct says lean back, away from the slope. But leaning back takes weight off the front of the board, so it stops turning and runs away from you. Control comes from committing your weight toward the scary part.",
+   "chew": "What are you leaning away from that would get easier if you leaned in?",
+   "added": "2026-11-15"
+  },
+  {
+   "id": "c086",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Make a save point",
+   "body": "Gamers save before the boss fight, so a loss costs minutes instead of hours. Life works the same way: a small cash cushion, a backup of your files, a plan B. When failure is survivable, taking the big swing gets much easier.",
+   "chew": "What save point would make your next big risk feel safer?",
+   "added": "2026-11-15"
   }
  ]
 }
