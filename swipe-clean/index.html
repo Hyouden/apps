@@ -1,0 +1,629 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Swipe Clean</title>
+<meta name="theme-color" content="#0E1012">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Swipe Clean">
+<style>
+:root{--bg:#0E1012;--panel:#171A1E;--panel2:#1F2328;--line:#2A2F36;--fg:#ECEEF1;--muted:#98A1AB;--del:#E5484D;--keep:#30A46C;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) max(14px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 14px) max(14px,env(safe-area-inset-left,0px))}
+header{display:flex;align-items:center;gap:8px;min-height:48px;margin-bottom:10px}
+header h1{font-size:19px;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.btn{min-height:48px;padding:0 18px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.danger{background:var(--del);border-color:var(--del);color:#fff}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.icon-btn{width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel);border:1px solid var(--line);display:grid;place-items:center}
+.icon-btn svg{width:22px;height:22px}
+.trash-pill{height:44px;padding:0 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;white-space:nowrap}
+.trash-pill.has{border-color:var(--del);color:#fff;background:rgba(229,72,77,.16)}
+.trash-pill svg{width:18px;height:18px}
+.screen{display:flex;flex-direction:column;gap:14px;flex:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.panel h2{margin:0 0 4px;font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+p{margin:0}
+.hero{padding:18px 2px 4px}
+.hero h2{font-size:28px;line-height:1.15;margin:0 0 8px;letter-spacing:-.02em}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:10px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--panel2);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+select{font:inherit;color:var(--fg);background:var(--panel2);border:1px solid var(--line);border-radius:12px;min-height:48px;padding:0 12px;flex:1;min-width:0}
+label.lbl{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+.sugg{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;min-height:64px;background:var(--panel2);border:1px solid var(--line);border-radius:14px}
+.sugg .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;background:#262B31;font-size:19px}
+.sugg .tx{flex:1;min-width:0}
+.sugg b{display:block}
+.sugg span{font-size:14px;color:var(--muted)}
+.sugg .sz{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.link{color:var(--fg);text-decoration:underline;text-underline-offset:3px;padding:6px 0;font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--fg);transition:width .2s}
+
+/* swipe */
+.stage{position:relative;flex:1;min-height:380px}
+.card{position:absolute;inset:0;border-radius:20px;overflow:hidden;background:#000;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;will-change:transform}
+.card.under{transform:scale(.95) translateY(10px);opacity:.6}
+.card img,.card video,.card .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.ph{display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted);background:var(--panel)}
+.ph b{display:block;font-size:28px;color:var(--fg)}
+.info{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 14px;background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none}
+.info .sz{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.info .nm{font-size:14px;color:#D5DAE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.6);border-radius:8px;padding:4px 9px;font-size:13px;font-weight:600;pointer-events:none}
+.stamp{position:absolute;top:22px;padding:6px 14px;border:4px solid;border-radius:10px;font-weight:900;font-size:28px;letter-spacing:.06em;opacity:0;pointer-events:none}
+.stamp.del{right:18px;color:var(--del);border-color:var(--del);transform:rotate(12deg)}
+.stamp.keep{left:18px;color:var(--keep);border-color:var(--keep);transform:rotate(-12deg)}
+.controls{display:flex;align-items:center;justify-content:center;gap:22px;padding-top:14px}
+.round{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--panel);border:2px solid}
+.round svg{width:32px;height:32px}
+.round.del{border-color:var(--del);color:var(--del)}
+.round.keep{border-color:var(--keep);color:var(--keep)}
+.round.sm{width:52px;height:52px;border-color:var(--line);color:var(--fg)}
+.round.sm svg{width:22px;height:22px}
+.round:disabled{opacity:.35}
+.hint{text-align:center;font-size:13px;color:var(--muted)}
+.done{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;border:1px dashed var(--line);border-radius:20px}
+
+/* lists */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:12px;padding:8px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.item.marked{border-color:var(--del);background:rgba(229,72,77,.1)}
+.thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;background:#000;flex:none;position:relative}
+.thumb img,.thumb video,.thumb .ph{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ph{font-size:11px;padding:4px}
+.thumb .vb{position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,.7);border-radius:5px;font-size:10px;padding:1px 4px}
+.item .tx{flex:1;min-width:0}
+.item b{display:block;font-variant-numeric:tabular-nums}
+.item span{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toggle{min-height:44px;min-width:76px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);font-size:14px;font-weight:600;padding:0 10px}
+.marked .toggle{background:var(--del);border-color:var(--del);color:#fff}
+.group-h{font-size:13px;color:var(--muted);margin:8px 2px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.gcell{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#000;padding:0}
+.gcell img,.gcell video,.gcell .ph{width:100%;height:100%;object-fit:cover;display:block}
+.gcell .ph{font-size:11px}
+.gcell .x{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.7);display:grid;place-items:center;font-size:12px}
+.gcell .s{position:absolute;left:0;right:0;bottom:0;padding:12px 6px 4px;font-size:11px;font-weight:600;background:linear-gradient(transparent,rgba(0,0,0,.8));text-align:left}
+.sticky{position:sticky;bottom:0;padding:12px 0 calc(env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 30%)}
+dialog{background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:18px;padding:20px;max-width:min(420px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h3{margin:0 0 8px;font-size:19px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;font-size:14px}
+.check input{width:20px;height:20px;margin-top:1px;flex:none}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;max-width:calc(100vw - 32px);z-index:9}
+.namelist{font:13px/1.6 ui-monospace,Consolas,monospace;background:var(--panel2);border-radius:12px;padding:12px;max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <button class="icon-btn" id="back" aria-label="Back" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 id="title">Swipe Clean</h1>
+    <button class="trash-pill" id="trashBtn" hidden aria-label="Delete list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg><span id="trashTxt">0</span></button>
+  </header>
+
+  <!-- START -->
+  <section class="screen" id="s-start">
+    <div class="hero">
+      <h2>Swipe left to delete.<br>Swipe right to keep.</h2>
+      <p class="muted">Plus a shortlist of the biggest files, videos, screenshots and duplicates eating your space.</p>
+    </div>
+    <div class="panel stack" id="folderCard">
+      <div><h2>Clean a folder</h2>
+      <p class="muted small">Pick a photo folder on this computer, like Pictures, a phone backup, OneDrive or a Google Photos download. Deleted files go into a trash folder first so nothing is lost by accident.</p></div>
+      <button class="btn primary block" id="pickFolder">Choose a folder</button>
+    </div>
+    <div class="panel stack">
+      <div><h2>Pick photos</h2>
+      <p class="muted small" id="pickNote">Choose photos and videos from this device to sort. Phones don't let web apps delete from your photo library, so you'll get a delete list to clear in your Photos app.</p></div>
+      <button class="btn block" id="pickFilesBtn">Pick photos and videos</button>
+      <input type="file" id="pickFiles" accept="image/*,video/*" multiple hidden>
+    </div>
+    <p class="muted small" id="noFolderNote" hidden>On a computer with Chrome or Edge, this app can delete the files for you.</p>
+  </section>
+
+  <!-- SCAN -->
+  <section class="screen" id="s-scan" hidden>
+    <div class="panel stack">
+      <h2 id="scanTitle">Scanning…</h2>
+      <p class="muted" id="scanTxt">0 found</p>
+      <div class="bar"><i id="scanBar"></i></div>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen" id="s-hub" hidden>
+    <div class="stats">
+      <div class="stat"><b id="stPhotos">0</b><span>photos</span></div>
+      <div class="stat"><b id="stVideos">0</b><span>videos</span></div>
+      <div class="stat"><b id="stSize">0</b><span>total</span></div>
+    </div>
+    <div class="panel stack">
+      <div><label class="lbl" for="order">Swipe order</label>
+      <div class="row"><select id="order">
+        <option value="size">Biggest first</option>
+        <option value="new">Newest first</option>
+        <option value="old">Oldest first</option>
+        <option value="shuffle">Shuffle</option>
+      </select></div></div>
+      <button class="btn primary block" id="startSwipe">Start swiping</button>
+    </div>
+    <h2 style="font-size:17px;margin:6px 2px 0">Suggestions to free space</h2>
+    <div class="stack" id="suggs"></div>
+    <div class="panel stack" id="trashFolderCard" hidden>
+      <p class="small"><b id="tfSize"></b> is sitting in the “Swipe Clean Trash” folder. Empty it to actually free that space.</p>
+      <button class="btn danger block" id="emptyTrash">Empty trash folder</button>
+    </div>
+    <p class="muted small" id="keptNote" hidden></p>
+    <button class="link" id="restart" style="align-self:flex-start">Choose different photos</button>
+  </section>
+
+  <!-- SWIPE -->
+  <section class="screen" id="s-swipe" hidden>
+    <div class="stage" id="stage"></div>
+    <div class="controls">
+      <button class="round sm" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
+      <button class="round del" id="btnDel" aria-label="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button class="round keep" id="btnKeep" aria-label="Keep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+      <div class="round sm" style="border-color:transparent;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums" id="leftCount" aria-live="polite"></div>
+    </div>
+    <p class="hint" id="hint">Tap a video to play it. On a keyboard: ← delete, → keep, Z undo.</p>
+  </section>
+
+  <!-- LIST -->
+  <section class="screen" id="s-list" hidden>
+    <p class="muted small" id="listNote"></p>
+    <div class="row" id="listActions"></div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <!-- TRASH -->
+  <section class="screen" id="s-trash" hidden>
+    <p class="muted small" id="trashNote"></p>
+    <div class="grid" id="trashGrid"></div>
+    <div class="stack" id="phoneHelp" hidden>
+      <div class="panel stack small">
+        <h2>How to delete these on your phone</h2>
+        <p class="muted"><b style="color:var(--fg)">iPhone:</b> open Photos, tap Select, tap each photo shown here, then the trash icon. Then go to Albums → Recently Deleted → Delete All to free the space.</p>
+        <p class="muted"><b style="color:var(--fg)">Android:</b> open Google Photos, long-press to select these, tap Delete, then empty Trash under Library.</p>
+        <p class="muted">Tip: keep this screen open in a split view or take a screenshot so you can match them up.</p>
+      </div>
+      <div class="namelist" id="nameList"></div>
+      <button class="btn block" id="copyNames">Copy file names</button>
+    </div>
+    <div class="sticky" id="trashActions"></div>
+  </section>
+</div>
+
+<dialog id="confirm">
+  <h3 id="cfTitle"></h3>
+  <p class="muted small" id="cfBody"></p>
+  <label class="check" id="cfPermWrap"><input type="checkbox" id="cfPerm"><span>Delete permanently instead (skips the trash folder, can't be undone)</span></label>
+  <div class="row" style="justify-content:flex-end;margin-top:8px">
+    <button class="btn" id="cfCancel">Cancel</button>
+    <button class="btn danger" id="cfOk"></button>
+  </div>
+</dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const STORE_KEY = "swipe-clean-v1"; // unique per app: every app on this site shares one browser storage
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+
+const TRASH = "Swipe Clean Trash";
+const IMG = /\.(jpe?g|png|gif|webp|heic|heif|avif|bmp|tiff?|dng)$/i;
+const VID = /\.(mp4|mov|m4v|avi|mkv|webm|3gp|mts|wmv)$/i;
+const SHOT = /screen ?shot|screenshot|screen[ _-]?record|screenrecord|snip|capture/i;
+const $ = s => document.querySelector(s);
+const canFolder = "showDirectoryPicker" in window;
+
+let items = [], mode = null, root = null, deck = [], history = [], current = "start", listCtx = null;
+let trashBytes = 0, dupeGroups = null, scanCancel = false;
+const urls = new Map();
+
+// ---------- storage (folder mode remembers what you kept) ----------
+function loadStore(){ try{ const d = JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); return { kept: new Set(d.kept || []), order: d.order || "size" }; }catch{ return { kept: new Set(), order: "size" }; } }
+let store = loadStore();
+function saveStore(){ try{ let k = [...store.kept]; if (k.length > 60000) k = k.slice(-60000); localStorage.setItem(STORE_KEY, JSON.stringify({ kept: k, order: store.order })); }catch{} }
+const keyOf = it => it.path + "|" + it.size;
+const isHiddenKept = it => mode === "folder" && store.kept.has(keyOf(it));
+
+// ---------- helpers ----------
+function fmt(b){ if (b < 1024) return b + " B"; const u = ["KB","MB","GB","TB"]; let i = -1; do { b /= 1024; i++; } while (b >= 1024 && i < 3); return (b >= 100 || i === 0 ? b.toFixed(0) : b.toFixed(1)) + " " + u[i]; }
+const fmtDate = t => t ? new Date(t).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "";
+const ext = n => (n.split(".").pop() || "").toUpperCase();
+const sum = a => a.reduce((s, it) => s + it.size, 0);
+const live = () => items.filter(it => !it.gone && !isHiddenKept(it));
+function src(it){ let u = urls.get(it.id); if (!u){ u = URL.createObjectURL(it.file); urls.set(it.id, u); } return u; }
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
+
+function media(it, thumb){
+  if (it.type === "video"){
+    const v = document.createElement("video");
+    v.src = src(it) + (thumb ? "#t=0.5" : ""); v.muted = true; v.playsInline = true; v.preload = "metadata"; v.loop = !thumb;
+    v.setAttribute("playsinline", ""); v.setAttribute("muted", "");
+    return v;
+  }
+  const img = new Image(); img.alt = ""; img.decoding = "async"; if (thumb) img.loading = "lazy";
+  img.onerror = () => { const ph = document.createElement("div"); ph.className = "ph"; ph.innerHTML = thumb ? ext(it.name) : `<div><b>${ext(it.name)}</b>This browser can't preview this file type</div>`; img.replaceWith(ph); };
+  img.src = src(it);
+  return img;
+}
+
+function show(name, title){
+  current = name;
+  for (const s of document.querySelectorAll(".screen")) s.hidden = s.id !== "s-" + name;
+  $("#back").hidden = !["swipe","list","trash"].includes(name);
+  $("#title").textContent = title || "Swipe Clean";
+  $("#trashBtn").hidden = !items.length || name === "trash" || name === "scan";
+  window.scrollTo(0, 0);
+}
+
+function updateTrash(){
+  const del = items.filter(it => it.status === "del" && !it.gone);
+  $("#trashTxt").textContent = del.length ? `${del.length} · ${fmt(sum(del))}` : "0";
+  $("#trashBtn").classList.toggle("has", del.length > 0);
+  $("#trashBtn").setAttribute("aria-label", `Delete list: ${del.length} files`);
+}
+
+// ---------- loading ----------
+$("#pickFolder").onclick = async () => {
+  let dir;
+  try { dir = await window.showDirectoryPicker({ id: "swipeclean", mode: "readwrite", startIn: "pictures" }); }
+  catch (e) { if (e.name !== "AbortError") toast("Couldn't open that folder. Try another one."); return; }
+  mode = "folder"; root = dir; items = []; trashBytes = 0; dupeGroups = null; scanCancel = false;
+  show("scan", "Scanning"); $("#scanTitle").textContent = `Scanning “${dir.name}”…`;
+  $("#scanBar").style.width = "30%";
+  let n = 0;
+  async function walk(d, prefix, inTrash){
+    for await (const [name, h] of d.entries()){
+      if (scanCancel) return;
+      if (h.kind === "directory"){
+        if (name.startsWith(".") || name === "$RECYCLE.BIN" || name === "node_modules") continue;
+        await walk(h, prefix + name + "/", inTrash || (prefix === "" && name === TRASH));
+      } else if (IMG.test(name) || VID.test(name)){
+        let f; try { f = await h.getFile(); } catch { continue; }
+        if (inTrash){ trashBytes += f.size; continue; }
+        items.push({ id: items.length, name, path: prefix + name, folder: prefix.replace(/\/$/, "") || dir.name, size: f.size, mtime: f.lastModified, type: VID.test(name) ? "video" : "image", file: f, handle: h, dir: d, status: null });
+        if (++n % 25 === 0) $("#scanTxt").textContent = `${n.toLocaleString()} found · ${fmt(sum(items))}`;
+      }
+    }
+  }
+  try { await walk(dir, "", false); } catch (e) { toast("Some folders couldn't be read."); }
+  $("#scanBar").style.width = "100%";
+  if (!items.length){ toast("No photos or videos found in that folder."); show("start"); return; }
+  openHub();
+};
+
+$("#pickFilesBtn").onclick = () => $("#pickFiles").click();
+$("#pickFiles").onchange = e => {
+  const files = [...e.target.files]; e.target.value = "";
+  if (!files.length) return;
+  mode = "picked"; root = null; trashBytes = 0; dupeGroups = null;
+  for (const u of urls.values()) URL.revokeObjectURL(u); urls.clear();
+  items = files.filter(f => f.type.startsWith("image/") || f.type.startsWith("video/") || IMG.test(f.name) || VID.test(f.name))
+    .map((f, i) => ({ id: i, name: f.name, path: f.name, folder: "", size: f.size, mtime: f.lastModified, type: (f.type.startsWith("video/") || VID.test(f.name)) ? "video" : "image", file: f, status: null }));
+  if (!items.length){ toast("Those weren't photos or videos."); return; }
+  openHub();
+};
+
+$("#restart").onclick = () => { items = []; deck = []; history = []; updateTrash(); show("start"); };
+
+// ---------- hub ----------
+function openHub(){
+  updateTrash();
+  const l = live();
+  $("#stPhotos").textContent = l.filter(i => i.type === "image").length.toLocaleString();
+  $("#stVideos").textContent = l.filter(i => i.type === "video").length.toLocaleString();
+  $("#stSize").textContent = fmt(sum(l));
+  $("#order").value = store.order;
+  const hidden = items.filter(it => !it.gone && isHiddenKept(it)).length;
+  $("#keptNote").hidden = !hidden;
+  $("#keptNote").innerHTML = `${hidden.toLocaleString()} you already kept are hidden. <button class="link" id="unhide">Show them again</button>`;
+  if (hidden) $("#unhide").onclick = () => { for (const it of items) store.kept.delete(keyOf(it)); saveStore(); openHub(); };
+  $("#trashFolderCard").hidden = !(mode === "folder" && trashBytes > 0);
+  $("#tfSize").textContent = fmt(trashBytes);
+  $("#restart").textContent = mode === "folder" ? "Choose a different folder" : "Pick different photos";
+  renderSuggs();
+  show("hub", mode === "folder" ? root.name : "Your photos");
+}
+$("#order").onchange = e => { store.order = e.target.value; saveStore(); };
+
+const SUGGS = [
+  { key: "big", ic: "🐘", title: "Biggest files", get: l => [...l].sort((a, b) => b.size - a.size).slice(0, 60) },
+  { key: "vid", ic: "🎬", title: "Videos", get: l => l.filter(i => i.type === "video").sort((a, b) => b.size - a.size) },
+  { key: "shot", ic: "📱", title: "Screenshots & screen recordings", get: l => l.filter(i => SHOT.test(i.path)).sort((a, b) => b.size - a.size) },
+  { key: "dup", ic: "👯", title: "Exact duplicates", get: null },
+];
+function renderSuggs(){
+  const box = $("#suggs"); box.innerHTML = ""; const l = live();
+  for (const s of SUGGS){
+    const b = document.createElement("button"); b.className = "sugg";
+    let sub, size = "";
+    if (s.key === "dup"){
+      if (dupeGroups){ const extras = dupeGroups.flatMap(g => g.slice(1)).filter(i => !i.gone); sub = extras.length ? `${extras.length} extra copies` : "None found"; size = extras.length ? fmt(sum(extras)) : ""; }
+      else sub = "Tap to check (reads each file, takes a moment)";
+    } else {
+      const list = s.get(l); sub = list.length ? `${list.length.toLocaleString()} file${list.length === 1 ? "" : "s"}` : "None found"; size = list.length ? fmt(sum(list)) : "";
+      if (s.key === "big" && list.length) sub = `Top ${list.length}, ${fmt(list[list.length - 1].size)} and up`;
+    }
+    b.innerHTML = `<span class="ic" aria-hidden="true">${s.ic}</span><span class="tx"><b>${s.title}</b><span>${sub}</span></span><span class="sz">${size}</span>`;
+    b.onclick = () => s.key === "dup" ? openDupes() : openList(s);
+    box.append(b);
+  }
+}
+
+// ---------- swiping ----------
+function sortBy(list, order){
+  if (order === "size") list.sort((a, b) => b.size - a.size);
+  else if (order === "new") list.sort((a, b) => b.mtime - a.mtime);
+  else if (order === "old") list.sort((a, b) => a.mtime - b.mtime);
+  else for (let i = list.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+  return list;
+}
+$("#startSwipe").onclick = () => startSwipe(sortBy(live().filter(i => i.status == null), $("#order").value), "Swipe");
+function startSwipe(list, title){
+  deck = list.filter(i => i.status == null && !i.gone); history = [];
+  show("swipe", title); renderDeck();
+}
+
+function card(it, top){
+  const c = document.createElement("div"); c.className = "card" + (top ? "" : " under");
+  c.append(media(it, false));
+  if (it.type === "video") { const t = document.createElement("div"); t.className = "tag"; t.textContent = "▶ Video · tap to play"; c.append(t); }
+  const info = document.createElement("div"); info.className = "info";
+  info.innerHTML = `<div class="sz"></div><div class="nm"></div>`;
+  info.firstChild.textContent = fmt(it.size);
+  info.lastChild.textContent = [it.name, fmtDate(it.mtime), mode === "folder" ? it.folder : ""].filter(Boolean).join(" · ");
+  c.append(info);
+  c.insertAdjacentHTML("beforeend", `<div class="stamp keep">KEEP</div><div class="stamp del">DELETE</div>`);
+  if (top) drag(c, it);
+  return c;
+}
+function renderDeck(){
+  const stage = $("#stage"); stage.innerHTML = "";
+  $("#undo").disabled = !history.length;
+  $("#btnDel").disabled = $("#btnKeep").disabled = !deck.length;
+  $("#leftCount").textContent = deck.length ? deck.length.toLocaleString() + " left" : "";
+  if (!deck.length){
+    const del = items.filter(i => i.status === "del" && !i.gone);
+    const d = document.createElement("div"); d.className = "done";
+    d.innerHTML = `<h2 style="margin:0">All sorted</h2><p class="muted">${del.length ? `${del.length} on your delete list · ${fmt(sum(del))}` : "Nothing marked for delete."}</p>`;
+    const r = document.createElement("button"); r.className = "btn primary"; r.textContent = "Review delete list"; r.onclick = openTrash; r.hidden = !del.length;
+    const h = document.createElement("button"); h.className = "btn"; h.textContent = "Back to suggestions"; h.onclick = openHub;
+    d.append(r, h); stage.append(d); return;
+  }
+  if (deck[1]) stage.append(card(deck[1], false));
+  stage.append(card(deck[0], true));
+}
+function stamps(c, dx){
+  const k = Math.min(1, Math.abs(dx) / 100);
+  c.querySelector(".stamp.keep").style.opacity = dx > 0 ? k : 0;
+  c.querySelector(".stamp.del").style.opacity = dx < 0 ? k : 0;
+}
+function drag(c, it){
+  let sx = 0, sy = 0, dx = 0, t0 = 0, on = false, pid = null;
+  c.addEventListener("pointerdown", e => { if (e.button > 0) return; pid = e.pointerId; c.setPointerCapture(pid); sx = e.clientX; sy = e.clientY; dx = 0; t0 = performance.now(); on = true; c.style.transition = "none"; });
+  c.addEventListener("pointermove", e => { if (!on || e.pointerId !== pid) return; dx = e.clientX - sx; const dy = (e.clientY - sy) * .25; c.style.transform = `translate(${dx}px,${dy}px) rotate(${dx / 18}deg)`; stamps(c, dx); });
+  const end = () => {
+    if (!on) return; on = false;
+    const v = Math.abs(dx) / Math.max(1, performance.now() - t0);
+    if (Math.abs(dx) > 110 || (Math.abs(dx) > 45 && v > .6)) return fling(dx < 0 ? "del" : "keep");
+    c.style.transition = "transform .2s ease"; c.style.transform = ""; stamps(c, 0);
+    if (Math.abs(dx) < 6 && it.type === "video"){ const v2 = c.querySelector("video"); if (v2) { if (v2.paused) { v2.play().catch(() => {}); } else v2.pause(); } }
+  };
+  c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
+}
+let flinging = false;
+function fling(status){
+  const c = $("#stage .card:not(.under)"); const it = deck[0];
+  if (!c || !it || flinging) return; flinging = true;
+  const dir = status === "del" ? -1 : 1;
+  stamps(c, dir * 100);
+  c.style.transition = "transform .24s ease-out, opacity .24s";
+  c.style.transform = `translate(${dir * Math.max(innerWidth, 600)}px,40px) rotate(${dir * 24}deg)`; c.style.opacity = "0";
+  setTimeout(() => { flinging = false; decide(it, status); }, 170);
+}
+function decide(it, status){
+  it.status = status; deck.shift(); history.push(it);
+  if (status === "keep" && mode === "folder"){ store.kept.add(keyOf(it)); saveStore(); }
+  updateTrash(); renderDeck();
+}
+function undo(){
+  const it = history.pop(); if (!it) return;
+  if (it.status === "keep" && mode === "folder"){ store.kept.delete(keyOf(it)); saveStore(); }
+  it.status = null; deck.unshift(it); updateTrash(); renderDeck();
+}
+$("#btnDel").onclick = () => fling("del");
+$("#btnKeep").onclick = () => fling("keep");
+$("#undo").onclick = undo;
+document.addEventListener("keydown", e => {
+  if (current !== "swipe" || e.target.closest("dialog")) return;
+  if (e.key === "ArrowLeft") { e.preventDefault(); fling("del"); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); fling("keep"); }
+  else if (e.key.toLowerCase() === "z" || e.key === "Backspace") { e.preventDefault(); undo(); }
+});
+
+// ---------- suggestion lists ----------
+function thumb(it){
+  const t = document.createElement("div"); t.className = "thumb"; t.append(media(it, true));
+  if (it.type === "video") t.insertAdjacentHTML("beforeend", `<span class="vb">▶</span>`);
+  return t;
+}
+function row(it){
+  const r = document.createElement("div"); r.className = "item" + (it.status === "del" ? " marked" : "");
+  r.append(thumb(it));
+  const tx = document.createElement("div"); tx.className = "tx";
+  tx.innerHTML = `<b></b><span></span>`; tx.firstChild.textContent = fmt(it.size);
+  tx.lastChild.textContent = [it.name, fmtDate(it.mtime), mode === "folder" ? it.folder : ""].filter(Boolean).join(" · ");
+  const b = document.createElement("button"); b.className = "toggle";
+  const sync = () => { r.classList.toggle("marked", it.status === "del"); b.textContent = it.status === "del" ? "Undo" : "Delete"; b.setAttribute("aria-label", (it.status === "del" ? "Unmark " : "Mark for delete ") + it.name); };
+  b.onclick = () => { it.status = it.status === "del" ? null : "del"; sync(); updateTrash(); };
+  sync(); r.append(tx, b); return r;
+}
+function openList(s){
+  listCtx = s;
+  const list = s.get(live());
+  $("#listNote").textContent = list.length ? `${list.length.toLocaleString()} files · ${fmt(sum(list))}. Tap Delete to add one to your delete list, or swipe through them.` : "Nothing here.";
+  const acts = $("#listActions"); acts.innerHTML = "";
+  if (list.length){ const sw = document.createElement("button"); sw.className = "btn primary block"; sw.textContent = "Swipe through these"; sw.onclick = () => startSwipe(list.filter(i => i.status == null), s.title); acts.append(sw); }
+  const box = $("#list"); box.innerHTML = "";
+  const frag = document.createDocumentFragment(); list.slice(0, 300).forEach(it => frag.append(row(it))); box.append(frag);
+  if (list.length > 300) box.insertAdjacentHTML("beforeend", `<p class="muted small">Showing the 300 largest. Swipe to go through all of them.</p>`);
+  show("list", s.title);
+}
+
+async function hashOf(it){
+  const parts = [await it.file.slice(0, 262144).arrayBuffer()];
+  if (it.size > 524288) parts.push(await it.file.slice(it.size - 131072).arrayBuffer());
+  const all = new Uint8Array(parts.reduce((n, p) => n + p.byteLength, 0)); let o = 0;
+  for (const p of parts){ all.set(new Uint8Array(p), o); o += p.byteLength; }
+  const h = await crypto.subtle.digest("SHA-256", all);
+  return [...new Uint8Array(h)].slice(0, 12).map(x => x.toString(16).padStart(2, "0")).join("");
+}
+async function openDupes(){
+  if (!dupeGroups){
+    show("scan", "Finding duplicates"); $("#scanTitle").textContent = "Finding exact duplicates…";
+    const bySize = new Map();
+    for (const it of items.filter(i => !i.gone)){ if (!bySize.has(it.size)) bySize.set(it.size, []); bySize.get(it.size).push(it); }
+    const cands = [...bySize.values()].filter(g => g.length > 1); const groups = []; let done = 0;
+    for (const g of cands){
+      const byHash = new Map();
+      for (const it of g){ let h; try { h = await hashOf(it); } catch { continue; } if (!byHash.has(h)) byHash.set(h, []); byHash.get(h).push(it); }
+      for (const gg of byHash.values()) if (gg.length > 1){ gg.sort((a, b) => a.mtime - b.mtime || a.path.length - b.path.length); groups.push(gg); }
+      done++; $("#scanTxt").textContent = `Checked ${done} of ${cands.length} possible matches`; $("#scanBar").style.width = (done / cands.length * 100) + "%";
+    }
+    groups.sort((a, b) => b[0].size * (b.length - 1) - a[0].size * (a.length - 1));
+    dupeGroups = groups;
+  }
+  const groups = dupeGroups.map(g => g.filter(i => !i.gone)).filter(g => g.length > 1);
+  const extras = groups.flatMap(g => g.slice(1));
+  $("#listNote").textContent = groups.length ? `${groups.length} sets of identical files. The oldest copy in each set is kept; the extra ${extras.length} copies use ${fmt(sum(extras))}.` : "No exact duplicates found. Nice.";
+  const acts = $("#listActions"); acts.innerHTML = "";
+  if (extras.length){ const m = document.createElement("button"); m.className = "btn primary block"; m.textContent = `Mark all ${extras.length} extra copies`; m.onclick = () => { extras.forEach(i => i.status = "del"); updateTrash(); openDupes(); toast(`${extras.length} added to your delete list`); }; acts.append(m); }
+  const box = $("#list"); box.innerHTML = "";
+  groups.slice(0, 150).forEach((g, gi) => {
+    box.insertAdjacentHTML("beforeend", `<p class="group-h">Set ${gi + 1} · ${g.length} copies of ${fmt(g[0].size)}</p>`);
+    g.forEach(it => box.append(row(it)));
+  });
+  show("list", "Exact duplicates");
+}
+
+// ---------- delete list ----------
+$("#trashBtn").onclick = openTrash;
+function openTrash(){
+  const del = items.filter(i => i.status === "del" && !i.gone).sort((a, b) => b.size - a.size);
+  $("#trashNote").textContent = del.length ? `${del.length} files · ${fmt(sum(del))}. Tap one to keep it after all.` : "Nothing on your delete list yet. Swipe left on a photo to add it.";
+  const g = $("#trashGrid"); g.innerHTML = "";
+  for (const it of del){
+    const c = document.createElement("button"); c.className = "gcell"; c.setAttribute("aria-label", "Keep " + it.name);
+    c.append(media(it, true));
+    c.insertAdjacentHTML("beforeend", `<span class="x" aria-hidden="true">↺</span><span class="s">${fmt(it.size)}${it.type === "video" ? " · ▶" : ""}</span>`);
+    c.onclick = () => { it.status = null; updateTrash(); openTrash(); };
+    g.append(c);
+  }
+  const acts = $("#trashActions"); acts.innerHTML = "";
+  $("#phoneHelp").hidden = !(mode === "picked" && del.length);
+  if (mode === "picked"){
+    $("#nameList").textContent = del.map(i => `${i.name}  (${fmt(i.size)})`).join("\n");
+  } else if (del.length){
+    const b = document.createElement("button"); b.className = "btn danger block"; b.textContent = `Delete ${del.length} files · ${fmt(sum(del))}`;
+    b.onclick = () => confirmDelete(del); acts.append(b);
+  }
+  show("trash", "Delete list");
+}
+$("#copyNames").onclick = async () => { try { await navigator.clipboard.writeText($("#nameList").textContent); toast("File names copied"); } catch { toast("Couldn't copy. Select the list and copy it instead."); } };
+
+function ask(title, body, okText, showPerm){
+  return new Promise(res => {
+    const d = $("#confirm"); $("#cfTitle").textContent = title; $("#cfBody").textContent = body; $("#cfOk").textContent = okText;
+    $("#cfPermWrap").hidden = !showPerm; $("#cfPerm").checked = false;
+    const done = v => { d.close(); $("#cfOk").onclick = $("#cfCancel").onclick = null; res(v); };
+    $("#cfOk").onclick = () => done({ ok: true, perm: $("#cfPerm").checked });
+    $("#cfCancel").onclick = () => done({ ok: false });
+    d.onclose = () => res({ ok: false });
+    d.showModal();
+  });
+}
+async function ensureWrite(){
+  const o = { mode: "readwrite" };
+  if ((await root.queryPermission(o)) === "granted") return true;
+  return (await root.requestPermission(o)) === "granted";
+}
+async function freeName(dir, name){
+  const dot = name.lastIndexOf("."); const base = dot > 0 ? name.slice(0, dot) : name; const ex = dot > 0 ? name.slice(dot) : "";
+  for (let i = 1; i < 10000; i++){
+    const n = i === 1 ? name : `${base} (${i})${ex}`;
+    try { await dir.getFileHandle(n); } catch { return n; }
+  }
+  return `${base}-${Date.now()}${ex}`;
+}
+async function moveToTrash(it, trash){
+  const name = await freeName(trash, it.name);
+  if (typeof it.handle.move === "function"){ try { await it.handle.move(trash, name); return; } catch {} }
+  const fh = await trash.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();
+  const f = await it.handle.getFile();
+  await f.stream().pipeTo(w);
+  await it.dir.removeEntry(it.name);
+}
+async function confirmDelete(del){
+  const total = sum(del);
+  const r = await ask(`Delete ${del.length} files?`, `They'll move into a “${TRASH}” folder inside ${root.name}. Check it in File Explorer if you like, then empty it here to free ${fmt(total)}.`, `Delete ${del.length} files`, true);
+  if (!r.ok) return;
+  if (!(await ensureWrite())){ toast("Swipe Clean needs permission to change that folder."); return; }
+  show("scan", "Deleting"); $("#scanTitle").textContent = r.perm ? "Deleting…" : "Moving to the trash folder…";
+  let trash = null; if (!r.perm) trash = await root.getDirectoryHandle(TRASH, { create: true });
+  let ok = 0, okBytes = 0; const failed = [];
+  for (const it of del){
+    try { if (r.perm) await it.dir.removeEntry(it.name); else await moveToTrash(it, trash); it.gone = true; ok++; okBytes += it.size; }
+    catch (e) { failed.push(it.name); }
+    $("#scanTxt").textContent = `${ok + failed.length} of ${del.length}`; $("#scanBar").style.width = ((ok + failed.length) / del.length * 100) + "%";
+    const u = urls.get(it.id); if (it.gone && u){ URL.revokeObjectURL(u); urls.delete(it.id); }
+  }
+  if (!r.perm) trashBytes += okBytes;
+  dupeGroups = dupeGroups && dupeGroups.map(g => g.filter(i => !i.gone));
+  toast(failed.length ? `${ok} done, ${failed.length} couldn't be deleted (open in another app?)` : r.perm ? `Deleted ${ok} files, freed ${fmt(okBytes)}` : `Moved ${ok} files to the trash folder`);
+  openHub();
+}
+$("#emptyTrash").onclick = async () => {
+  const r = await ask("Empty the trash folder?", `This permanently deletes everything in “${TRASH}” and frees ${fmt(trashBytes)}. It can't be undone.`, "Empty it", false);
+  if (!r.ok) return;
+  if (!(await ensureWrite())){ toast("Swipe Clean needs permission to change that folder."); return; }
+  try { await root.removeEntry(TRASH, { recursive: true }); toast(`Freed ${fmt(trashBytes)}`); trashBytes = 0; }
+  catch { toast("Couldn't empty it. Close any app using those files and try again."); }
+  openHub();
+};
+
+$("#back").onclick = () => {
+  if (current === "swipe" || current === "list" || current === "trash") openHub();
+};
+
+// ---------- start ----------
+if (!canFolder){
+  $("#folderCard").hidden = true; $("#noFolderNote").hidden = false; $("#pickFilesBtn").classList.add("primary");
+} else {
+  $("#pickNote").textContent = "Or choose some photos and videos by hand to sort. You'll get a delete list at the end.";
+}
+if (!matchMedia("(hover:hover)").matches) $("#hint").textContent = "Tap a video to play it.";
+show("start");
+</script>
+</body></html>
