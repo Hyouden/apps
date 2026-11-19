@@ -222,6 +222,7 @@ h3.sec{font:800 1.12rem/1.3 var(--serif);margin:26px 0 10px}
 .legend .ringd{background:transparent;border:2.5px solid var(--shu)}
 .legend .d.hb0{background:var(--q0)}.legend .d.hb1{background:var(--q1)}.legend .d.hb2{background:var(--q2)}.legend .d.hb3{background:var(--q3)}.legend .d.hbc{background:var(--closed)}
 .leaflet-container{font-family:var(--sans);background:var(--soft)}
+@media (prefers-color-scheme:dark){.leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9)}}
 .leaflet-interactive.pin{stroke:var(--card);fill-opacity:1}
 .pin0{fill:var(--q0)}.pin1{fill:var(--q1)}.pin2{fill:var(--q2)}.pin3{fill:var(--q3)}.pinc{fill:var(--closed)}
 .leaflet-interactive.pins{stroke:var(--shu)}
@@ -1071,7 +1072,8 @@ function mountMap(){
 function setTiles(){
   if(!MAP) return;
   if(mapTiles) mapTiles.remove();
-  mapTiles=L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dark()?"dark_all":"rastertiles/voyager"}/{z}/{x}/{y}{r}.png`,{maxZoom:19,subdomains:"abcd",attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'}).addTo(MAP);
+  // GSI (Geospatial Information Authority of Japan) pale map: free, no key, Japanese + English place names
+  mapTiles=L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",{maxZoom:19,maxNativeZoom:18,minZoom:5,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院 GSI Japan</a>'}).addTo(MAP);
 }
 function popupHTML(t,c){
   return `<div class="pop"><b class="nm">${esc(t.n)}</b><span class="sub"><span class="jp">${t.j}</span><span class="love"><i>♥</i>${t.l.toFixed(1)}</span></span>${c?pill(c):""}
