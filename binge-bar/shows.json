@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-13",
+ "updated": "2026-11-20",
  "region": "US",
  "shows": [
   {
@@ -179,7 +179,7 @@
    "rt": 98,
    "len": "Season 1",
    "short": true,
-   "note": "Watch season 1 (98%); season 2 dropped to 87%",
+   "note": "Watch season 1 (98%); season 2 scored 89%",
    "blurb": "A road-rage incident spirals into all-out war. Dark and funny.",
    "added": "2026-10-01"
   },
@@ -247,7 +247,7 @@
    "id": "rectify",
    "title": "Rectify",
    "cat": "drama",
-   "imdb": 8.3,
+   "imdb": 8.4,
    "rt": 96,
    "len": "4 seasons, 30 episodes",
    "short": false,
@@ -259,11 +259,11 @@
    "id": "the-diplomat",
    "title": "The Diplomat",
    "cat": "drama",
-   "imdb": 8.0,
-   "rt": 94,
+   "imdb": 8.1,
+   "rt": 93,
    "len": "4 seasons",
    "short": false,
-   "note": "Now clears the bar: seasons 2 to 4 scored 95 to 100%, season 1 was 84%",
+   "note": "Seasons 2 to 4 scored 95 to 97% with critics; season 1 was 84%",
    "blurb": "A career diplomat lands a crisis posting and a messy marriage.",
    "added": "2026-11-12"
   },
@@ -308,10 +308,10 @@
    "title": "Narcos: Mexico",
    "cat": "crime",
    "imdb": 8.3,
-   "rt": 89,
+   "rt": 90,
    "len": "3 seasons",
    "short": false,
-   "note": "One point short with critics",
+   "note": "Now clears the bar with critics; season 2 is the weakest (81%)",
    "blurb": "The birth of the Guadalajara cartel.",
    "added": "2026-10-01"
   },
@@ -320,12 +320,24 @@
    "title": "Dept. Q",
    "cat": "crime",
    "imdb": 8.1,
-   "rt": 87,
+   "rt": 88,
    "len": "1 season, 9 episodes",
    "short": false,
    "note": "",
    "blurb": "A bitter detective builds a cold-case unit in a basement.",
    "added": "2026-10-01"
+  },
+  {
+   "id": "power",
+   "title": "Power",
+   "cat": "crime",
+   "imdb": 8.1,
+   "rt": 81,
+   "len": "6 seasons, 63 episodes",
+   "short": false,
+   "note": "Arrived on Netflix Nov 9. Critics vary by season: 2 and 5 hit 100%, season 1 only 44%",
+   "blurb": "A New York nightclub owner tries to leave the drug empire that bankrolls his double life.",
+   "added": "2026-11-20"
   },
   {
    "id": "the-glory",
@@ -383,7 +395,7 @@
    "rt": 94,
    "len": "2 seasons, 12 episodes",
    "short": false,
-   "note": "Season 2 landed Nov 5 at 94% with critics",
+   "note": "Season 2 landed Nov 5; season 1 scored 92% with critics",
    "blurb": "A spy married to a politician, and the hitman who protects her.",
    "added": "2026-11-12"
   }
