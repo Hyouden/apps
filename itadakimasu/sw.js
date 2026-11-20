@@ -1,7 +1,7 @@
-// Offline support for Table Talk.
+// Offline support for Itadakimasu.
 // Pages load from the network first (so updates show up), falling back to the saved copy offline.
 // Icons and fonts are served from the saved copy for speed.
-const CACHE = "table-talk-v1";
+const CACHE = "itadakimasu-v1";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png",
   "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];
@@ -12,7 +12,7 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k.startsWith("table-talk-") && k !== CACHE).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k.startsWith("itadakimasu-") && k !== CACHE).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
