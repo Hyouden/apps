@@ -1,0 +1,350 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Table Talk</title>
+<meta name="description" content="Talk to restaurant staff in Japan for Sydney: greeting, allergy card, questions and what their answers mean">
+<meta name="theme-color" content="#1E2A4A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Table Talk">
+<style>
+:root{
+  --ink:#1E2A4A;--ink2:#2B3A63;--paper:#FBF7F0;--card:#fff;--fg:#1F1B17;--muted:#6B625A;--line:#E8DFD2;
+  --shu:#D2452B;--shu-soft:#FBE6E1;--good:#2E7D4F;--good-soft:#E3F2E8;--bad:#B3261E;--bad-soft:#FBE3E1;
+  --wait:#9A6A12;--wait-soft:#FBF0D9;--gold:#E8B45A;
+  --jp:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  color-scheme:light
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 12px) 18px 12px}
+header .in{max-width:620px;margin:0 auto;display:flex;align-items:center;gap:12px}
+header img{width:40px;height:40px;border-radius:11px}
+header h1{margin:0;font-size:1.2rem;line-height:1.15}
+header small{display:block;font-weight:500;font-size:.82rem;opacity:.75}
+main{max-width:620px;margin:0 auto;padding:16px max(14px,env(safe-area-inset-left,0px)) calc(100px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-right,0px));display:grid;gap:14px}
+.intro{color:var(--muted);font-size:.95rem;margin:0}
+.step{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;display:grid;gap:10px;box-shadow:0 4px 14px rgba(40,30,20,.05)}
+.step h2{margin:0;font-size:1.02rem;display:flex;align-items:center;gap:10px}
+.step h2 .n{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:.9rem;flex:none}
+.step .when{margin:-4px 0 0 38px;color:var(--muted);font-size:.88rem}
+.line{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:start}
+.line.key{border-color:var(--shu);background:var(--shu-soft)}
+.line .ja{font-family:var(--jp);font-weight:800;font-size:1.25rem;line-height:1.4;background:none;border:0;padding:0;text-align:left}
+.line .ro{grid-column:1/-1;font-size:.92rem}
+.line .ro i{color:var(--muted);font-style:normal}
+.line .say{grid-column:1/-1;color:var(--muted);font-size:.86rem}
+.line .en{grid-column:1/-1;font-weight:600;font-size:.95rem}
+.acts{display:flex;gap:6px}
+.ib{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:1.15rem;display:grid;place-items:center}
+.ib:active{transform:scale(.96)}
+.btn{min-height:48px;border-radius:14px;border:0;padding:0 16px;font-weight:700;background:var(--ink);color:#fff;width:100%}
+.btn.shu{background:var(--shu)}
+.btn:active{transform:scale(.99)}
+.tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--shu);margin-left:auto}
+/* replies */
+.rgroup h3{margin:4px 0 8px;font-size:.95rem}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reply{border-radius:16px;padding:10px 12px;border:2px solid transparent;text-align:left;display:grid;gap:2px;min-height:76px;background:#fff}
+.reply b{font-family:var(--jp);font-size:1.08rem;line-height:1.35}
+.reply span{font-size:.86rem}
+.reply.good{background:var(--good-soft);border-color:#B7DCC4}.reply.good span{color:var(--good)}
+.reply.bad{background:var(--bad-soft);border-color:#F0B9B4}.reply.bad span{color:var(--bad)}
+.reply.wait{background:var(--wait-soft);border-color:#EED29B}.reply.wait span{color:var(--wait)}
+.meaning{position:sticky;top:76px;z-index:3;border-radius:18px;padding:14px 16px;font-weight:700;display:grid;gap:6px}
+.meaning.good{background:var(--good);color:#fff}.meaning.bad{background:var(--bad);color:#fff}.meaning.wait{background:var(--wait);color:#fff}
+.meaning .then{font-weight:500;font-size:.92rem;opacity:.95}
+/* order */
+.dish{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.dish .e{font-size:1.6rem}
+.dish b{display:block}
+.dish .jp{font-family:var(--jp);font-weight:800}
+.dish small{color:var(--muted);display:block;font-size:.84rem;line-height:1.35}
+.sec{margin:6px 2px 0;font-size:.95rem}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:800}
+.pill.g{background:var(--good-soft);color:var(--good)}.pill.a{background:var(--wait-soft);color:var(--wait)}.pill.x{background:var(--bad-soft);color:var(--bad)}
+/* card */
+.acard{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;font-family:var(--jp)}
+.acard .band{background:var(--shu);color:#fff;padding:14px 16px;font-weight:800;font-size:1.25rem;line-height:1.4}
+.acard .body{padding:14px 16px;display:grid;gap:10px}
+.no{display:flex;gap:12px;align-items:center;border:2px solid var(--bad);background:var(--bad-soft);border-radius:14px;padding:10px 12px}
+.no.soft{border-color:#D9A441;background:var(--wait-soft)}
+.no .x{width:32px;height:32px;border-radius:50%;background:var(--bad);color:#fff;display:grid;place-items:center;font:800 17px system-ui;flex:none}
+.no.soft .x{background:#C98A1B}
+.no b{display:block;font-size:1.3rem;line-height:1.3}
+.no .sub{display:block;font-weight:700;color:#6d2a22;font-size:.95rem;line-height:1.4}
+.fask{background:var(--shu-soft);border-radius:14px;padding:10px 12px;font-weight:800;font-size:1.12rem;line-height:1.5}
+.fthanks{font-weight:700}
+.en{display:block;font-family:system-ui,sans-serif;font-weight:500;font-size:.88rem;color:var(--muted);margin-top:2px}
+.band .en{color:#fff;opacity:.85}
+/* full screen */
+#full{position:fixed;inset:0;z-index:20;background:#FFFDF8;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 12px)}
+#full .bar{display:flex;gap:8px;justify-content:space-between}
+#full .bar .ib{width:auto;padding:0 14px;font-weight:700;font-size:1rem}
+#fullBody{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:1.6vh;font-family:var(--jp);padding:8px 2px}
+#fullBody .big{font-weight:800;font-size:min(9vw,5.4vh);line-height:1.35;color:var(--fg)}
+#fullBody .fhead{font-weight:800;font-size:min(8vw,4.4vh);color:var(--shu);line-height:1.3}
+#fullBody .no b{font-size:min(9vw,5vh)}
+#fullBody .no .sub{font-size:min(5vw,2.7vh)}
+#fullBody .fask{font-size:min(6.2vw,3.4vh)}
+#fullBody .fthanks{font-size:min(5.6vw,3vh)}
+#full.no-en .en{display:none}
+#full .hint{text-align:center;color:var(--muted);font-size:.82rem}
+/* tabs */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav .in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{border:0;background:none;padding:8px 0 10px;display:grid;justify-items:center;gap:2px;font-size:.78rem;font-weight:700;color:var(--muted);min-height:56px}
+nav button .ic{font-size:1.35rem;line-height:1}
+nav button[aria-selected="true"]{color:var(--shu)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.toast.on{opacity:1}
+.foot{color:var(--muted);font-size:.8rem;text-align:center;margin:4px 0 0}
+</style>
+</head><body>
+<header><div class="in">
+  <img src="icons/icon-192.png" alt="">
+  <h1>Table Talk<small id="sub">You do the talking, she enjoys the food</small></h1>
+</div></header>
+
+<main>
+<!-- TALK -->
+<section id="tab-talk" class="tab">
+  <p class="intro">Go top to bottom. Tap the Japanese to show it big, 🔊 to hear it, 🐢 to hear it slowly. Red lines are the ones that matter most.</p>
+  <div id="steps" style="display:grid;gap:14px;margin-top:12px"></div>
+</section>
+
+<!-- CARD -->
+<section id="tab-card" class="tab" hidden>
+  <p class="intro">Hand your phone over after “Kore o mite itadakemasu ka?” Staff usually read it, nod, and point at dishes.</p>
+  <div class="acard" id="acard" style="margin-top:12px"></div>
+  <button class="btn shu" id="showCard" style="margin-top:12px">⤢ Show card full screen</button>
+</section>
+
+<!-- REPLIES -->
+<section id="tab-replies" class="tab" hidden>
+  <p class="intro">Tap what they said. Green = good to order, red = pick something else, yellow = wait or answer.</p>
+  <div id="meaning" class="meaning" hidden style="margin-top:12px"></div>
+  <div id="replies" style="display:grid;gap:14px;margin-top:12px"></div>
+</section>
+
+<!-- ORDER -->
+<section id="tab-order" class="tab" hidden>
+  <p class="intro">Dish names to say or point at. Tap one to show it big with “…, please”.</p>
+  <div id="dishes" style="display:grid;gap:8px;margin-top:12px"></div>
+  <p class="foot">Not medical advice. She knows her body best; when in doubt, show the card.</p>
+</section>
+</main>
+
+<nav><div class="in" role="tablist">
+  <button role="tab" data-tab="talk" aria-selected="true"><span class="ic">💬</span>Talk</button>
+  <button role="tab" data-tab="card"><span class="ic">🪪</span>Card</button>
+  <button role="tab" data-tab="replies"><span class="ic">👂</span>Replies</button>
+  <button role="tab" data-tab="order"><span class="ic">🍣</span>Order</button>
+</div></nav>
+
+<div id="full" hidden role="dialog" aria-modal="true">
+  <div class="bar">
+    <button class="ib" id="fullClose">✕ Close</button>
+    <span style="display:flex;gap:8px"><button class="ib" id="fullSay" aria-label="Play">🔊</button><button class="ib" id="fullEn">EN</button></span>
+  </div>
+  <div id="fullBody"></div>
+  <div class="hint" id="awakeMsg"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PREFIX = "table-talk-";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2400); }
+
+/* ---------- speech ---------- */
+let voice = null;
+function pickVoice() { const v = speechSynthesis.getVoices(); voice = v.find(x => /ja[-_]JP/i.test(x.lang) && /Kyoko|O-ren|Google/i.test(x.name)) || v.find(x => /^ja/i.test(x.lang)) || null; }
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text, slow) {
+  if (!("speechSynthesis" in window)) { toast("Your phone can't play speech here"); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/\n/g, "。")); u.lang = "ja-JP"; if (voice) u.voice = voice; u.rate = slow ? .6 : .9;
+  speechSynthesis.speak(u);
+  if (!voice) toast("Tip: add a Japanese voice in your phone's settings for better audio");
+}
+
+/* ---------- wake lock ---------- */
+let lock = null;
+async function awakeOn() { try { if ("wakeLock" in navigator) { lock = await navigator.wakeLock.request("screen"); return true; } } catch {} return false; }
+function awakeOff() { try { lock && lock.release(); } catch {} lock = null; }
+
+/* ---------- the card (same wording as Sydney Eats Japan) ---------- */
+const CARD = {
+  head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have a food allergy." },
+  items: [
+    { ja: "乳製品はNG", sub: "牛乳・バター・チーズ・生クリーム（少量も不可）", en: "No dairy — milk, butter, cheese, cream (not even a little)" },
+    { soft: 1, ja: "小麦・大豆は少量ならOK", sub: "醤油・十割そば・米麺は大丈夫です", en: "A little wheat or soy is OK — soy sauce, 100% buckwheat soba and rice noodles are fine" }
+  ],
+  ask: { ja: "乳製品なしで、小麦と大豆が少なめのおすすめはありますか？", en: "Do you have a recommendation with no dairy and little wheat or soy?" },
+  thanks: { ja: "よろしくお願いします。", en: "Thank you very much." }
+};
+const en = t => `<span class="en">${esc(t)}</span>`;
+function cardInner() {
+  return CARD.items.map(i => `<div class="no${i.soft ? " soft" : ""}"><span class="x">${i.soft ? "△" : "✕"}</span><div><b>${esc(i.ja)}</b><span class="sub">${esc(i.sub)}</span>${en(i.en)}</div></div>`).join("") +
+    `<div class="fask">${esc(CARD.ask.ja)}${en(CARD.ask.en)}</div><div class="fthanks">${esc(CARD.thanks.ja)}${en(CARD.thanks.en)}</div>`;
+}
+const cardSpeech = () => [CARD.head.ja, ...CARD.items.map(i => i.ja + "。" + i.sub), CARD.ask.ja, CARD.thanks.ja].join("。");
+$("#acard").innerHTML = `<div class="band">${esc(CARD.head.ja)}${en(CARD.head.en)}</div><div class="body">${cardInner()}</div>`;
+
+/* ---------- full screen ---------- */
+let fullSpeech = "";
+async function showFull(html, speech, withEn) {
+  $("#fullBody").innerHTML = html; fullSpeech = speech;
+  const f = $("#full"); f.classList.toggle("no-en", !withEn); $("#fullEn").textContent = withEn ? "EN ✓" : "EN";
+  f.hidden = false; document.body.style.overflow = "hidden";
+  $("#awakeMsg").textContent = (await awakeOn()) ? "☀︎ Screen stays on while this is open" : "";
+}
+function closeFull() { $("#full").hidden = true; document.body.style.overflow = ""; awakeOff(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+function showCard() { showFull(`<div class="fhead">${esc(CARD.head.ja)}${en(CARD.head.en)}</div>` + cardInner(), cardSpeech(), false); }
+function showLine(l) { showFull(`<div class="big">${esc(l.ja)}</div><span class="en" style="font-size:1rem">${esc(l.en)}</span>`, l.ja, false); }
+$("#fullClose").onclick = closeFull;
+$("#fullSay").onclick = () => speak(fullSpeech);
+$("#fullEn").onclick = () => { const f = $("#full"); f.classList.toggle("no-en"); $("#fullEn").textContent = f.classList.contains("no-en") ? "EN" : "EN ✓"; };
+$("#showCard").onclick = showCard;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#full").hidden) closeFull(); });
+
+/* ---------- script ---------- */
+const STEPS = [
+  { t: "Walk in", when: "Staff greet you with “Irasshaimase!” — you don't need to reply to that.", lines: [
+    { ja: "すみません、二人です。", ro: "Sumimasen, futari desu.", say: "soo-mee-mah-sen, foo-tah-ree dess", en: "Excuse me, two people.", key: 1 },
+    { ja: "予約しています。", ro: "Yoyaku shite imasu.", say: "yoh-yah-koo shteh ee-mahs", en: "We have a reservation." }
+  ]},
+  { t: "Before ordering", when: "Once you're seated and someone comes over. Three short lines, then the card.", lines: [
+    { ja: "日本語が下手ですみません。", ro: "Nihongo ga heta de sumimasen.", say: "nee-hohn-goh gah heh-tah deh soo-mee-mah-sen", en: "Sorry, my Japanese isn't good." },
+    { ja: "彼女は乳製品のアレルギーがあります。", ro: "Kanojo wa nyūseihin no arerugī ga arimasu.", say: "kah-noh-joh wah nyoo-say-heen noh ah-reh-roo-ghee gah ah-ree-mahs", en: "My girlfriend is allergic to dairy.", key: 1 },
+    { ja: "これを見ていただけますか？", ro: "Kore o mite itadakemasu ka?", say: "koh-reh oh mee-teh ee-tah-dah-keh-mahs kah", en: "Could you look at this? (hand over the card)", key: 1, card: 1 }
+  ]},
+  { t: "Ask about a dish", when: "Point at the menu item as you say it.", lines: [
+    { ja: "これは大丈夫ですか？", ro: "Kore wa daijōbu desu ka?", say: "koh-reh wah dye-joh-boo dess kah", en: "Is this one OK (for her)?", key: 1 },
+    { ja: "バターなしでできますか？", ro: "Batā nashi de dekimasu ka?", say: "bah-tah nah-shee deh deh-kee-mahs kah", en: "Can you make it without butter?" },
+    { ja: "おすすめはありますか？", ro: "Osusume wa arimasu ka?", say: "oh-soo-soo-meh wah ah-ree-mahs kah", en: "What do you recommend?" }
+  ]},
+  { t: "Order", when: "Point, then say it. Add the second line for her dish.", lines: [
+    { ja: "これをお願いします。", ro: "Kore o onegai shimasu.", say: "koh-reh oh oh-neh-gai shee-mahs", en: "This one, please.", key: 1 },
+    { ja: "これは乳製品なしでお願いします。", ro: "Kore wa nyūseihin nashi de onegai shimasu.", say: "koh-reh wah nyoo-say-heen nah-shee deh oh-neh-gai shee-mahs", en: "This one with no dairy, please.", key: 1 }
+  ]},
+  { t: "If you didn't catch it", when: "Totally normal to use — staff are used to it.", lines: [
+    { ja: "もう一度お願いします。", ro: "Mō ichido onegai shimasu.", say: "moh ee-chee-doh oh-neh-gai shee-mahs", en: "One more time, please." },
+    { ja: "ゆっくりお願いします。", ro: "Yukkuri onegai shimasu.", say: "yook-koo-ree oh-neh-gai shee-mahs", en: "Slowly, please." }
+  ]},
+  { t: "Leaving", when: "At the register or on the way out.", lines: [
+    { ja: "お会計お願いします。", ro: "O-kaikei onegai shimasu.", say: "oh-kai-kay oh-neh-gai shee-mahs", en: "The check, please." },
+    { ja: "ごちそうさまでした。", ro: "Gochisōsama deshita.", say: "goh-chee-soh-sah-mah desh-tah", en: "Thank you for the meal! (they'll love this)", key: 1 }
+  ]}
+];
+const LINES = [];
+function lineHtml(l) {
+  const i = LINES.push(l) - 1;
+  return `<div class="line${l.key ? " key" : ""}">
+    <button class="ja" data-show="${i}">${esc(l.ja)}</button>
+    <span class="acts"><button class="ib" data-say="${i}" aria-label="Play">🔊</button><button class="ib" data-slow="${i}" aria-label="Play slowly">🐢</button></span>
+    <div class="en">${esc(l.en)}</div>
+    <div class="ro">${esc(l.ro)}</div>
+    <div class="say">say: ${esc(l.say)}</div>
+    ${l.card ? `<button class="btn shu" data-card style="grid-column:1/-1;margin-top:6px">🪪 Show the card</button>` : ""}
+  </div>`;
+}
+$("#steps").innerHTML = STEPS.map((s, n) => `<div class="step"><h2><span class="n">${n + 1}</span>${esc(s.t)}</h2><p class="when">${esc(s.when)}</p>${s.lines.map(lineHtml).join("")}</div>`).join("");
+
+/* ---------- replies ---------- */
+const REPLIES = [
+  { g: "About a dish", items: [
+    { k: "good", ja: "大丈夫です", ro: "daijōbu desu", en: "It's OK", then: "Order it: “Kore o onegai shimasu.”" },
+    { k: "good", ja: "入っていません", ro: "haitte imasen", en: "It doesn't contain it", then: "Safe — order it." },
+    { k: "good", ja: "できます", ro: "dekimasu", en: "We can do that", then: "They'll make it the way you asked. Order it." },
+    { k: "good", ja: "抜けます", ro: "nukemasu", en: "We can leave it out", then: "Say “Onegai shimasu” (please)." },
+    { k: "bad", ja: "入っています", ro: "haitte imasu", en: "It contains it", then: "Pick another dish, or ask “Osusume wa arimasu ka?”" },
+    { k: "bad", ja: "できません", ro: "dekimasen", en: "We can't", then: "Say “Wakarimashita” (understood) and choose something else." },
+    { k: "bad", ja: "ちょっと…", ro: "chotto…", en: "“It's a bit…” = a polite no", then: "Treat it as no. Choose something else." },
+    { k: "bad", ja: "対応できません", ro: "taiō dekimasen", en: "We can't accommodate allergies", then: "Thank them and go elsewhere: “Wakarimashita, sumimasen.”" }
+  ]},
+  { g: "They need a moment", items: [
+    { k: "wait", ja: "少々お待ちください", ro: "shōshō omachi kudasai", en: "One moment, please", then: "They're asking the kitchen. Just wait." },
+    { k: "wait", ja: "確認します", ro: "kakunin shimasu", en: "I'll check", then: "Good sign — they're taking it seriously. Wait." },
+    { k: "wait", ja: "少しなら大丈夫ですか？", ro: "sukoshi nara daijōbu desu ka?", en: "Is a little OK?", then: "Depends what: dairy → “Nyūseihin wa dame desu.” Wheat or soy → “Sukoshi nara daijōbu desu.”" },
+    { k: "wait", ja: "醤油は大丈夫ですか？", ro: "shōyu wa daijōbu desu ka?", en: "Is soy sauce OK?", then: "Yes! Say “Daijōbu desu.”" }
+  ]}
+];
+const ANSWERS = [
+  { ja: "乳製品はだめです。", ro: "Nyūseihin wa dame desu.", say: "nyoo-say-heen wah dah-meh dess", en: "Dairy is a no." },
+  { ja: "小麦と大豆は少しなら大丈夫です。", ro: "Komugi to daizu wa sukoshi nara daijōbu desu.", say: "koh-moo-ghee toh dye-zoo wah skoh-shee nah-rah dye-joh-boo dess", en: "A little wheat and soy is fine." },
+  { ja: "大丈夫です。", ro: "Daijōbu desu.", say: "dye-joh-boo dess", en: "That's fine." },
+  { ja: "わかりました。", ro: "Wakarimashita.", say: "wah-kah-ree-mahsh-tah", en: "Understood." },
+  { ja: "じゃあ、これにします。", ro: "Jā, kore ni shimasu.", say: "jah, koh-reh nee shee-mahs", en: "OK, I'll go with this one then." }
+];
+const RFLAT = REPLIES.flatMap(g => g.items);
+$("#replies").innerHTML = REPLIES.map(g => `<div class="rgroup"><h3>${esc(g.g)}</h3><div class="rgrid">${g.items.map(r => `<button class="reply ${r.k}" data-r="${RFLAT.indexOf(r)}"><b>${esc(r.ja)}</b><span>${esc(r.ro)} · ${esc(r.en)}</span></button>`).join("")}</div></div>`).join("") +
+  `<div class="step"><h2>Your quick answers</h2>${ANSWERS.map(lineHtml).join("")}</div>`;
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-r]"); if (!b) return;
+  const r = RFLAT[+b.dataset.r], m = $("#meaning");
+  const icon = { good: "✅", bad: "❌", wait: "⏳" }[r.k];
+  m.className = "meaning " + r.k; m.hidden = false;
+  m.innerHTML = `<div>${icon} “${esc(r.ja)}” = ${esc(r.en)}</div><div class="then">→ ${esc(r.then)}</div>`;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ---------- order ---------- */
+const DISHES = [
+  { s: "g", e: "🍣", n: "Sushi / sashimi", ja: "寿司・刺身", ro: "sushi · sashimi", t: "Soy sauce is fine. Skip cream-cheese or mayo-cheese rolls." },
+  { s: "g", e: "🍢", n: "Yakitori", ja: "焼き鳥", ro: "yakitori", t: "Salt or sauce both fine. Skip anything with チーズ (cheese)." },
+  { s: "g", e: "🐟", n: "Grilled-fish set meal", ja: "焼き魚定食", ro: "yakizakana teishoku", t: "Fish, rice, miso soup, pickles — classic and safe." },
+  { s: "g", e: "🍜", n: "100% buckwheat soba", ja: "十割そば", ro: "jūwari soba", t: "Ask “Jūwari desu ka?” Regular soba is ~20–30% wheat — her call." },
+  { s: "g", e: "🍖", n: "Sukiyaki", ja: "すき焼き", ro: "sukiyaki", t: "Sweet soy-sauce broth, no dairy. The raw egg for dipping is fine." },
+  { s: "g", e: "🥩", n: "Yakiniku", ja: "焼肉", ro: "yakiniku", t: "Grill-your-own. Skip butter-topped items." },
+  { s: "g", e: "🍲", n: "Shabu-shabu with ponzu", ja: "しゃぶしゃぶ（ポン酢で）", ro: "shabu-shabu (ponzu de)", t: "Use ponzu, not the creamy sesame dip." },
+  { s: "g", e: "🐍", n: "Grilled eel", ja: "うなぎ", ro: "unagi", t: "Sweet soy glaze — fine." },
+  { s: "a", e: "🥩", n: "Teppanyaki", ja: "鉄板焼き（バターなしで）", ro: "teppanyaki (batā nashi de)", t: "Butter is standard. Always say “batā nashi de”." },
+  { s: "a", e: "🍜", n: "Ramen", ja: "ラーメン", ro: "rāmen", t: "Wheat noodles + sometimes butter/milk. Only at GF ramen shops." },
+  { s: "a", e: "🍳", n: "Omelettes & tamagoyaki", ja: "卵焼き", ro: "tamagoyaki", t: "Some add milk. Ask “Kore wa daijōbu desu ka?”" },
+  { s: "x", e: "🧀", n: "Gratin, doria, cream stew", ja: "グラタン・ドリア", ro: "guratan · doria", t: "Cheese and cream sauce." },
+  { s: "x", e: "🍛", n: "Japanese curry", ja: "カレー", ro: "karē", t: "Roux usually has milk/butter and wheat." },
+  { s: "x", e: "🥐", n: "Bread, cakes, lattes", ja: "パン・ケーキ・ラテ", ro: "pan · kēki · rate", t: "Dairy. For coffee: “Ōtsu miruku ni dekimasu ka?” (oat milk?)" }
+];
+const LAB = { g: ["g", "Usually safe"], a: ["a", "Ask first"], x: ["x", "Skip"] };
+let lastS = "";
+$("#dishes").innerHTML = DISHES.map((d, i) => {
+  const head = d.s !== lastS ? `<h3 class="sec"><span class="pill ${LAB[d.s][0]}">${LAB[d.s][1]}</span></h3>` : ""; lastS = d.s;
+  return head + `<div class="dish"><span class="e">${d.e}</span><div><b>${esc(d.n)}</b><span class="jp">${esc(d.ja)}</span> <small style="display:inline">${esc(d.ro)}</small><small>${esc(d.t)}</small></div>${d.s !== "x" ? `<button class="ib" data-dish="${i}" aria-label="Show">⤢</button>` : ""}</div>`;
+}).join("");
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-dish]"); if (!b) return;
+  const d = DISHES[+b.dataset.dish], ja = d.ja + "をお願いします。";
+  showFull(`<div class="big">${esc(ja)}</div><div class="fhead" style="color:var(--fg);font-size:min(6vw,3.2vh)">乳製品なしでお願いします。</div><span class="en" style="font-size:1rem">${esc(d.n)}, please — no dairy, please.</span>`, ja + "乳製品なしでお願いします。", false);
+});
+
+/* ---------- line actions ---------- */
+document.addEventListener("click", e => {
+  let b;
+  if ((b = e.target.closest("[data-say]"))) speak(LINES[+b.dataset.say].ja);
+  else if ((b = e.target.closest("[data-slow]"))) speak(LINES[+b.dataset.slow].ja, true);
+  else if ((b = e.target.closest("[data-show]"))) showLine(LINES[+b.dataset.show]);
+  else if ((b = e.target.closest("[data-card]"))) showCard();
+});
+
+/* ---------- tabs ---------- */
+const SUBS = { talk: "You do the talking, she enjoys the food", card: "Show this to staff", replies: "What did they say?", order: "What to order" };
+function setTab(t) {
+  document.querySelectorAll(".tab").forEach(s => s.hidden = s.id !== "tab-" + t);
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  $("#sub").textContent = SUBS[t]; window.scrollTo({ top: 0 });
+  try { localStorage.setItem(PREFIX + "tab", t); } catch {}
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+try { const t = localStorage.getItem(PREFIX + "tab"); if (t && SUBS[t]) setTab(t); } catch {}
+
+if ("serviceWorker" in navigator && location.protocol === "https:") window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body></html>

@@ -1,7 +1,7 @@
 {
   "name": "Sydney Eats Japan",
   "short_name": "Sydney Eats",
-  "description": "Gluten, dairy & soy-free allergy card, phrases, food guide and safe restaurants for Japan",
+  "description": "Dairy-free allergy card (a little wheat & soy OK), phrases, food guide and restaurants for Japan",
   "id": "./",
   "start_url": "./",
   "scope": "./",

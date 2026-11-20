@@ -425,15 +425,14 @@ const awake = (() => {
 /* ================= ALLERGY CARD ================= */
 function cardModel() {
   return {
-    head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have food allergies." },
+    head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have a food allergy." },
     items: [
-      { ja: "乳製品は少量でもNGです", sub: "牛乳・バター・生クリーム・チーズ・ヨーグルト", en: "Dairy — none at all, not even a little (milk, butter, cream, cheese, yogurt)" },
-      { soft: 1, ja: "小麦", sub: "パン・麺・揚げ物の衣はNG。少量や調理器具の共用（コンタミ）は大丈夫です。", en: "Wheat — no bread, noodles or batter. Traces and shared cookware are fine." },
-      { soft: 1, ja: "大豆", sub: "少量なら大丈夫です（醤油・味噌の味付けはOK）。", en: "Soy — small amounts are fine (soy sauce or miso seasoning is OK)." }
+      { ja: "乳製品はNG", sub: "牛乳・バター・チーズ・生クリーム（少量も不可）", en: "No dairy — milk, butter, cheese, cream (not even a little)" },
+      { soft: 1, ja: "小麦・大豆は少量ならOK", sub: "醤油・十割そば・米麺は大丈夫です", en: "A little wheat or soy is OK — soy sauce, 100% buckwheat soba and rice noodles are fine" }
     ],
     note: null,
-    ask: { ja: "乳製品を使っていないおすすめの料理はありますか？", en: "Is there a dish you'd recommend that has no dairy?" },
-    thanks: { ja: "よろしくお願いします。", en: "Thank you so much." }
+    ask: { ja: "乳製品なしで、小麦と大豆が少なめのおすすめはありますか？", en: "Do you have a recommendation with no dairy and little wheat or soy?" },
+    thanks: { ja: "よろしくお願いします。", en: "Thank you very much." }
   };
 }
 const enSpan = t => `<span class="en">${esc(t)}</span>`;
