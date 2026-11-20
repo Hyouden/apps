@@ -51,7 +51,7 @@ section.view{padding-top:14px}
 
 /* bottom nav */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr);height:var(--navh)}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);height:var(--navh)}
 nav.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--ink3);font-size:.78rem;font-weight:500}
 nav.tabs button .k{font:800 1.3rem/1.1 var(--serif)}
 nav.tabs button[aria-current="page"]{color:var(--ink)}
@@ -257,6 +257,27 @@ h3.sec{font:800 1.12rem/1.3 var(--serif);margin:26px 0 10px}
 .leg::before{content:"";position:absolute;left:6px;top:-2px;bottom:0;width:2px;background:var(--line)}
 .rstep .card{padding:10px 12px}
 button.link{background:none;border:0;padding:0;text-align:left;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+/* Today tab */
+.tday .mapslot{height:min(34vh,280px)}
+.nowbox{background:var(--shu-soft);border:2px solid var(--shu);border-radius:14px;padding:12px 14px;margin:0 0 14px}
+.nowbox .lbl{color:var(--shu);font-weight:700;margin:0}
+.nowbox .big{font:800 1.25rem/1.3 var(--serif);margin:2px 0 4px}
+.nowbox p{margin:4px 0 0;color:var(--ink2);font-size:.9rem}
+.pstep::after{border-color:var(--shu)}
+.pstep.done{opacity:.5}
+.pstep.done::after{background:var(--ai);border-color:var(--ai)}
+.pstep.cur .card{border:2px solid var(--shu);box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pstep.cur::after{background:var(--shu);border-color:var(--shu)}
+.pstep .top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.pstep .nm{font-weight:700;font-size:1rem}
+.pstep .jp{display:block;font-size:.78rem;color:var(--ink3);font-weight:500}
+.pstep .ic{font-size:1.3rem;line-height:1}
+.pstep .tip{margin:6px 0 0;font-size:.9rem;color:var(--ink2)}
+.pstep .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ptag{display:inline-block;margin-top:6px;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:8px;background:var(--q0);color:#fff}
+.ptag.food{background:var(--q2)}
+.pnum{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--shu);color:#fff;font:700 .95rem/1 var(--sans);border:2.5px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pnum.done{background:var(--closed)}
 .locbtn{width:40px;height:40px;margin-bottom:8px!important;border-radius:10px;border:2px solid rgba(0,0,0,.2);background:var(--card);color:var(--ink2);display:flex;align-items:center;justify-content:center;padding:0}
 .locbtn.on{color:#2F7BEA}
 .locbtn.wait svg{animation:locp 1s ease-in-out infinite}
@@ -281,6 +302,7 @@ button.link{background:none;border:0;padding:0;text-align:left;color:var(--ink);
 <main class="wrap" id="main"></main>
 <nav class="tabs" aria-label="Sections"><div class="wrap">
   <button data-act="tab" data-v="temples"><span class="k">寺</span>Temples</button>
+  <button data-act="tab" data-v="today"><span class="k">今日</span>Today</button>
   <button data-act="tab" data-v="map"><span class="k">地図</span>Map</button>
   <button data-act="tab" data-v="mood"><span class="k">気分</span>Mood</button>
   <button data-act="tab" data-v="stamps"><span class="k">印</span>Stamps</button>
@@ -464,6 +486,35 @@ const ROUTES = [
 ];
 const RI = Object.fromEntries(ROUTES.map(r=>[r.id,r]));
 
+/* ---------- Today: our own day plans ----------
+ items: t = time (24h decimal), m = minutes, n/j = name (j is also the directions search), ll = map pin (null = off the map),
+ k = icon kind, tid = temple id when it is one of ours, tag = deer | food, leg = how you get there from the last item */
+const PLANS = [
+{id:"p-nara",c:"nara",n:"Our Nara day",j:"奈良の一日",
+ d:"Tōdai-ji at opening, the Wakakusa hike, Kasuga Taisha, then Naramachi. One loop, no backtracking.",
+ tip:"Bring ¥100 coins and small bills: gates, deer crackers and the lunch teahouse are cash only. Sunset is about 16:50.",
+ items:[
+  {t:7,m:45,n:"Leave Kyoto Station",j:"近鉄京都駅",ll:null,k:"🚃",note:"Kintetsu Kyoto Line Express to Kintetsu-Nara (~45 min). The Limited Express is ~10 min faster but needs a reserved-seat ticket."},
+  {t:7.75,m:20,n:"Arrive at Kintetsu-Nara",j:"近鉄奈良駅",ll:[34.6845,135.8278],k:"🚶",note:"Walk east along Noboriōji to Tōdai-ji (~20 min)."},
+  {t:8.08,m:55,n:"Tōdai-ji Great Buddha Hall",j:"東大寺大仏殿",tid:"todai",k:"🛕",note:"¥800, opens 8:00. You'll beat the tour buses. The deer at the main gate are pushy: keep bags zipped and don't feed them here.",leg:"🚶 20 min"},
+  {t:9,m:20,n:"Nigatsu-dō Hall",j:"二月堂",tid:"nigatsu",k:"🛕",note:"Free. Walk uphill and look out from the wooden balcony, which is lovely in morning light.",leg:"🚶 10 min uphill"},
+  {t:9.33,m:10,n:"Mizuya Chaya (optional)",j:"水谷茶屋",ll:[34.6873,135.8458],k:"🍵",note:"Thatched teahouse just below Nigatsu-dō. If it's open and the line is short, stop for tea and warabimochi; otherwise skip it.",leg:"🚶 3 min"},
+  {t:9.5,m:45,n:"Mt. Wakakusa North Gate",j:"若草山",ll:[34.6884,135.8472],k:"🥾",note:"Buy 1–2 packs of deer crackers (~¥200) near the gate, pay ¥150 to go in, then climb the three grassy tiers (~40 min).",leg:"🚶 5 min"},
+  {t:10.25,m:30,n:"Deer feeding at the summit",j:"若草山 山頂",ll:[34.6903,135.8546],k:"🦌",tag:"deer",note:"The calmest, politest deer of the day, and a view over all of Nara. Use your first pack here.",leg:"🥾 climb"},
+  {t:10.75,m:20,n:"Down through the South Gate",j:"若草山 南ゲート",ll:[34.6858,135.8480],k:"🥾",note:"Paved paths down to the Kasuga Taisha area (~15–20 min)."},
+  {t:11.08,m:40,n:"Kasuga Taisha",j:"春日大社",tid:"kasuga",k:"⛩️",note:"Outer grounds free, inner area has a fee. Stone-lantern paths and vermilion corridors.",leg:"🚶 15 min"},
+  {t:11.75,m:60,n:"Lunch at Kasuga Ninai Chaya",j:"春日荷茶屋",ll:[34.6806,135.8448],k:"🍜",tag:"food",note:"Garden teahouse near the Man'yō Botanical Garden gate. Try the seasonal Man'yō-gayu porridge and kakinoha-zushi (persimmon-leaf sushi). No cards. Backup: Hiraso in Naramachi.",leg:"🚶 5 min"},
+  {t:12.75,m:25,n:"Deer feeding on Tobihino meadow",j:"飛火野",ll:[34.6836,135.8412],k:"🦌",tag:"deer",note:"Open grass with big, relaxed groups of deer. Use your second pack here.",leg:"🚶 10 min west"},
+  {t:13.25,m:25,n:"Walk to Naramachi",j:"猿沢池",ll:[34.6806,135.8311],k:"🚶",note:"About 20–25 min, past Sarusawa Pond."},
+  {t:13.67,m:110,n:"Explore Naramachi",j:"ならまち",ll:[34.6776,135.8293],k:"🏮",note:"Narrow lanes of old wooden merchant houses, small cafes and craft shops. There's an extra hour of slack here."},
+  {t:15.5,m:15,n:"Nakatanidō for yomogi mochi",j:"中谷堂",ll:[34.6826,135.8287],k:"🍡",tag:"food",note:"Warm mugwort rice cakes with red bean, on the way to the station.",leg:"🚶 10 min"},
+  {t:15.75,m:45,n:"Train back to Kyoto",j:"近鉄奈良駅",ll:[34.6845,135.8278],k:"🚃",note:"Back at Kyoto Station around 16:30, in time for dinner.",leg:"🚶 5 min"}
+ ]}
+];
+const PI = Object.fromEntries(PLANS.map(p=>[p.id,p]));
+const pLL = it => it.tid ? GEO[it.tid] : it.ll;
+const pName = it => it.tid ? TI[it.tid].n : it.n;
+
 
 /* ---------- Mood companion ----------
  m = moods, s = slots (am, lunch, pm, eve), cr = typical crowd 1–5, in = mostly indoors,
@@ -629,7 +680,7 @@ const LVL = ["Quiet","Light","Busy","Packed"];
 const BASE_WORD = ["","Usually quiet","Some visitors","Steady crowds","Busy","Packed"];
 
 /* ---------- state ---------- */
-const DEF = {st:{},days:{},names:["Me","Sydney"],trip:{start:"",end:""},ui:{mcity:"kyoto",route:null,rdate:"",tab:"temples",tcity:"kyoto",q:"",when:"now",date:"",sort:"best",view:"list",f:{leaves:false,night:false,want:false,unst:false},open:null,city:"kyoto",moods:["chill"],avoid:true,plan:null}};
+const DEF = {st:{},days:{},names:["Me","Sydney"],trip:{start:"",end:""},ui:{mcity:"kyoto",route:null,rdate:"",tab:"temples",tcity:"kyoto",q:"",when:"now",date:"",sort:"best",view:"list",f:{leaves:false,night:false,want:false,unst:false},open:null,city:"kyoto",moods:["chill"],avoid:true,plan:null,today:"p-nara"},follow:{}};
 let S;
 function load(){
   try{const raw=localStorage.getItem(STORE_KEY); if(raw){const p=JSON.parse(raw); return {...DEF,...p,ui:{...DEF.ui,...(p.ui||{}),f:{...DEF.ui.f,...((p.ui||{}).f||{})}}};}}catch(e){}
@@ -999,6 +1050,57 @@ function routeScore(r,date){
 function bestRoute(city,date){
   return ROUTES.filter(r=>r.c===city).map(r=>[r,routeScore(r,date)]).sort((a,b)=>b[1]-a[1])[0][0];
 }
+function planNow(p){
+  const n=jst(), on = S.follow && S.follow[p.id]===n.date, h=n.h+n.mi/60;
+  let cur=-1; if(on) p.items.forEach((it,i)=>{ if(h>=it.t) cur=i; });
+  const last=p.items[p.items.length-1], over = on && h>=last.t+last.m/60;
+  return {on,h,cur,over};
+}
+const fmtMins = m => m<60 ? m+" min" : Math.floor(m/60)+" h"+(m%60?" "+(m%60)+" min":"");
+function renderToday(){
+  const p=PI[S.ui.today]||PLANS[0], st=planNow(p), its=p.items;
+  let h=`<div class="tday"><div class="planhead" style="margin-top:4px"><h2>${esc(p.n)}</h2><span class="lbl">${p.j}</span></div>`;
+  if(st.on){
+    if(st.over) h+=`<div class="nowbox"><p class="lbl">Done for the day</p><div class="big">That's a wrap. おつかれさま!</div></div>`;
+    else if(st.cur<0){ const nx=its[0]; h+=`<div class="nowbox"><p class="lbl">Starts in ${fmtMins(Math.round((nx.t-st.h)*60))}</p><div class="big">${nx.k} ${esc(pName(nx))} at ${fmtH(nx.t)}</div></div>`; }
+    else { const c=its[st.cur], nx=its[st.cur+1];
+      h+=`<div class="nowbox"><p class="lbl">Now</p><div class="big">${c.k} ${esc(pName(c))}</div>${nx?`<p>Next: <b>${nx.k} ${esc(pName(nx))}</b> at ${fmtH(nx.t)} (${st.h<nx.t?"in "+fmtMins(Math.max(1,Math.round((nx.t-st.h)*60))):"now"})</p>`:""}</div>`; }
+  } else {
+    h+=`<div class="card" style="margin-bottom:14px"><p style="margin:0 0 10px">${esc(p.d)}</p><button class="btn primary" data-act="follow" data-v="${p.id}">Follow along today</button><p class="fine" style="margin-top:8px">Highlights where you should be right now and what's next, using Japan time.</p></div>`;
+  }
+  h+=`<div class="mapwrap"><div id="mapslot" class="mapslot"><p class="maploading">Loading map…</p></div></div>
+  <p class="count">🦌 = deer feeding · 🍜 🍡 = food. Tap a pin for the stop.</p>
+  <p class="y26" style="margin:8px 0 14px">${esc(p.tip)}</p><ol class="day">`;
+  let num=0;
+  its.forEach((it,i)=>{
+    if(it.leg) h+=`<li class="leg">${esc(it.leg)}</li>`;
+    const done = st.on && (st.over || i<st.cur), cur = st.on && !st.over && i===st.cur;
+    const t = it.tid && TI[it.tid], stamped = t && !!peek(it.tid).v;
+    if(pLL(it)) num++;
+    h+=`<li class="step pstep${done?" done":""}${cur?" cur":""}" id="pi-${i}"><div class="when">${fmtH(it.t)} · ${fmtMins(it.m)}${pLL(it)?` · stop ${num}`:""}</div>
+      <div class="card"><div class="top"><span><span class="nm">${esc(pName(it))}</span><span class="jp">${esc(it.j)}</span></span><span class="ic" aria-hidden="true">${it.k}</span></div>
+      ${it.tag==="deer"?`<span class="ptag">🦌 Deer feeding</span>`:it.tag==="food"?`<span class="ptag food">${it.k} Food stop</span>`:""}
+      <p class="tip">${esc(it.note)}</p>
+      <div class="acts"><a class="btn" href="https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${encodeURIComponent(it.j+" 奈良")}" target="_blank" rel="noopener">Directions ↗</a>
+      ${t?`<button class="btn ${stamped?"on":""}" data-act="stamp" data-v="${it.tid}">${stamped?"✓ Stamped":"Stamp it"}</button><button class="btn" data-act="goto" data-v="${it.tid}">Temple info</button>`:""}</div></div></li>`;
+  });
+  h+=`</ol>${st.on?`<p class="fine"><a href="#" data-act="follow" data-v="${p.id}">Stop following today</a></p>`:""}</div>`;
+  return h;
+}
+function drawToday(){
+  const p=PI[S.ui.today]||PLANS[0], st=planNow(p), pts=[];
+  let num=0;
+  p.items.forEach((it,i)=>{
+    const ll=pLL(it); if(!ll) return; num++;
+    const done = st.on && (st.over || i<st.cur), cur = st.on && !st.over && i===st.cur;
+    const lbl = it.tag==="deer" ? "🦌" : it.tag==="food" ? it.k : num;
+    const icon=L.divIcon({className:"",html:`<span class="pnum${done?" done":""}"${cur?' style="outline:3px solid var(--shu);outline-offset:2px"':""}>${lbl}</span>`,iconSize:[30,30],iconAnchor:[15,15],popupAnchor:[0,-14]});
+    L.marker(ll,{icon,title:pName(it),keyboard:true,zIndexOffset:cur?1000:0}).bindPopup(`<div class="pop"><b class="nm">${esc(pName(it))}</b><span class="sub"><span>${fmtH(it.t)}</span><span class="jp">${esc(it.j)}</span></span><p>${esc(it.note)}</p></div>`).addTo(mapLayer);
+    pts.push(ll);
+  });
+  L.polyline(pts,{className:"rline",weight:4,dashArray:"2 8",lineCap:"round"}).addTo(mapLayer);
+  return pts;
+}
 function renderMap(){
   const u=S.ui, city=u.mcity, date=rdate(), days=tripDays();
   const sel = u.route && RI[u.route] && (city==="both"||RI[u.route].c===city) ? RI[u.route] : null;
@@ -1060,7 +1162,7 @@ function routeCard(r,date,best,open){
   return h+`</div>`;
 }
 function mountMap(){
-  if(S.ui.tab!=="map") return;
+  if(S.ui.tab!=="map" && S.ui.tab!=="today") return;
   ensureLeaflet().then(L=>{
     const slot=document.getElementById("mapslot"); if(!slot) return;
     if(!mapEl){
@@ -1117,8 +1219,13 @@ function drawMap(){
   if(!MAP) return;
   const u=S.ui, city=u.mcity, date=rdate();
   const sel = u.route && RI[u.route] && (city==="both"||RI[u.route].c===city) ? RI[u.route] : null;
-  const key=JSON.stringify([city,sel&&sel.id,date,u.when,u.date]);
+  const key=JSON.stringify([u.tab,city,sel&&sel.id,date,u.when,u.date]);
   mapLayer.clearLayers();
+  if(u.tab==="today"){
+    const tp=drawToday();
+    if(key!==mapKey && tp.length) MAP.fitBounds(L.latLngBounds(tp),{padding:[30,30],maxZoom:16});
+    mapKey=key; return;
+  }
   const pts=[];
   if(sel){
     const ll=sel.stops.map(s=>GEO[s[0]]), cs=stopCrowds(sel,date);
@@ -1152,11 +1259,14 @@ function render(keepScroll){
   const y=window.scrollY;
   renderTrip();
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===S.ui.tab?"page":"false"));
-  main.innerHTML=`<section class="view">${S.ui.tab==="temples"?renderTemples():S.ui.tab==="map"?renderMap():S.ui.tab==="mood"?renderMood():renderStamps()}</section>`;
+  main.innerHTML=`<section class="view">${S.ui.tab==="temples"?renderTemples():S.ui.tab==="map"?renderMap():S.ui.tab==="today"?renderToday():S.ui.tab==="mood"?renderMood():renderStamps()}</section>`;
+  if(S.ui.tab==="today") mountMap();
   if(S.ui.tab==="map"){ mountMap(); const dc=document.querySelector('.dchip[aria-pressed="true"]'); if(dc) dc.parentElement.scrollLeft = dc.offsetLeft - dc.parentElement.offsetLeft - 8; }
   if(keepScroll) window.scrollTo(0,y);
 }
-function setTab(t){if(t!=="map") stopLocate(); S.ui.tab=t; save(); render(); window.scrollTo(0,0);}
+setInterval(()=>{ if(S.ui.tab==="today" && !document.hidden && !document.querySelector(".leaflet-popup")) render(true); },60000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && S.ui.tab==="today") render(true); });
+function setTab(t){if(t!=="map"&&t!=="today") stopLocate(); S.ui.tab=t; save(); render(); window.scrollTo(0,0);}
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]"); if(!el) return;
   const act=el.dataset.act, v=el.dataset.v, u=S.ui;
@@ -1178,6 +1288,7 @@ document.addEventListener("click",e=>{
     case "rdate": u.rdate=v; save(); render(true); break;
     case "assign": {const d=rdate(); if(S.days[d]===v) delete S.days[d]; else S.days[d]=v; save(); render(true); toast(S.days[d]?`${RI[v].n} planned for ${fmtDate(d)}`:"Removed from that day"); break;}
     case "wantall": {RI[v].stops.forEach(([id])=>{const r=rec(id); if(!r.v) r.w=true;}); save(); render(true); toast("Added to your want-to-go list"); break;}
+    case "follow": {e.preventDefault(); const d=jst().date; S.follow=S.follow||{}; if(S.follow[v]===d){delete S.follow[v]; toast("Stopped following");} else {S.follow[v]=d; toast("Following along today");} save(); render(true); const c=document.querySelector(".pstep.cur"); if(c) c.scrollIntoView({block:"center",behavior:"smooth"}); break;}
     case "city": u.city=v; save(); render(true); break;
     case "mood": {const i=u.moods.indexOf(v); if(i>=0) u.moods.splice(i,1); else {u.moods.push(v); if(u.moods.length>2) u.moods.shift();} save(); render(true); break;}
     case "avoid": u.avoid=!u.avoid; save(); render(true); break;
@@ -1213,6 +1324,7 @@ document.getElementById("restoreFile").addEventListener("change",async e=>{
   catch(_){toast("That file isn’t a Kibun backup.");}
   e.target.value="";
 });
+if(Object.values(S.follow||{}).includes(jst().date)) S.ui.tab="today"; // following a plan today: open straight to it
 render();
 setInterval(()=>{ if(S.ui.tab==="map" && S.ui.when==="now") { drawMap(); renderTrip(); return; } if(S.ui.when==="now" && S.ui.tab==="temples" && !document.activeElement?.matches("textarea,input")) render(true); else renderTrip(); },60000);
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
