@@ -425,19 +425,19 @@ const awake = (() => {
 /* ================= ALLERGY CARD ================= */
 function cardModel() {
   return {
-    head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have a food allergy." },
+    head: { ja: "すみません。", en: "Excuse me." },
     items: [
-      { ja: "乳製品はNG", sub: "牛乳・バター・チーズ・生クリーム（少量も不可）", en: "No dairy — milk, butter, cheese, cream (not even a little)" },
-      { soft: 1, ja: "小麦・大豆は少量ならOK", sub: "醤油・十割そば・米麺は大丈夫です", en: "A little wheat or soy is OK — soy sauce, 100% buckwheat soba and rice noodles are fine" }
+      { ja: "乳製品と小麦（グルテン）が食べられません。", en: "I can't have dairy or wheat (gluten)." },
+      { soft: 1, ja: "醤油は少しなら大丈夫です。", en: "A little soy sauce is OK." }
     ],
     note: null,
-    ask: { ja: "乳製品なしで、小麦と大豆が少なめのおすすめはありますか？", en: "Do you have a recommendation with no dairy and little wheat or soy?" },
+    ask: { ja: "おすすめは何ですか？", en: "What would you recommend?" },
     thanks: { ja: "よろしくお願いします。", en: "Thank you very much." }
   };
 }
 const enSpan = t => `<span class="en">${esc(t)}</span>`;
 function cardInner(m) {
-  return `<div class="nos" style="display:grid;gap:10px">${m.items.map(i => `<div class="no${i.soft ? " soft" : ""}"><span class="x">${i.soft ? "△" : "✕"}</span><div><b>${esc(i.ja)}</b>${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}${enSpan(i.en)}</div></div>`).join("")}</div>` +
+  return `<div class="nos" style="display:grid;gap:10px">${m.items.map(i => `<div class="no${i.soft ? " soft" : ""}"><span class="x">${i.soft ? "○" : "✕"}</span><div><b>${esc(i.ja)}</b>${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}${enSpan(i.en)}</div></div>`).join("")}</div>` +
     (m.note ? `<div class="fnote">${esc(m.note.ja)}${enSpan(m.note.en)}</div>` : "") +
     `<div class="fask">${esc(m.ask.ja)}${enSpan(m.ask.en)}</div>` +
     `<div class="fthanks">${esc(m.thanks.ja)}${enSpan(m.thanks.en)}</div>`;
@@ -486,7 +486,7 @@ function openRequest(i) {
     <div class="fhead">すみません。${enSpan("Excuse me.")}</div>
     <div class="rq-lead">${esc(REQ_LEAD.ja)}${enSpan(REQ_LEAD.en)}</div>
     <div class="fask">${esc(r.ask)}${enSpan(r.askEn)}</div>
-    <div class="rq-algs"><span class="rq-alg">✕ 乳製品</span><span class="rq-alg">△ 小麦・大豆は少量OK</span></div>
+    <div class="rq-algs"><span class="rq-alg">✕ 乳製品・小麦</span><span class="rq-alg">○ 醤油は少しOK</span></div>
     <div class="rq-close">${esc(REQ_CLOSE.ja).replace("\n", "<br>")}${enSpan(REQ_CLOSE.en)}</div>`;
   showFull(html, r.ja.replace(/\n/g, "。"));
 }

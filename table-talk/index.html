@@ -182,20 +182,20 @@ function awakeOff() { try { lock && lock.release(); } catch {} lock = null; }
 
 /* ---------- the card (same wording as Sydney Eats Japan) ---------- */
 const CARD = {
-  head: { ja: "すみません、食物アレルギーがあります。", en: "Excuse me — I have a food allergy." },
+  head: { ja: "すみません。", en: "Excuse me." },
   items: [
-    { ja: "乳製品はNG", sub: "牛乳・バター・チーズ・生クリーム（少量も不可）", en: "No dairy — milk, butter, cheese, cream (not even a little)" },
-    { soft: 1, ja: "小麦・大豆は少量ならOK", sub: "醤油・十割そば・米麺は大丈夫です", en: "A little wheat or soy is OK — soy sauce, 100% buckwheat soba and rice noodles are fine" }
+    { ja: "彼女は乳製品と小麦（グルテン）が食べられません。", en: "She can't have dairy or wheat (gluten)." },
+    { soft: 1, ja: "醤油は少しなら大丈夫です。", en: "A little soy sauce is OK." }
   ],
-  ask: { ja: "乳製品なしで、小麦と大豆が少なめのおすすめはありますか？", en: "Do you have a recommendation with no dairy and little wheat or soy?" },
+  ask: { ja: "おすすめは何ですか？", en: "What would you recommend?" },
   thanks: { ja: "よろしくお願いします。", en: "Thank you very much." }
 };
 const en = t => `<span class="en">${esc(t)}</span>`;
 function cardInner() {
-  return CARD.items.map(i => `<div class="no${i.soft ? " soft" : ""}"><span class="x">${i.soft ? "△" : "✕"}</span><div><b>${esc(i.ja)}</b><span class="sub">${esc(i.sub)}</span>${en(i.en)}</div></div>`).join("") +
+  return CARD.items.map(i => `<div class="no${i.soft ? " soft" : ""}"><span class="x">${i.soft ? "○" : "✕"}</span><div><b>${esc(i.ja)}</b>${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}${en(i.en)}</div></div>`).join("") +
     `<div class="fask">${esc(CARD.ask.ja)}${en(CARD.ask.en)}</div><div class="fthanks">${esc(CARD.thanks.ja)}${en(CARD.thanks.en)}</div>`;
 }
-const cardSpeech = () => [CARD.head.ja, ...CARD.items.map(i => i.ja + "。" + i.sub), CARD.ask.ja, CARD.thanks.ja].join("。");
+const cardSpeech = () => [CARD.head.ja, ...CARD.items.map(i => i.ja), CARD.ask.ja, CARD.thanks.ja].join("。");
 $("#acard").innerHTML = `<div class="band">${esc(CARD.head.ja)}${en(CARD.head.en)}</div><div class="body">${cardInner()}</div>`;
 
 /* ---------- full screen ---------- */
@@ -223,17 +223,17 @@ const STEPS = [
   ]},
   { t: "Before ordering", when: "Once you're seated and someone comes over. Three short lines, then the card.", lines: [
     { ja: "日本語が下手ですみません。", ro: "Nihongo ga heta de sumimasen.", say: "nee-hohn-goh gah heh-tah deh soo-mee-mah-sen", en: "Sorry, my Japanese isn't good." },
-    { ja: "彼女は乳製品のアレルギーがあります。", ro: "Kanojo wa nyūseihin no arerugī ga arimasu.", say: "kah-noh-joh wah nyoo-say-heen noh ah-reh-roo-ghee gah ah-ree-mahs", en: "My girlfriend is allergic to dairy.", key: 1 },
+    { ja: "彼女は乳製品と小麦が食べられません。", ro: "Kanojo wa nyūseihin to komugi ga taberaremasen.", say: "kah-noh-joh wah nyoo-say-heen toh koh-moo-ghee gah tah-beh-rah-reh-mah-sen", en: "My girlfriend can't have dairy or wheat.", key: 1 },
     { ja: "これを見ていただけますか？", ro: "Kore o mite itadakemasu ka?", say: "koh-reh oh mee-teh ee-tah-dah-keh-mahs kah", en: "Could you look at this? (hand over the card)", key: 1, card: 1 }
   ]},
   { t: "Ask about a dish", when: "Point at the menu item as you say it.", lines: [
     { ja: "これは大丈夫ですか？", ro: "Kore wa daijōbu desu ka?", say: "koh-reh wah dye-joh-boo dess kah", en: "Is this one OK (for her)?", key: 1 },
     { ja: "バターなしでできますか？", ro: "Batā nashi de dekimasu ka?", say: "bah-tah nah-shee deh deh-kee-mahs kah", en: "Can you make it without butter?" },
-    { ja: "おすすめはありますか？", ro: "Osusume wa arimasu ka?", say: "oh-soo-soo-meh wah ah-ree-mahs kah", en: "What do you recommend?" }
+    { ja: "おすすめは何ですか？", ro: "Osusume wa nan desu ka?", say: "oh-soo-soo-meh wah nahn dess kah", en: "What would you recommend?", key: 1 }
   ]},
   { t: "Order", when: "Point, then say it. Add the second line for her dish.", lines: [
     { ja: "これをお願いします。", ro: "Kore o onegai shimasu.", say: "koh-reh oh oh-neh-gai shee-mahs", en: "This one, please.", key: 1 },
-    { ja: "これは乳製品なしでお願いします。", ro: "Kore wa nyūseihin nashi de onegai shimasu.", say: "koh-reh wah nyoo-say-heen nah-shee deh oh-neh-gai shee-mahs", en: "This one with no dairy, please.", key: 1 }
+    { ja: "これは乳製品と小麦なしでお願いします。", ro: "Kore wa nyūseihin to komugi nashi de onegai shimasu.", say: "koh-reh wah nyoo-say-heen toh koh-moo-ghee nah-shee deh oh-neh-gai shee-mahs", en: "This one with no dairy or wheat, please.", key: 1 }
   ]},
   { t: "If you didn't catch it", when: "Totally normal to use — staff are used to it.", lines: [
     { ja: "もう一度お願いします。", ro: "Mō ichido onegai shimasu.", say: "moh ee-chee-doh oh-neh-gai shee-mahs", en: "One more time, please." },
@@ -265,7 +265,7 @@ const REPLIES = [
     { k: "good", ja: "入っていません", ro: "haitte imasen", en: "It doesn't contain it", then: "Safe — order it." },
     { k: "good", ja: "できます", ro: "dekimasu", en: "We can do that", then: "They'll make it the way you asked. Order it." },
     { k: "good", ja: "抜けます", ro: "nukemasu", en: "We can leave it out", then: "Say “Onegai shimasu” (please)." },
-    { k: "bad", ja: "入っています", ro: "haitte imasu", en: "It contains it", then: "Pick another dish, or ask “Osusume wa arimasu ka?”" },
+    { k: "bad", ja: "入っています", ro: "haitte imasu", en: "It contains it", then: "Pick another dish, or ask “Osusume wa nan desu ka?”" },
     { k: "bad", ja: "できません", ro: "dekimasen", en: "We can't", then: "Say “Wakarimashita” (understood) and choose something else." },
     { k: "bad", ja: "ちょっと…", ro: "chotto…", en: "“It's a bit…” = a polite no", then: "Treat it as no. Choose something else." },
     { k: "bad", ja: "対応できません", ro: "taiō dekimasen", en: "We can't accommodate allergies", then: "Thank them and go elsewhere: “Wakarimashita, sumimasen.”" }
@@ -273,13 +273,14 @@ const REPLIES = [
   { g: "They need a moment", items: [
     { k: "wait", ja: "少々お待ちください", ro: "shōshō omachi kudasai", en: "One moment, please", then: "They're asking the kitchen. Just wait." },
     { k: "wait", ja: "確認します", ro: "kakunin shimasu", en: "I'll check", then: "Good sign — they're taking it seriously. Wait." },
-    { k: "wait", ja: "少しなら大丈夫ですか？", ro: "sukoshi nara daijōbu desu ka?", en: "Is a little OK?", then: "Depends what: dairy → “Nyūseihin wa dame desu.” Wheat or soy → “Sukoshi nara daijōbu desu.”" },
+    { k: "wait", ja: "少しなら大丈夫ですか？", ro: "sukoshi nara daijōbu desu ka?", en: "Is a little OK?", then: "Soy sauce → “Daijōbu desu.” Dairy or wheat → “Dame desu.” (no)." },
     { k: "wait", ja: "醤油は大丈夫ですか？", ro: "shōyu wa daijōbu desu ka?", en: "Is soy sauce OK?", then: "Yes! Say “Daijōbu desu.”" }
   ]}
 ];
 const ANSWERS = [
   { ja: "乳製品はだめです。", ro: "Nyūseihin wa dame desu.", say: "nyoo-say-heen wah dah-meh dess", en: "Dairy is a no." },
-  { ja: "小麦と大豆は少しなら大丈夫です。", ro: "Komugi to daizu wa sukoshi nara daijōbu desu.", say: "koh-moo-ghee toh dye-zoo wah skoh-shee nah-rah dye-joh-boo dess", en: "A little wheat and soy is fine." },
+  { ja: "小麦もだめです。", ro: "Komugi mo dame desu.", say: "koh-moo-ghee moh dah-meh dess", en: "Wheat is a no too." },
+  { ja: "醤油は少しなら大丈夫です。", ro: "Shōyu wa sukoshi nara daijōbu desu.", say: "show-yoo wah skoh-shee nah-rah dye-joh-boo dess", en: "A little soy sauce is fine." },
   { ja: "大丈夫です。", ro: "Daijōbu desu.", say: "dye-joh-boo dess", en: "That's fine." },
   { ja: "わかりました。", ro: "Wakarimashita.", say: "wah-kah-ree-mahsh-tah", en: "Understood." },
   { ja: "じゃあ、これにします。", ro: "Jā, kore ni shimasu.", say: "jah, koh-reh nee shee-mahs", en: "OK, I'll go with this one then." }
@@ -301,7 +302,7 @@ const DISHES = [
   { s: "g", e: "🍣", n: "Sushi / sashimi", ja: "寿司・刺身", ro: "sushi · sashimi", t: "Soy sauce is fine. Skip cream-cheese or mayo-cheese rolls." },
   { s: "g", e: "🍢", n: "Yakitori", ja: "焼き鳥", ro: "yakitori", t: "Salt or sauce both fine. Skip anything with チーズ (cheese)." },
   { s: "g", e: "🐟", n: "Grilled-fish set meal", ja: "焼き魚定食", ro: "yakizakana teishoku", t: "Fish, rice, miso soup, pickles — classic and safe." },
-  { s: "g", e: "🍜", n: "100% buckwheat soba", ja: "十割そば", ro: "jūwari soba", t: "Ask “Jūwari desu ka?” Regular soba is ~20–30% wheat — her call." },
+  { s: "g", e: "🍜", n: "100% buckwheat soba", ja: "十割そば", ro: "jūwari soba", t: "Ask “Jūwari desu ka?” Regular soba is 20–30% wheat — skip it." },
   { s: "g", e: "🍖", n: "Sukiyaki", ja: "すき焼き", ro: "sukiyaki", t: "Sweet soy-sauce broth, no dairy. The raw egg for dipping is fine." },
   { s: "g", e: "🥩", n: "Yakiniku", ja: "焼肉", ro: "yakiniku", t: "Grill-your-own. Skip butter-topped items." },
   { s: "g", e: "🍲", n: "Shabu-shabu with ponzu", ja: "しゃぶしゃぶ（ポン酢で）", ro: "shabu-shabu (ponzu de)", t: "Use ponzu, not the creamy sesame dip." },
@@ -322,7 +323,7 @@ $("#dishes").innerHTML = DISHES.map((d, i) => {
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-dish]"); if (!b) return;
   const d = DISHES[+b.dataset.dish], ja = d.ja + "をお願いします。";
-  showFull(`<div class="big">${esc(ja)}</div><div class="fhead" style="color:var(--fg);font-size:min(6vw,3.2vh)">乳製品なしでお願いします。</div><span class="en" style="font-size:1rem">${esc(d.n)}, please — no dairy, please.</span>`, ja + "乳製品なしでお願いします。", false);
+  showFull(`<div class="big">${esc(ja)}</div><div class="fhead" style="color:var(--fg);font-size:min(6vw,3.2vh)">乳製品と小麦なしでお願いします。</div><span class="en" style="font-size:1rem">${esc(d.n)}, please — no dairy or wheat.</span>`, ja + "乳製品と小麦なしでお願いします。", false);
 });
 
 /* ---------- line actions ---------- */
