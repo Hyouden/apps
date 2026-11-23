@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-15",
+ "updated": "2026-11-22",
  "cards": [
   {
    "id": "c001",
@@ -775,6 +775,168 @@
    "body": "Gamers save before the boss fight, so a loss costs minutes instead of hours. Life works the same way: a small cash cushion, a backup of your files, a plan B. When failure is survivable, taking the big swing gets much easier.",
    "chew": "What save point would make your next big risk feel safer?",
    "added": "2026-11-15"
+  },
+  {
+   "id": "c087",
+   "kind": "deep",
+   "rarity": 2,
+   "title": "The raft parable",
+   "body": "The Buddha compared his teaching to a raft: you build it to cross a river, then leave it on the far shore instead of hauling it around on your head. Ideas, habits and even beliefs are tools for getting somewhere, not things to cling to.",
+   "chew": "What raft are you still carrying long after you crossed the river?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c088",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Out of my sunlight",
+   "body": "The story goes that Alexander the Great found the philosopher Diogenes lounging in the sun and offered him anything he wanted. Diogenes just asked him to step aside, because he was blocking the light. The Cynics believed the fewer things you need, the freer you are.",
+   "chew": "What are you chasing that's mostly standing in your sunlight?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c089",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Being a bat",
+   "body": "Philosopher Thomas Nagel asked what it's like to be a bat, sensing the world through echoes. Science can explain how sonar works, but not how it feels from the inside. Your dog, sniffing one fence post for a full minute, lives in a world of smells you'll never get to experience.",
+   "chew": "What do you think your dog or cat experiences that you never will?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c090",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Lived forwards",
+   "body": "Soren Kierkegaard, often called the father of existentialism, wrote in his journal that life can only be understood backwards but has to be lived forwards. You see the shape of your choices once they're behind you, yet you still have to make the next one without that view.",
+   "chew": "What decision are you waiting to fully understand before you'll make it?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c091",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Tie yourself to the mast",
+   "body": "In the Odyssey, Odysseus wants to hear the Sirens sing without steering into the rocks, so he has his crew tie him to the mast. Smart people don't count on willpower in the moment; they set things up beforehand, like leaving the phone in another room or packing the gym bag tonight.",
+   "chew": "What temptation could you outsmart tonight before future you has to face it?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c092",
+   "kind": "steady",
+   "rarity": 1,
+   "title": "Survivorship bias",
+   "body": "In World War II, the US military studied bullet holes on planes that made it back. Statistician Abraham Wald pointed out that armor belonged where the returning planes had no holes, because planes hit there never came home. The stories you hear mostly come from the survivors.",
+   "chew": "Whose success are you copying without hearing from the people who tried it and failed?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c093",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Good enough on purpose",
+   "body": "Economist Herbert Simon coined 'satisficing': taking the first option that meets your standards instead of hunting for the absolute best. Studies have found that people who always try to maximize tend to feel worse about their choices, even when they choose well.",
+   "chew": "Where are you hunting for the best when good enough would let you get on with life?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c094",
+   "kind": "steady",
+   "rarity": 0,
+   "title": "Rubber duck debugging",
+   "body": "Some programmers keep a rubber duck on the desk and explain their broken code to it, line by line. Partway through, the bug often becomes obvious. Saying a problem out loud forces you to fill in the steps your brain was quietly skipping.",
+   "chew": "What problem would you crack faster if you explained it out loud to your pet?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c095",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Grams and burritos",
+   "body": "Mountain bikers will pay serious money to shave 200 grams off their bike, then ride up the climb with three liters of water, a full tool kit and a burrito in their pack.",
+   "chew": "What do you obsess over optimizing while ignoring the burrito in your backpack?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c096",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "The dog learned to spell",
+   "body": "You started spelling out W-A-L-K so the dog wouldn't lose its mind. Now the dog can spell. The next step is pig latin, and the dog is already studying.",
+   "chew": "What has your pet learned that you definitely didn't mean to teach it?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c097",
+   "kind": "funny",
+   "rarity": 1,
+   "title": "The goat side quest",
+   "body": "The village is burning and the quest-giver is begging for help. The party has spent the whole session trying to adopt a goat. The goat now has a name, a tragic backstory and a tiny suit of armor.",
+   "chew": "What side quest has quietly taken over your week?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c098",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "The birthday paradox",
+   "body": "Put just 23 people in a room and there's a better than even chance two of them share a birthday; with 70 people it's over 99%. It feels wrong because you're not comparing yourself to everyone. You're comparing every pair, and 23 people make 253 pairs.",
+   "chew": "What coincidence in your life might have been more likely than it felt?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c099",
+   "kind": "bender",
+   "rarity": 0,
+   "title": "The potato paradox",
+   "body": "You have 100 kilograms of potatoes that are 99% water, and you let them dry until they're 98% water. They now weigh 50 kilograms. The 1 kilogram of solid potato went from 1% of the total to 2%, so the total had to halve.",
+   "chew": "When did a tiny-sounding change turn out to be huge?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c100",
+   "kind": "bender",
+   "rarity": 1,
+   "title": "The bootstrap paradox",
+   "body": "You travel back in time and hand a struggling young musician a recording of their own future hit song. They learn it, it becomes famous, and years later you buy the very copy you'll carry back. So who actually wrote the song?",
+   "chew": "Where did your favorite idea really come from?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c101",
+   "kind": "bender",
+   "rarity": 2,
+   "title": "The coastline paradox",
+   "body": "Measure the coast of Britain with a 100-kilometer ruler, then a 1-kilometer ruler, and the second answer comes out much longer because it traces every bay and headland. Keep shrinking the ruler and the coast keeps growing. Benoit Mandelbrot made the puzzle famous in 1967.",
+   "chew": "What in your life looks simple from far away and endless up close?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c102",
+   "kind": "fuel",
+   "rarity": 1,
+   "title": "The four-minute mile",
+   "body": "No runner had ever officially broken four minutes in the mile until Roger Bannister did it in May 1954. Just 46 days later, John Landy ran it even faster. Sometimes seeing it done once changes what everyone believes is possible.",
+   "chew": "What would you go for if you'd just watched a friend pull it off?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c103",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "New Game Plus",
+   "body": "Beat a game and many unlock New Game Plus: you start back at the beginning, but you keep your skills and gear. A new job, a move or a new hobby can feel like starting over. You're not level 1, though; you're bringing everything you've learned.",
+   "chew": "What skill from an old chapter of your life could carry into the next one?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "c104",
+   "kind": "fuel",
+   "rarity": 0,
+   "title": "Ride with faster friends",
+   "body": "Riders and skaters often improve fastest by tagging along with people a little better than them. You see lines you'd never pick, borrow some of their confidence and push your pace without trying. The same goes for work, games and anything else you want to get good at.",
+   "chew": "Who's a little ahead of you that you could spend more time around?",
+   "added": "2026-11-22"
   }
  ]
 }
