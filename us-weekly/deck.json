@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-15",
+ "updated": "2026-11-22",
  "cards": [
   {
    "id": "q001",
@@ -913,6 +913,134 @@
    "title": "Closing toast",
    "q": "Raise a mug or a glass and give a ten-second toast to us and the week ahead.",
    "added": "2026-11-15"
+  },
+  {
+   "id": "q115",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Invisible load",
+   "q": "What's something you kept track of this week that I might not have noticed you were carrying?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q116",
+   "kind": "checkin",
+   "rarity": 0,
+   "title": "Pressure valve",
+   "q": "When stress hit this week, what helped you let off steam, and what made it worse?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q117",
+   "kind": "reflect",
+   "rarity": 0,
+   "title": "Surprise moment",
+   "q": "When did I surprise you this week, in a good way or a confusing way?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q118",
+   "kind": "reflect",
+   "rarity": 1,
+   "title": "Turning point",
+   "q": "Looking back, when was the moment you knew we were something real? What do you remember about it?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q119",
+   "kind": "deep",
+   "rarity": 0,
+   "title": "Changed mind",
+   "q": "What's something you've changed your mind about since we've been together, and did I have anything to do with it?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q120",
+   "kind": "deep",
+   "rarity": 1,
+   "title": "Quiet love",
+   "q": "How do you show me love in ways you worry I might not notice?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q121",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Pet road trip",
+   "q": "Would you rather take a cross-country road trip with the dogs, or a fancy hotel weekend with the cats? Who complains most, us or them?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q122",
+   "kind": "fun",
+   "rarity": 0,
+   "title": "Mystery trip",
+   "q": "Plan a surprise weekend trip for me. Give me three clues, and I get three guesses.",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q123",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Award night",
+   "q": "Give me a ridiculous award for something I did this week. I have to give the acceptance speech.",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q124",
+   "kind": "funny",
+   "rarity": 0,
+   "title": "Honest profile",
+   "q": "Write a brutally honest dating profile for me in three lines. Then write the one that would make you swipe right.",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q125",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Kitchen dance",
+   "q": "We're slow dancing in the kitchen right now. What song is playing, and where are your hands?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q126",
+   "kind": "spicy",
+   "rarity": 0,
+   "title": "Slow burn",
+   "q": "What's one small thing I could do on an ordinary morning that would have you thinking about me all day?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q127",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Gentle edit",
+   "q": "Is there anything we usually do in bed that you'd like to change or skip? I'd rather know than guess.",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q128",
+   "kind": "intimate",
+   "rarity": 0,
+   "title": "Who starts",
+   "q": "How do you like it when I initiate, and is there a way you'd feel comfortable initiating more often?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q129",
+   "kind": "love",
+   "rarity": 1,
+   "title": "Better because",
+   "q": "What's one thing in your life that's better because I'm in it?",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "q130",
+   "kind": "love",
+   "rarity": 0,
+   "title": "Keep forever",
+   "q": "What's an ordinary moment from our life, dogs, cats and all, that you'd want to keep forever?",
+   "added": "2026-11-22"
   }
  ]
 }
