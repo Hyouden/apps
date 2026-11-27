@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-11-20",
+ "updated": "2026-11-27",
  "region": "US",
  "shows": [
   {
@@ -247,7 +247,7 @@
    "id": "rectify",
    "title": "Rectify",
    "cat": "drama",
-   "imdb": 8.4,
+   "imdb": 8.3,
    "rt": 96,
    "len": "4 seasons, 30 episodes",
    "short": false,
@@ -283,7 +283,7 @@
    "id": "the-keepers",
    "title": "The Keepers",
    "cat": "doc",
-   "imdb": 8.0,
+   "imdb": 8.1,
    "rt": 97,
    "len": "7 episodes",
    "short": true,
